@@ -1,0 +1,124 @@
+#!/bin/sh
+# ctx-check - contextify's freshness check. Fast path only; anything but a clean hit
+# execs ctx_check.py. POSIX sh, no bashisms, no arrays, no [[ ]]. See SCRIPTS-SPEC.md.
+# Exit: 0 empty stdout = fresh; 0 with stdout = drift; 3 = no stamp; 1 = the check broke.
+set -f
+
+# DISCOVERY_GLOBS_BEGIN
+DISCOVERY_GLOBS='package.json */package.json packages/*/package.json apps/*/package.json
+package-lock.json pnpm-lock.yaml yarn.lock bun.lockb bun.lock
+pnpm-workspace.yaml lerna.json nx.json turbo.json
+tsconfig.json tsconfig.*.json
+Makefile makefile GNUmakefile justfile Justfile .justfile
+pyproject.toml setup.py setup.cfg requirements.txt Pipfile poetry.lock
+uv.lock tox.ini noxfile.py
+Cargo.toml Cargo.lock go.mod go.work Gemfile pom.xml build.gradle
+build.gradle.kts settings.gradle settings.gradle.kts
+Dockerfile */Dockerfile docker-compose.yml docker-compose.yaml compose.yml
+compose.yaml
+.github/workflows/*.yml .github/workflows/*.yaml .gitlab-ci.yml
+.env.example .env.sample .env.template
+vercel.json netlify.toml fly.toml render.yaml Procfile serverless.yml
+amplify.yml apprunner.yaml cdk.json
+AGENTS.md CLAUDE.md GEMINI.md .github/copilot-instructions.md
+.cursor/rules/contextify.mdc'
+# DISCOVERY_GLOBS_END
+
+# ${0%/*} rather than dirname: every process this script does not fork is about 8ms
+# off the session-start budget, and the fast path is meant to be invisible.
+SELF_DIR=${0%/*}
+[ "$SELF_DIR" = "$0" ] && SELF_DIR=.
+
+usage() {
+  cat <<'USAGE'
+Usage: ctx-check [--hook claude|codex|gemini|cursor] [--ci] [--strict] [--json]
+                 [--quiet-if-fresh] [PATH]
+
+Prints nothing when the context files are fresh. Prints a bounded drift notice when the
+evidence they were written from has moved or a quoted command no longer resolves.
+Exit 0 (empty stdout) fresh, 0 (stdout) drift, 3 no stamp, 1 the check itself broke.
+USAGE
+}
+
+HOOK=''
+CI=0
+WANT=''
+ARGPATH=''
+for a in "$@"; do
+  if [ "$WANT" = hook ]; then HOOK="$a"; WANT=''; continue; fi
+  case "$a" in
+    --hook) WANT=hook ;;
+    --hook=*) HOOK=${a#--hook=} ;;
+    --ci) CI=1 ;;
+    --help|-h) usage; exit 0 ;;
+    --*) : ;;
+    *) [ -z "$ARGPATH" ] && ARGPATH="$a" ;;
+  esac
+done
+
+TARGET=''
+[ -n "$ARGPATH" ] && TARGET="$ARGPATH"
+if [ -z "$TARGET" ] && [ -n "$HOOK" ] && [ ! -t 0 ]; then
+  IN=$(dd bs=8192 count=1 2>/dev/null)
+  TARGET=$(printf '%s' "$IN" | tr -d '\n' \
+    | sed -n 's/.*"cwd"[ 	]*:[ 	]*"\([^"]*\)".*/\1/p')
+fi
+[ -z "$TARGET" ] && TARGET="${CLAUDE_PROJECT_DIR:-}"
+[ -z "$TARGET" ] && TARGET="$PWD"
+cd "$TARGET" 2>/dev/null || exit 0
+
+# The hook hands us the project directory, which is the worktree root in nearly every
+# session, so a stamp sitting next to a .git entry answers the question without forking
+# git rev-parse. Anything else takes the slower, always-correct route.
+if [ -e .git ] && [ -f .contextify/stamp.json ]; then
+  ROOT=$PWD
+else
+  ROOT=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+  [ -n "$ROOT" ] || exit 0
+  cd "$ROOT" 2>/dev/null || exit 0
+fi
+
+if [ -f .contextify/journal.json ]; then
+  echo "contextify: an interrupted write left .contextify/journal.json; run /contextify update to recover" >&2
+  exit 1
+fi
+
+fallback() {
+  command -v python3 >/dev/null 2>&1 || {
+    echo "contextify: check failed: python3 not found" >&2
+    exit 1
+  }
+  exec python3 "$SELF_DIR/ctx_check.py" --root "$ROOT" "$@"
+}
+
+STAMP=.contextify/stamp.json
+[ -f "$STAMP" ] || fallback "$@"
+[ "$CI" = 1 ] && fallback "$@"
+
+FASTKEY=$(sed -n '/"fastKey"/{s/.*"fastKey"[ ]*:[ ]*"sha256:\([0-9a-f]\{64\}\)".*/\1/p
+q
+}' "$STAMP")
+[ -n "$FASTKEY" ] || fallback "$@"
+
+SHA=''
+command -v shasum >/dev/null 2>&1 && SHA='shasum -a 256'
+[ -z "$SHA" ] && command -v sha256sum >/dev/null 2>&1 && SHA='sha256sum'
+[ -n "$SHA" ] || fallback "$@"
+
+SUM=$(git ls-files -s -z -- $DISCOVERY_GLOBS 2>/dev/null | $SHA)
+SUM=${SUM%% *}
+[ "$SUM" = "$FASTKEY" ] || fallback "$@"
+
+# AGENTS.md, CLAUDE.md, GEMINI.md and the two pointer files are themselves in
+# DISCOVERY_GLOBS, so this one call covers the evidence paths and the context files.
+git diff --quiet -- $DISCOVERY_GLOBS 2>/dev/null || fallback "$@"
+
+CF=$(sed -n '/^  "contextFiles": {/,/^  },*$/{
+s/^    "\([^"]*\)": {$/\1/p
+}' "$STAMP")
+[ -n "$CF" ] || fallback "$@"
+for f in $CF; do
+  [ -e "$f" ] || fallback "$@"
+done
+
+exit 0
