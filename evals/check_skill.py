@@ -3,21 +3,26 @@
 contextify skill eval: machine-checkable static assertions on skills/contextify/SKILL.md.
 
 This is the deterministic half of the eval suite. It encodes the house contract and the
-contextify design lock as pass/fail checks, so a regression is caught in CI rather than in
-someone's security report. It was written BEFORE the skill existed and run once against the
-missing file (RED: not found, exit 1); see evals/RED-baseline.md. The behavioral half, a cold
-model asked to audit an app's security with no skill installed, is recorded in the same file.
+contextify design lock (docs/design/DECISIONS.md, docs/design/SCRIPTS-SPEC.md) as pass/fail
+checks, so a regression is caught in CI rather than in someone's repository. It was written
+BEFORE the skill existed and run once against the missing file (RED: not found, exit 1); see
+evals/RED-baseline.md. The behavioral half, a cold model asked to write an AGENTS.md with no
+skill installed, is recorded in the same file.
 
 What it enforces:
   - frontmatter keys present and well-formed (name, description, license, metadata.version,
     argument-hint), with the version quoted and never at the top level;
-  - the description is WHEN-only, carries the story sentence verbatim, and sits in the house
-    length range;
+  - the description is WHEN-only, carries the story sentence verbatim, names the trigger
+    words, promises evidence, promises a zero-token check that never rewrites, and contrasts
+    with Claude Code's own /init;
   - the required section headings are all present and in the right order;
   - no emoji in any heading, and no em dash anywhere in the file;
   - the body stays under 600 lines, so the depth lives in references/;
-  - every references/*.md path the body mentions exists on disk;
-  - the control sections give orders, not advice ("you should" and friends are banned there).
+  - every references/*.md path the body mentions exists on disk, and all ten are named;
+  - the control sections give orders, not advice ("you should" and friends are banned there);
+  - the design numbers that a careless edit would duplicate or drift: the line target, the
+    ceiling, the CLAUDE.md cap, the check's exit contract, the free-form clause, the pointer
+    template, and the names of the five scripts the skill drives.
 
 Usage:
     python3 evals/check_skill.py [path-to-SKILL.md]   # default: skills/contextify/SKILL.md
@@ -30,10 +35,11 @@ import sys
 NAME = "contextify"
 DEFAULT_PATH = os.path.join("skills", NAME, "SKILL.md")
 
-# Locked byte-identical across the whole repo (README, plugin.json, both mirrors,
+# Locked byte-identical across the whole repo (README, plugin.json, both editor mirrors,
 # marketplace.json, SKILL.md). Compared against the RAW text: the point of locking it is that
-# the wording does not drift.
-STORY = "Find what a stranger can take from your app. Then close it and prove it closed."
+# the wording does not drift. tests/test_manifests.py parses the assignment below with
+# `^STORY = (.*?)\n\n`, so it stays one line followed by one blank line.
+STORY = "Tell every coding agent how your repo works. Then prove it is still true."
 
 # The house section skeleton, in order. Each entry is (what the section DOES, the heading
 # prefixes that count as it). Matched on the lowercased heading with backticks stripped, so a
@@ -46,9 +52,9 @@ REQUIRED_SECTIONS = [
     ("how it is invoked", ["## invocation"]),
     ("when to use it and when not", ["## when to use"]),
     ("the procedure", ["## the run", "## procedure"]),
-    ("the hard rules", ["## what this refuses to do", "## hard rules"]),
-    ("the output artifact and handoff", ["## the output", "## handoff format", "## the report"]),
-    ("the depth pointer", ["## reference files", "## reuse"]),
+    ("the hard rules", ["## hard rules", "## what this refuses to do"]),
+    ("the output artifact and handoff", ["## the output", "## handoff format"]),
+    ("the depth pointer", ["## reference files"]),
     ("the failure modes", ["## common mistakes"]),
 ]
 
@@ -73,32 +79,61 @@ ADVICE_PHRASES = [
 # Quoted specimens: a line that quotes the banned wording in order to ban it. Pinned so the
 # hatch cannot widen silently.
 EXPECTED_SPECIMENS = 1
+QUOTED_RE_TMPL = r'["“‘][^"”’]*{}[^"”’]*["”’]'
 
-# --- domain invariants -----------------------------------------------------------------
-# Two claims in this skill are the kind that read as fine and are wrong, so they are pinned
-# here rather than trusted to review. Both were caught by an adversarial review on 2026-09-06.
+# Specimens for the self-tests at the end: the advice gate has to fire on the wrong form and
+# stay quiet on an order, because a gate nobody has watched fail is not a gate.
+ADVICE_UNQUOTED_SPECIMEN = "You should run the tests before pushing."
+ADVICE_QUOTED_SPECIMEN = ('A line that reads "you should run the tests before pushing" is what '
+                          "the agent already assumed.")
+ORDER_SPECIMEN = "Run the tests before pushing. Never invent a filter flag."
 
-# 1. The gate's third label. "NO CONFIRMED EXPOSURE" was retired because a reader hears it as
-#    "no exposure". The replacement says only what happened, and it is never printed alone:
-#    a thoroughly checked app and a run that could barely check anything reach the same label,
-#    so the coverage counts have to ride on the same line.
-GATE_LABEL = "NOTHING CONFIRMED HERE"
-RETIRED_GATE_LABEL = "NO CONFIRMED EXPOSURE"
-GATE_WITH_COVERAGE_RE = re.compile(r"GATE:\s+" + GATE_LABEL + r"\s+coverage\s+\d+\s+checked")
+# --- domain invariants ------------------------------------------------------------------
+# The contextify design lock. Each of these reads as fine when it is wrong, so it is pinned
+# here rather than trusted to review.
 
-# 2. The RLS direction. Row-level security switched ON with no matching policy DENIES. The
-#    inverted claim, that a table with no policy is therefore readable, sends a user to "fix"
-#    their safest table. RLS_WRONG_RE catches the inverted form; the self-tests below prove it
-#    fires on the wrong sentence and stays quiet on the correct one, because a gate nobody has
-#    watched fail is not a gate.
-RLS_WRONG_RE = re.compile(
-    r"no (?:matching )?polic(?:y|ies)[^.]{0,70}?\b(?:so|means|implies|therefore)\b"
-    r"[^.]{0,70}?(?:public|exposed|readable|anyone can read)", re.I)
-RLS_WRONG_SPECIMEN = ("There is no policy on this table, so the data is public.")
-RLS_RIGHT_SPECIMEN = ('RLS switched ON with no matching policy denies. So "there is no policy on '
-                      'this table" is not evidence of exposure on its own.')
+# 1. The budget numbers (DECISIONS.md D2). Each appears in the body exactly once, in one place,
+#    and every later mention refers back. Two copies of a number is how one of them goes stale.
+BUDGET_PATTERNS = [
+    ("the line target (60)", r"target (?:of )?60"),
+    ("the hard ceiling (150)", r"ceiling (?:of )?150"),
+    ("the CLAUDE.md cap (30)", r"under 30"),
+]
 
-EM_DASH = "—"
+# 2. The ctx-check exit contract (D9). Exit 2 is reserved for ctx_write.py, which is not a hook.
+#    A check that exits 2 from a SessionStart hook is a check the user switches off.
+EXIT_CONTRACT = "never exit 2"
+
+# 3. The agents.md convention has no schema (seed skill's Iron rule). A skill that quietly
+#    prescribes one produces empty headings, which read as facts.
+FREE_FORM_CLAUSE = "AGENTS.md is free-form Markdown"
+
+# 4. The hook's whole promise (D11 plus hooks/hooks.json): a fresh repo costs zero tokens.
+FRESH_IS_SILENT = "prints nothing"
+
+# 5. The pointer template. CLAUDE.md line 1 is owned by contextify; if the import goes, Claude
+#    Code reads none of this.
+POINTER_IMPORT = "@AGENTS.md"
+
+# 6. The ten reference files (the depth lives there, and the body is the only index of them).
+REFERENCE_FILES = [
+    "agents-and-files.md",
+    "section-template.md",
+    "detection-signals.md",
+    "budget-and-style.md",
+    "update-in-place.md",
+    "verification.md",
+    "hooks-and-ci.md",
+    "monorepo.md",
+    "comparison.md",
+    "init-prompts.md",
+]
+
+# 7. The deterministic layer (SCRIPTS-SPEC.md). The skill drives these by name; a rename that
+#    reaches only the scripts directory leaves the body telling the model to run nothing.
+SCRIPTS = ["detect_repo.sh", "ctx-check", "ctx_write.py", "ctx_stamp.py", "verify_claims.py"]
+
+EM_DASH = "\u2014"  # written as an escape so this file itself carries no em dash
 
 # Emoji blocks. Arrows (U+2190-U+21FF), the middle dot and the maths operators the house style
 # uses on purpose are deliberately NOT in here.
@@ -114,6 +149,15 @@ EMOJI_RANGES = [
 
 def has_emoji(s):
     return any(any(lo <= ord(ch) <= hi for lo, hi in EMOJI_RANGES) for ch in s)
+
+
+def advice_hit(line, phrase):
+    """(is an unquoted hit, is a quoted specimen) for one line and one banned phrase."""
+    if phrase not in line.lower():
+        return (False, False)
+    if re.search(QUOTED_RE_TMPL.format(re.escape(phrase)), line, re.I):
+        return (False, True)
+    return (True, False)
 
 
 def parse_frontmatter(block):
@@ -189,6 +233,22 @@ def section_slices(body):
     return slices
 
 
+def fenced_blocks(body, lang):
+    """Bodies of every ```<lang> fenced block."""
+    out, buf, inside = [], [], False
+    for line in body.split("\n"):
+        if not inside and re.match(r"^\s{0,3}```" + lang + r"\s*$", line):
+            inside, buf = True, []
+            continue
+        if inside and re.match(r"^\s{0,3}```\s*$", line):
+            out.append("\n".join(buf))
+            inside = False
+            continue
+        if inside:
+            buf.append(line)
+    return out
+
+
 def main():
     path = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_PATH
     if not os.path.exists(path):
@@ -208,7 +268,10 @@ def main():
     block = m.group(1)
     body = text[m.end():]
     fm = parse_frontmatter(block)
-    low = re.sub(r"\s+", " ", body).replace("`", "").replace("*", "").lower()
+    # `flat` keeps the casing and folds the line wrapping away, so a pinned phrase is found
+    # whether or not the author's editor broke it across two lines.
+    flat = re.sub(r"\s+", " ", body)
+    low = flat.replace("`", "").replace("*", "").lower()
     checks = []
 
     # --- frontmatter ---
@@ -225,6 +288,9 @@ def main():
                    len(desc) <= 1024, f"{len(desc)} chars, {max(0, len(desc) - 1024)} over"))
     checks.append(("frontmatter: description is >= 400 chars (the house floor)",
                    len(desc) >= 400, f"{len(desc)} chars"))
+    checks.append(("frontmatter: description is a folded block scalar (>-)",
+                   bool(re.search(r"^description:\s*>-\s*$", block, re.MULTILINE)),
+                   "a one-line description this long wraps badly in every reader"))
     checks.append(("frontmatter: metadata.version is present AND quoted",
                    bool(re.search(r"^\s+version:\s*[\"']\d+\.\d+\.\d+[\"']\s*$", block,
                                   re.MULTILINE)),
@@ -236,15 +302,32 @@ def main():
                    bool(re.search(r"^license:\s*[\"']?MIT[\"']?\s*$", block, re.MULTILINE)), ""))
     checks.append(("frontmatter: argument-hint is declared",
                    bool(re.search(r"^argument-hint:\s*\S", block, re.MULTILINE)), ""))
+    checks.append(("frontmatter: argument-hint names the four modes",
+                   all(mode in fm.get("argument-hint", "")
+                       for mode in ("init", "update", "check", "accept")),
+                   f"got {fm.get('argument-hint', '')!r}"))
 
     # --- description contract (WHEN-only) ---
     checks.append(("description: carries the story sentence verbatim", STORY in desc,
                    "the first sentences must be byte-identical to plugin.json and the README"))
+    checks.append(("description: opens on the story sentence", desc.startswith(STORY),
+                   f"starts {desc[:60]!r}"))
     checks.append((f"description: names the trigger word {NAME!r}", NAME in desc.lower(), ""))
-    checks.append(("description: says every finding carries a proof",
-                   "prove" in desc.lower() or "proof" in desc.lower(), ""))
-    checks.append(("description: says a fix waits for approval",
-                   "approv" in desc.lower(), "the human approves each fix before it is applied"))
+    trigger_phrases = ["contextify this repo", "write an agents.md", "generate claude.md",
+                       "agent context", "context file is stale"]
+    missing_triggers = [t for t in trigger_phrases if t not in desc.lower()]
+    checks.append(("description: names every documented trigger phrase", not missing_triggers,
+                   "missing: " + ", ".join(repr(t) for t in missing_triggers)))
+    checks.append(("description: says an unsupported line is labelled unverified",
+                   "unverified" in desc.lower(),
+                   "evidence-backed, or omitted, or labelled unverified: say so where the "
+                   "model reading the description will see it"))
+    checks.append(("description: says the drift check spends zero tokens",
+                   "zero token" in desc.lower(), ""))
+    checks.append(("description: says the check never rewrites a file on its own",
+                   "never rewrites" in desc.lower(), ""))
+    checks.append(("description: contrasts with Claude Code's own /init", "/init" in desc,
+                   "the nearest built-in is the thing a reader has to be able to tell it from"))
     checks.append(("description: is WHEN-only (no numbered procedure steps)",
                    not re.search(r"\b[1-9]\.\s", desc),
                    "a numbered summary in the description becomes a shortcut models follow "
@@ -282,6 +365,7 @@ def main():
     bad_headings = [f"line {n}: {h}" for n, h in hs if has_emoji(h)]
     checks.append(("structure: no emoji in any heading", not bad_headings,
                    "; ".join(bad_headings[:4])))
+    checks.append(("structure: no emoji anywhere in the body", not has_emoji(body), ""))
 
     em_lines = [str(n) for n, line in enumerate(text.split("\n"), 1) if EM_DASH in line]
     checks.append((f"style: no em dash anywhere in {os.path.basename(path)}", not em_lines,
@@ -293,65 +377,76 @@ def main():
                    line_count < 600, f"{line_count} lines"))
     checks.append((f"structure: the body documents /{NAME}", f"/{NAME}" in body, ""))
     checks.append(("structure: the body documents $ARGUMENTS", "$ARGUMENTS" in body, ""))
-    checks.append((f"structure: the body names the .{NAME}/ output directory",
+    checks.append(("structure: the body documents all four modes as $ARGUMENTS values",
+                   "[init|update|check|accept]" in body,
+                   "the argument grammar has to appear in the body, not only in the hint"))
+    checks.append((f"structure: the body names the .{NAME}/ state directory",
                    f".{NAME}/" in body, ""))
-    checks.append(("structure: a ```markdown template block is fenced in the body",
-                   bool(re.search(r"^```markdown\s*$", body, re.MULTILINE)),
-                   "the report template must be one fenced ```markdown block"))
+    checks.append(("structure: the body quotes the story sentence too", STORY in body,
+                   "the overview opens on the same sentence the description carries"))
 
-    # --- references: every path the body names has to exist ---
+    # --- the pointer template: one fenced ```markdown block, and the import line in it ---
+    md_blocks = fenced_blocks(body, "markdown")
+    checks.append(("structure: a ```markdown template block is fenced in the body",
+                   bool(md_blocks),
+                   "the CLAUDE.md pointer must be shown as one fenced ```markdown block"))
+    checks.append((f"pointer: the ```markdown block carries the literal line {POINTER_IMPORT!r}",
+                   any(POINTER_IMPORT in b.split("\n") for b in md_blocks),
+                   "CLAUDE.md line 1 is the import; without it Claude Code reads none of this"))
+
+    # --- references: every path the body names has to exist, and all ten are named ---
     ref_dir = os.path.join(os.path.dirname(os.path.abspath(path)), "references")
     refs = sorted(set(re.findall(r"(?:skills/" + NAME + r"/)?references/([A-Za-z0-9._\-]+\.md)",
                                  body)))
     checks.append(("references: the body names at least one references/*.md file", bool(refs),
                    "a body under 600 lines needs the depth to live somewhere"))
+    for ref in REFERENCE_FILES:
+        checks.append((f"references: the body names references/{ref}", ref in refs,
+                       "the body is the only index of the references directory"))
     for ref in refs:
         target = os.path.join(ref_dir, ref)
         checks.append((f"references: references/{ref} exists on disk", os.path.isfile(target),
                        f"{target} is missing"))
 
-    # --- domain invariants: the gate label and the RLS direction ---
-    ref_texts = {}
-    if os.path.isdir(ref_dir):
-        for fn in sorted(os.listdir(ref_dir)):
-            if fn.endswith(".md"):
-                ref_texts[f"references/{fn}"] = open(os.path.join(ref_dir, fn),
-                                                     encoding="utf-8").read()
-    corpus = {os.path.basename(path): text, **ref_texts}
-
-    checks.append((f"gate: the third label is {GATE_LABEL!r}", GATE_LABEL in text, ""))
-    retired = [f for f, t in corpus.items() if RETIRED_GATE_LABEL in t]
-    checks.append((f"gate: the retired label {RETIRED_GATE_LABEL!r} appears nowhere",
-                   not retired, "still in " + ", ".join(retired)))
-    checks.append(("gate: the rule that it is never printed without coverage is stated",
-                   "on the same line" in low and "coverage" in low,
-                   "the gate alone is misleading and the skill has to say so"))
-    checks.append(("gate: a worked example prints the label with its coverage counts inline",
-                   bool(GATE_WITH_COVERAGE_RE.search(text)),
-                   f"no line matching `GATE: {GATE_LABEL}   coverage N checked ...`"))
-
-    rls_deny = [f for f, t in corpus.items()
-                if re.search(r"no matching policy\s+denies", t, re.I)]
-    checks.append(("RLS: the deny direction is stated in the skill body",
-                   bool(re.search(r"no matching policy\s+denies", text, re.I)),
-                   "RLS switched ON with no matching policy DENIES; getting this backwards "
-                   "sends a user to fix their safest table"))
-    checks.append(("RLS: the deny direction is stated in a reference file too",
-                   any(f.startswith("references/") for f in rls_deny),
-                   "expected it in references/controls.md as well as the body"))
-    checks.append(("RLS: absence of a policy is stated not to be evidence of exposure",
-                   any(re.search(r"not (?:by itself )?evidence of exposure", t, re.I)
-                       for t in corpus.values()), ""))
-    inverted = [f for f, t in corpus.items()
-                if any(RLS_WRONG_RE.search(w) and " not " not in w.lower()
-                       for w in re.sub(r"\s+", " ", t).split(". "))]
-    checks.append(("RLS: the inverted claim appears nowhere", not inverted,
-                   "found in " + ", ".join(inverted)))
-    checks.append(("gate self-test: the inverted RLS claim is caught",
-                   bool(RLS_WRONG_RE.search(RLS_WRONG_SPECIMEN)), ""))
-    checks.append(("gate self-test: the correct RLS sentence is not caught",
-                   not any(RLS_WRONG_RE.search(w) and " not " not in w.lower()
-                           for w in RLS_RIGHT_SPECIMEN.split(". ")), ""))
+    # --- domain invariants: the design numbers and the locked phrases ---
+    for label, pattern in BUDGET_PATTERNS:
+        hits = re.findall(pattern, flat)
+        checks.append((f"budget: {label} is stated exactly once in the body", len(hits) == 1,
+                       f"{len(hits)} match(es) for /{pattern}/; state the budget in one place "
+                       "and refer back, or the copies drift apart"))
+    checks.append((f"check contract: the body says {EXIT_CONTRACT!r}", EXIT_CONTRACT in flat,
+                   "exit 2 belongs to ctx_write.py; a hook that exits 2 gets switched off"))
+    checks.append(("check contract: the body names the other exit codes",
+                   all(code in low for code in ("exit 0", "exit 3", "exit 1")),
+                   "0 fresh, 0 with a notice drift, 3 no stamp, 1 the check itself breaking"))
+    checks.append((f"check contract: the body says the hook {FRESH_IS_SILENT!r} when fresh",
+                   FRESH_IS_SILENT in flat,
+                   "a fresh repo costing zero tokens is the hook's whole promise"))
+    checks.append((f"schema: the body states {FREE_FORM_CLAUSE!r}", FREE_FORM_CLAUSE in flat,
+                   "the agents.md convention has no required schema; prescribing one is how "
+                   "empty headings get written and then read as facts"))
+    checks.append(("evidence rule: the body bans code blocks in the generated file",
+                   "no code blocks in the generated agents.md" in low, ""))
+    checks.append(("evidence rule: the body states the omit-or-label rule",
+                   "unverified" in low and "omit" in low, ""))
+    checks.append(("evidence rule: the body forbids writing secret values",
+                   ".env.example" in body and "secret" in low, ""))
+    checks.append(("evidence rule: the body requires a separate verification pass",
+                   "separate" in low and "verif" in low, ""))
+    for script in SCRIPTS:
+        checks.append((f"scripts: the body drives {script}", script in body,
+                       "the deterministic layer is only reachable if the body names it"))
+    checks.append(("scripts: the body resolves them through ${CLAUDE_SKILL_DIR}",
+                   "${CLAUDE_SKILL_DIR}" in body, ""))
+    checks.append(("cross-harness: the body says what ${CLAUDE_SKILL_DIR} means elsewhere",
+                   "scripts directory next to this file" in low, ""))
+    checks.append(("cross-harness: the body names the npx skills add install line",
+                   "npx skills add" in body, ""))
+    checks.append(("cross-harness: the body says the SessionStart hook is not shipped elsewhere",
+                   "install_hooks.sh" in body and "not installed" in low, ""))
+    checks.append(("honest limits: the ETH finding is quoted exactly, with no invented figure",
+                   "do not generally improve task success rates, while increasing inference "
+                   "cost by over 20% on average" in flat and "2602.11988" in body, ""))
 
     # --- control sections give orders, not advice ---
     # A phrase inside quotation marks is a specimen: the line is quoting the wrong form in order
@@ -369,13 +464,11 @@ def main():
         for phrase in ADVICE_PHRASES:
             hits = []
             for ln, line in enumerate(sec.split("\n"), 1):
-                if phrase not in line.lower():
-                    continue
-                if re.search(r'["\u201c\u2018][^"\u201d\u2019]*' + re.escape(phrase)
-                             + r'[^"\u201d\u2019]*["\u201d\u2019]', line, re.I):
+                is_hit, is_specimen = advice_hit(line, phrase)
+                if is_specimen:
                     quoted_specimens += 1
-                    continue
-                hits.append(ln)
+                if is_hit:
+                    hits.append(ln)
             checks.append((f"control section for {want_label} gives orders, not advice: "
                            f"no {phrase!r}", not hits,
                            f"{path}, inside the {want_label} section, relative line(s) "
@@ -387,6 +480,15 @@ def main():
                    quoted_specimens == EXPECTED_SPECIMENS,
                    "confirm the line TEACHES the wrong form, then change EXPECTED_SPECIMENS "
                    "in evals/check_skill.py in the same commit"))
+
+    # --- self-tests on the advice gate ---
+    checks.append(("gate self-test: the advice gate fires on an unquoted specimen",
+                   advice_hit(ADVICE_UNQUOTED_SPECIMEN, "you should") == (True, False), ""))
+    checks.append(("gate self-test: a quoted specimen counts as a specimen, not a hit",
+                   advice_hit(ADVICE_QUOTED_SPECIMEN, "you should") == (False, True), ""))
+    checks.append(("gate self-test: an order is not caught",
+                   all(advice_hit(ORDER_SPECIMEN, p) == (False, False) for p in ADVICE_PHRASES),
+                   ""))
 
     failed = [c for c in checks if not c[1]]
     for nm, ok, detail in checks:
