@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none" role="img"
+     aria-label="contextify: two facing square brackets holding a block of repository facts, with one light travelling the whole circuit">
+  <title>contextify</title>
+  <desc>Animated dark-mode logo mark. The whole mark stays drawn as a muted track. One bright
+  segment travels the left bracket, the lower rail, the right bracket and the upper rail back to
+  the start, which is one instruction source reaching every agent file and returning. Under reduced
+  motion the segment freezes and the full track stays drawn.</desc>
+  <defs>
+    <linearGradient id="cx-plate" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#0E1524"/>
+      <stop offset="58%" stop-color="#0A0F1C"/>
+      <stop offset="100%" stop-color="#07070C"/>
+    </linearGradient>
+    <radialGradient id="cx-bloomA" cx="0.22" cy="0.20" r="0.70">
+      <stop offset="0%" stop-color="#E879DF" stop-opacity="0.34"/>
+      <stop offset="100%" stop-color="#E879DF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomB" cx="0.80" cy="0.84" r="0.66">
+      <stop offset="0%" stop-color="#FF4D8D" stop-opacity="0.26"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cx-ink" gradientUnits="userSpaceOnUse" x1="38" y1="212" x2="218" y2="44">
+      <stop class="cxs1" offset="0%"   stop-color="#C77DFF"/>
+      <stop class="cxs2" offset="52%"  stop-color="#E879DF"/>
+      <stop class="cxs3" offset="100%" stop-color="#FF4D8D"/>
+    </linearGradient>
+    <filter id="cx-glow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="4.5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    @keyframes cx-breathe { 0%,100% { opacity:0.62; } 50% { opacity:1; } }
+    .cxbloom { animation: cx-breathe 9s ease-in-out infinite; }
+    /* one segment, one circuit, eight seconds: out to every agent file and back */
+    @keyframes cx-travel { from { stroke-dashoffset: -16; } to { stroke-dashoffset: -116; } }
+    .cxlit { animation: cx-travel 8s linear infinite; }
+    @keyframes cx-k1 { 0%,100% { stop-color:#C77DFF; } 50% { stop-color:#E879DF; } }
+    @keyframes cx-k2 { 0%,100% { stop-color:#E879DF; } 50% { stop-color:#FF4D8D; } }
+    @keyframes cx-k3 { 0%,100% { stop-color:#FF4D8D; } 50% { stop-color:#E879DF; } }
+    .cxs1 { animation: cx-k1 12s ease-in-out infinite; }
+    .cxs2 { animation: cx-k2 12s ease-in-out infinite; }
+    .cxs3 { animation: cx-k3 12s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="256" height="256" rx="56" fill="url(#cx-plate)"/>
+  <g class="cxbloom">
+    <rect width="256" height="256" rx="56" fill="url(#cx-bloomA)"/>
+    <rect width="256" height="256" rx="56" fill="url(#cx-bloomB)"/>
+  </g>
+  <rect x="0.9" y="0.9" width="254.2" height="254.2" rx="55.2" fill="none"
+        stroke="#1E2A42" stroke-width="1.8"/>
+
+  <g transform="translate(3,3) scale(6.25)">
+    <rect x="15.5" y="15.5" width="9" height="9" rx="1.2" fill="#E879DF" fill-opacity="0.20"/>
+    <g fill="#E879DF" fill-opacity="0.75">
+      <rect x="16.8" y="17.6" width="6.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="20.3" width="4.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="23.0" width="5.6" height="1.3" rx="0.65"/>
+    </g>
+    <g fill="none" stroke-linejoin="miter" stroke-miterlimit="8">
+      <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="#E879DF" stroke-opacity="0.32" stroke-width="3"/>
+    </g>
+  </g>
+  <g filter="url(#cx-glow)">
+    <g transform="translate(3,3) scale(6.25)" fill="none"
+       stroke-linejoin="miter" stroke-linecap="round" stroke-miterlimit="8">
+      <path class="cxlit" d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="url(#cx-ink)" stroke-width="3"
+            pathLength="100" stroke-dasharray="8 92" stroke-dashoffset="-16"/>
+    </g>
+  </g>
+</svg>

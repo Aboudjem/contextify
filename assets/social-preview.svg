@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img"
+     aria-label="contextify: tell every coding agent how your repo works, then prove it is still true. One AGENTS.md carries the facts, every other agent file points at it, and the session-start check costs nothing while the evidence still holds.">
+  <title>contextify</title>
+  <desc>Static social preview card. It gets rasterised, so nothing here animates. One source file
+  carries the repository facts with a citation on every line, every other agent file is a thin
+  pointer at it, and the freshness check runs offline.</desc>
+  <defs>
+    <linearGradient id="cx-ground" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#0E1524"/>
+      <stop offset="55%" stop-color="#0A0F1C"/>
+      <stop offset="100%" stop-color="#07070C"/>
+    </linearGradient>
+    <radialGradient id="cx-bloomA" cx="0.10" cy="0.10" r="0.48">
+      <stop offset="0%" stop-color="#E879DF" stop-opacity="0.24"/>
+      <stop offset="100%" stop-color="#E879DF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomB" cx="0.90" cy="0.90" r="0.54">
+      <stop offset="0%" stop-color="#FF4D8D" stop-opacity="0.21"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomC" cx="0.55" cy="0.02" r="0.40">
+      <stop offset="0%" stop-color="#C77DFF" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#C77DFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cx-rule" gradientUnits="userSpaceOnUse" x1="64" y1="152" x2="1216" y2="152">
+      <stop offset="0%"   stop-color="#E879DF" stop-opacity="0.75"/>
+      <stop offset="46%"  stop-color="#C77DFF" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cx-ink" gradientUnits="userSpaceOnUse" x1="64" y1="134" x2="160" y2="42">
+      <stop offset="0%"   stop-color="#C77DFF"/>
+      <stop offset="52%"  stop-color="#E879DF"/>
+      <stop offset="100%" stop-color="#FF4D8D"/>
+    </linearGradient>
+    <linearGradient id="cx-word" x1="0" y1="0" x2="1" y2="0.25">
+      <stop offset="0%"   stop-color="#C77DFF"/>
+      <stop offset="46%"  stop-color="#E879DF"/>
+      <stop offset="100%" stop-color="#FF4D8D"/>
+    </linearGradient>
+    <filter id="cx-glow" x="-45%" y="-45%" width="190%" height="190%">
+      <feGaussianBlur stdDeviation="5" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <style>
+    .disp { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; }
+    .kick  { font-size: 15px; font-weight: 600; letter-spacing: 4px; fill: #E879DF; }
+    .lede  { font-size: 46px; font-weight: 800; fill: #F2F6FF; letter-spacing: -1px; }
+    .lede2 { font-size: 46px; font-weight: 500; fill: #B6C2DA; letter-spacing: -1px; }
+    .story { font-size: 23px; font-weight: 500; fill: #8494B0; letter-spacing: -0.2px; }
+    .colhd { font-size: 14px; font-weight: 600; letter-spacing: 2.8px; fill: #8494B0; }
+    .name  { font-size: 17px; font-weight: 600; fill: #F2F6FF; }
+    .body  { font-size: 15px; fill: #B6C2DA; }
+    .cite  { font-size: 13px; fill: #8494B0; }
+    .tag   { font-size: 15px; letter-spacing: 1.6px; fill: #8494B0; }
+    .card  { fill: #0E1524; stroke: #1E2A42; stroke-width: 1; }
+  </style>
+
+  <rect width="1280" height="640" fill="url(#cx-ground)"/>
+  <rect width="1280" height="640" fill="url(#cx-bloomA)"/>
+  <rect width="1280" height="640" fill="url(#cx-bloomB)"/>
+  <rect width="1280" height="640" fill="url(#cx-bloomC)"/>
+
+  <g transform="translate(46.5,23.3) scale(3.185)">
+    <rect x="15.5" y="15.5" width="9" height="9" rx="1.2" fill="#E879DF" fill-opacity="0.20"/>
+    <g fill="#E879DF" fill-opacity="0.75">
+      <rect x="16.8" y="17.6" width="6.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="20.3" width="4.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="23.0" width="5.6" height="1.3" rx="0.65"/>
+    </g>
+    <g fill="none" stroke-linejoin="miter" stroke-miterlimit="8">
+      <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="#E879DF" stroke-opacity="0.32" stroke-width="3"/>
+      <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="url(#cx-ink)" stroke-width="3" stroke-linecap="round"
+            pathLength="100" stroke-dasharray="8 92" stroke-dashoffset="-16"/>
+    </g>
+  </g>
+  <text class="disp" x="182" y="112" font-size="48" font-weight="800"
+        letter-spacing="-1.2" fill="url(#cx-word)">contextify</text>
+  <text class="mono kick" x="1216" y="112" text-anchor="end">A CLAUDE CODE PLUGIN</text>
+
+  <line x1="64" y1="152" x2="1216" y2="152" stroke="url(#cx-rule)" stroke-width="1.5"/>
+
+  <text class="disp lede"  x="64" y="228">One file the agents read.</text>
+  <text class="disp lede2" x="64" y="284">One check that proves it.</text>
+  <text class="disp story" x="64" y="332">Tell every coding agent how your repo works. Then prove it is still true.</text>
+
+  <text class="mono colhd" x="64"  y="382">ONE SOURCE</text>
+  <text class="mono colhd" x="466" y="382">EVERY AGENT</text>
+  <text class="mono colhd" x="868" y="382">STILL TRUE</text>
+
+  <rect x="64" y="396" width="338" height="140" rx="12" class="card"/>
+  <rect x="64" y="416" width="4" height="100" rx="2" fill="#E879DF"/>
+  <text class="mono name" x="88" y="428">AGENTS.md</text>
+  <line x1="88" y1="442" x2="380" y2="442" stroke="#1E2A42" stroke-width="1"/>
+  <text class="mono body" x="88" y="472">Test:  pnpm -r test</text>
+  <text class="mono cite" x="88" y="494">cites package.json:14</text>
+  <text class="mono body" x="88" y="522">Build: pnpm build</text>
+
+  <rect x="466" y="396" width="338" height="30" rx="8" class="card"/>
+  <circle cx="482" cy="411" r="3.6" fill="#E879DF"/>
+  <text class="mono body" x="498" y="416">CLAUDE.md</text>
+  <text class="mono cite" x="788" y="416" text-anchor="end">@AGENTS.md</text>
+
+  <rect x="466" y="432" width="338" height="30" rx="8" class="card"/>
+  <circle cx="482" cy="447" r="3.6" fill="#E879DF"/>
+  <text class="mono body" x="498" y="452">GEMINI.md</text>
+  <text class="mono cite" x="788" y="452" text-anchor="end">3 lines</text>
+
+  <rect x="466" y="468" width="338" height="30" rx="8" class="card"/>
+  <circle cx="482" cy="483" r="3.6" fill="#E879DF"/>
+  <text class="mono body" x="498" y="488">.cursor/rules</text>
+  <text class="mono cite" x="788" y="488" text-anchor="end">alwaysApply</text>
+
+  <rect x="466" y="504" width="338" height="30" rx="8" class="card"/>
+  <circle cx="482" cy="519" r="3.6" fill="#E879DF"/>
+  <text class="mono body" x="498" y="524">copilot-instructions</text>
+  <text class="mono cite" x="788" y="524" text-anchor="end">pointer</text>
+
+  <rect x="868" y="396" width="348" height="64" rx="12" class="card"/>
+  <rect x="868" y="414" width="4" height="30" rx="2" fill="#3DFFAB"/>
+  <text class="mono body" x="892" y="424">$ ctx-check</text>
+  <rect x="892" y="438" width="8" height="8" rx="2" fill="#3DFFAB"/>
+  <text class="mono" x="910" y="446" font-size="15" fill="#3DFFAB">silent, exit 0, 0 tokens</text>
+
+  <rect x="868" y="472" width="348" height="64" rx="12" class="card"/>
+  <rect x="868" y="490" width="4" height="30" rx="2" fill="#E879DF"/>
+  <text class="mono body" x="892" y="500">$ ctx-check</text>
+  <rect x="892" y="514" width="8" height="8" rx="2" fill="#E879DF"/>
+  <text class="mono" x="910" y="522" font-size="15" fill="#E879DF">8 lines, names the file</text>
+
+  <text class="mono tag" x="64" y="596">every line cites a file  &#183;  no model, no network  &#183;  runs offline</text>
+  <text class="mono tag" x="1216" y="596" text-anchor="end">github.com/Aboudjem/contextify</text>
+</svg>

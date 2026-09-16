@@ -1,0 +1,130 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img"
+     aria-label="One loop, four stations and a way back: init reads the repo and every line cites a file, files writes AGENTS.md plus thin pointers, stamp records digests of the evidence, the SessionStart hook runs ctx-check and stays silent while the evidence holds, and update rewrites only what moved.">
+  <title>contextify: how it works</title>
+  <desc>Dark-mode diagram. Four stations on one rail and a return path. The loop only turns when
+  the evidence behind a claim has moved, so a fresh repository costs nothing at session start.</desc>
+  <defs>
+    <linearGradient id="cx-ground" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0%" stop-color="#0E1524"/>
+      <stop offset="60%" stop-color="#0A0F1C"/>
+      <stop offset="100%" stop-color="#07070C"/>
+    </linearGradient>
+    <radialGradient id="cx-bloomA" cx="0.16" cy="0.20" r="0.72">
+      <stop offset="0%" stop-color="#E879DF" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#E879DF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomB" cx="0.86" cy="0.88" r="0.68">
+      <stop offset="0%" stop-color="#FF4D8D" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cx-rule" gradientUnits="userSpaceOnUse" x1="36" y1="62" x2="1164" y2="62">
+      <stop offset="0%"   stop-color="#E879DF" stop-opacity="0.70"/>
+      <stop offset="46%"  stop-color="#C77DFF" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cx-track" gradientUnits="userSpaceOnUse" x1="170" y1="186" x2="980" y2="186">
+      <stop offset="0%"   stop-color="#C77DFF"/>
+      <stop offset="55%"  stop-color="#E879DF"/>
+      <stop offset="100%" stop-color="#FF4D8D"/>
+    </linearGradient>
+    <filter id="cx-glow-sm" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="3.2" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <clipPath id="cx-frame"><rect width="1200" height="360" rx="14"/></clipPath>
+  </defs>
+
+  <style>
+    .disp { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; }
+    .h1   { font-size: 28px; font-weight: 700; fill: #F2F6FF; letter-spacing: -0.3px; }
+    .st   { font-size: 20px; font-weight: 700; fill: #F2F6FF; letter-spacing: 1.5px; }
+    .sd   { font-size: 12.5px; fill: #B6C2DA; }
+    .ft   { font-size: 13px; fill: #8494B0; }
+    .chip { font-size: 12.5px; letter-spacing: 1.2px; }
+
+    @keyframes cx-breathe { 0%,100% { opacity:0.66; } 50% { opacity:1; } }
+    .cxbloom { animation: cx-breathe 11s ease-in-out infinite; }
+    @keyframes cx-flow { to { stroke-dashoffset: -240; } }
+    .flowline { animation: cx-flow 14s linear infinite; }
+    @keyframes cx-run { to { stroke-dashoffset: -168; } }
+    .runline { animation: cx-run 8s linear infinite; }
+    @keyframes cx-back { to { stroke-dashoffset: 168; } }
+    .backline { animation: cx-back 8s linear infinite; }
+    @keyframes cx-cue { 0% { opacity:0; } 3% { opacity:1; } 22% { opacity:1; } 25%,100% { opacity:0; } }
+    .s1 { animation: cx-cue 16s linear infinite 0s; }
+    .s2 { animation: cx-cue 16s linear infinite -4s; }
+    .s3 { animation: cx-cue 16s linear infinite -8s; }
+    .s4 { animation: cx-cue 16s linear infinite -12s; }
+    @keyframes cx-pip { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+    .hold { animation: cx-pip 3.4s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <g clip-path="url(#cx-frame)">
+    <rect width="1200" height="360" fill="url(#cx-ground)"/>
+    <g class="cxbloom">
+      <rect width="1200" height="360" fill="url(#cx-bloomA)"/>
+      <rect width="1200" height="360" fill="url(#cx-bloomB)"/>
+    </g>
+  </g>
+  <rect x="0.5" y="0.5" width="1199" height="359" rx="13.5" fill="none" stroke="#1E2A42" stroke-width="1"/>
+
+  <text class="disp h1" x="36" y="44">One loop, four stations, and a way back.</text>
+  <text class="mono chip" x="1164" y="44" text-anchor="end" fill="#3DFFAB">0 TOKENS WHEN FRESH</text>
+  <line x1="36" y1="62" x2="1164" y2="62" stroke="url(#cx-rule)" stroke-width="1.25"/>
+  <line class="flowline" x1="36" y1="62" x2="1164" y2="62" stroke="url(#cx-rule)"
+        stroke-width="1.25" stroke-dasharray="3 9"/>
+
+  <g class="mono" text-anchor="middle">
+    <text class="st" x="170"  y="104">init</text>
+    <text class="sd" x="170"  y="130">reads the repo,</text>
+    <text class="sd" x="170"  y="150">every line cites a file</text>
+    <text class="st" x="440"  y="104">files</text>
+    <text class="sd" x="440"  y="130">AGENTS.md, and thin</text>
+    <text class="sd" x="440"  y="150">pointers for every agent</text>
+    <text class="st" x="710"  y="104">stamp</text>
+    <text class="sd" x="710"  y="130">.contextify/stamp.json</text>
+    <text class="sd" x="710"  y="150">digests what was cited</text>
+    <text class="st" x="980"  y="104">hook</text>
+    <text class="sd" x="980"  y="130">SessionStart ctx-check,</text>
+    <text class="sd" x="980"  y="150">silent while it holds</text>
+  </g>
+
+  <line x1="170" y1="186" x2="980" y2="186" stroke="#1E2A42" stroke-width="2"/>
+  <line class="runline" x1="170" y1="186" x2="980" y2="186" stroke="url(#cx-track)"
+        stroke-width="2" stroke-dasharray="4 10" opacity="0.9"/>
+  <g fill="none" stroke="#C77DFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85">
+    <path d="M299 178 L311 186 L299 194"/>
+    <path d="M569 178 L581 186 L569 194"/>
+    <path d="M839 178 L851 186 L839 194"/>
+  </g>
+
+  <path d="M994 186 H1082 Q1100 186 1100 204 V244 Q1100 262 1082 262 H458 Q440 262 440 244 V202"
+        fill="none" stroke="#1E2A42" stroke-width="2"/>
+  <path class="backline" d="M994 186 H1082 Q1100 186 1100 204 V244 Q1100 262 1082 262 H458 Q440 262 440 244 V202"
+        fill="none" stroke="#E879DF" stroke-width="2" stroke-dasharray="4 10"
+        stroke-linecap="round" opacity="0.85"/>
+  <path d="M433 210 L440 200 L447 210" fill="none" stroke="#E879DF" stroke-width="2.2"
+        stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+
+  <g fill="#0E1524" stroke="#E879DF" stroke-width="3">
+    <circle cx="170" cy="186" r="13"/><circle cx="440" cy="186" r="13"/>
+    <circle cx="710" cy="186" r="13"/><circle cx="980" cy="186" r="13"/>
+  </g>
+  <g fill="#E879DF" filter="url(#cx-glow-sm)">
+    <circle class="s1" cx="170" cy="186" r="13"/>
+    <circle class="s2" cx="440" cy="186" r="13" opacity="0"/>
+    <circle class="s3" cx="710" cy="186" r="13" opacity="0"/>
+    <circle class="s4" cx="980" cy="186" r="13" opacity="0"/>
+  </g>
+
+  <rect x="560" y="244" width="420" height="36" rx="10" fill="#0E1524"
+        stroke="#E879DF" stroke-opacity="0.45" stroke-width="1"/>
+  <rect class="hold" x="578" y="257" width="7" height="7" rx="2" fill="#E879DF"/>
+  <text class="mono" x="596" y="266" font-size="13.5" font-weight="700" fill="#E879DF">update</text>
+  <text class="mono" x="660" y="266" font-size="12.5" fill="#B6C2DA">rewrites only what moved, shows the diff</text>
+
+  <text class="mono ft" x="36" y="330">nothing is written without your approval  &#183;  human edits outside the managed block survive</text>
+  <text class="mono ft" x="1164" y="330" text-anchor="end">NO MODEL, NO NETWORK</text>
+</svg>

@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none" role="img"
+     aria-label="contextify: two facing square brackets holding a block of repository facts, with one light travelling the whole circuit">
+  <title>contextify</title>
+  <desc>Animated light-mode logo mark. The whole mark stays drawn as a muted track. One bright
+  segment travels the left bracket, the lower rail, the right bracket and the upper rail back to
+  the start, which is one instruction source reaching every agent file and returning. Under reduced
+  motion the segment freezes and the full track stays drawn.</desc>
+  <defs>
+    <linearGradient id="cx-plate" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="58%" stop-color="#F7F8FB"/>
+      <stop offset="100%" stop-color="#F7F8FB"/>
+    </linearGradient>
+    <radialGradient id="cx-bloomA" cx="0.22" cy="0.20" r="0.70">
+      <stop offset="0%" stop-color="#A32698" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#A32698" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomB" cx="0.80" cy="0.84" r="0.66">
+      <stop offset="0%" stop-color="#EB0054" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#EB0054" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cx-ink" gradientUnits="userSpaceOnUse" x1="38" y1="212" x2="218" y2="44">
+      <stop class="cxs1" offset="0%"   stop-color="#A836FF"/>
+      <stop class="cxs2" offset="52%"  stop-color="#A32698"/>
+      <stop class="cxs3" offset="100%" stop-color="#EB0054"/>
+    </linearGradient>
+  </defs>
+
+  <style>
+    @keyframes cx-breathe { 0%,100% { opacity:0.72; } 50% { opacity:1; } }
+    .cxbloom { animation: cx-breathe 9s ease-in-out infinite; }
+    /* one segment, one circuit, eight seconds: out to every agent file and back */
+    @keyframes cx-travel { from { stroke-dashoffset: -16; } to { stroke-dashoffset: -116; } }
+    .cxlit { animation: cx-travel 8s linear infinite; }
+    @keyframes cx-k1 { 0%,100% { stop-color:#A836FF; } 50% { stop-color:#A32698; } }
+    @keyframes cx-k2 { 0%,100% { stop-color:#A32698; } 50% { stop-color:#EB0054; } }
+    @keyframes cx-k3 { 0%,100% { stop-color:#EB0054; } 50% { stop-color:#A32698; } }
+    .cxs1 { animation: cx-k1 12s ease-in-out infinite; }
+    .cxs2 { animation: cx-k2 12s ease-in-out infinite; }
+    .cxs3 { animation: cx-k3 12s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <rect width="256" height="256" rx="56" fill="url(#cx-plate)"/>
+  <g class="cxbloom">
+    <rect width="256" height="256" rx="56" fill="url(#cx-bloomA)"/>
+    <rect width="256" height="256" rx="56" fill="url(#cx-bloomB)"/>
+  </g>
+  <rect x="0.9" y="0.9" width="254.2" height="254.2" rx="55.2" fill="none"
+        stroke="#D8DEE9" stroke-width="1.8"/>
+
+  <g transform="translate(3,3) scale(6.25)">
+    <rect x="15.5" y="15.5" width="9" height="9" rx="1.2" fill="#A32698" fill-opacity="0.11"/>
+    <g fill="#A32698" fill-opacity="0.75">
+      <rect x="16.8" y="17.6" width="6.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="20.3" width="4.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="23.0" width="5.6" height="1.3" rx="0.65"/>
+    </g>
+    <g fill="none" stroke-linejoin="miter" stroke-miterlimit="8">
+      <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="#A32698" stroke-opacity="0.50" stroke-width="3"/>
+    </g>
+  </g>
+  <g>
+    <g transform="translate(3,3) scale(6.25)" fill="none"
+       stroke-linejoin="miter" stroke-linecap="round" stroke-miterlimit="8">
+      <path class="cxlit" d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="url(#cx-ink)" stroke-width="3"
+            pathLength="100" stroke-dasharray="8 92" stroke-dashoffset="-16"/>
+    </g>
+  </g>
+</svg>

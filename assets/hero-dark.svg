@@ -1,0 +1,200 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img"
+     aria-label="contextify: tell every coding agent how your repo works, then prove it is still true. One AGENTS.md carries the facts and every line cites a file. CLAUDE.md, GEMINI.md, the Cursor rule and the Copilot instructions point at it. ctx-check is silent while the evidence still holds.">
+  <title>contextify</title>
+  <desc>Dark-mode hero. One source file carries the repository facts and every claim names the
+  file and line it came from. Every other agent file is a thin pointer at that one source. The
+  session-start check stays silent while the evidence still holds, and names what moved when it
+  does not.</desc>
+  <defs>
+    <linearGradient id="cx-ground" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0%" stop-color="#0E1524"/>
+      <stop offset="55%" stop-color="#0A0F1C"/>
+      <stop offset="100%" stop-color="#07070C"/>
+    </linearGradient>
+    <radialGradient id="cx-bloomA" cx="0.13" cy="0.12" r="0.46">
+      <stop offset="0%" stop-color="#E879DF" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#E879DF" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomB" cx="0.88" cy="0.86" r="0.52">
+      <stop offset="0%" stop-color="#FF4D8D" stop-opacity="0.17"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="cx-bloomC" cx="0.52" cy="0.02" r="0.38">
+      <stop offset="0%" stop-color="#C77DFF" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#C77DFF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cx-rule" gradientUnits="userSpaceOnUse" x1="44" y1="88" x2="1156" y2="88">
+      <stop offset="0%"   stop-color="#E879DF" stop-opacity="0.70"/>
+      <stop offset="46%"  stop-color="#C77DFF" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FF4D8D" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="cx-ink" gradientUnits="userSpaceOnUse" x1="38" y1="212" x2="218" y2="44">
+      <stop class="cxs1" offset="0%"   stop-color="#C77DFF"/>
+      <stop class="cxs2" offset="52%"  stop-color="#E879DF"/>
+      <stop class="cxs3" offset="100%" stop-color="#FF4D8D"/>
+    </linearGradient>
+    <linearGradient id="cx-word" x1="0" y1="0" x2="1" y2="0.25">
+      <stop class="cxs1" offset="0%"   stop-color="#C77DFF"/>
+      <stop class="cxs2" offset="46%"  stop-color="#E879DF"/>
+      <stop class="cxs3" offset="100%" stop-color="#FF4D8D"/>
+    </linearGradient>
+    <clipPath id="cx-frame"><rect width="1200" height="400" rx="14"/></clipPath>
+  </defs>
+
+  <style>
+    .disp { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; }
+    .mono { font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace; }
+    .kick  { font-size: 12px; font-weight: 600; letter-spacing: 3.2px; fill: #E879DF; }
+    .lede  { font-size: 25px; font-weight: 700; fill: #F2F6FF; letter-spacing: -0.3px; }
+    .eyeb  { font-size: 12.5px; fill: #8494B0; letter-spacing: 0.2px; }
+    .colhd { font-size: 12px; font-weight: 600; letter-spacing: 2.4px; fill: #8494B0; }
+    .name  { font-size: 14px; font-weight: 600; fill: #F2F6FF; }
+    .body  { font-size: 12.5px; fill: #B6C2DA; }
+    .cite  { font-size: 11px; fill: #8494B0; letter-spacing: 0.2px; }
+    .tag   { font-size: 11.5px; letter-spacing: 1.6px; fill: #8494B0; }
+    .card  { fill: #0E1524; stroke: #1E2A42; stroke-width: 1; }
+
+    @keyframes cx-breathe { 0%,100% { opacity:0.64; } 50% { opacity:1; } }
+    .cxbloom { animation: cx-breathe 11s ease-in-out infinite; }
+    @keyframes cx-flow { to { stroke-dashoffset: -240; } }
+    .flowline { animation: cx-flow 14s linear infinite; }
+    @keyframes cx-fan { to { stroke-dashoffset: -96; } }
+    .fanline { animation: cx-fan 6s linear infinite; }
+    @keyframes cx-travel { from { stroke-dashoffset: -16; } to { stroke-dashoffset: -116; } }
+    .cxlit { animation: cx-travel 8s linear infinite; }
+    @keyframes cx-pip { 0%,100% { opacity:0.45; } 50% { opacity:1; } }
+    .p1 { animation: cx-pip 6s ease-in-out infinite 0s; }
+    .p2 { animation: cx-pip 6s ease-in-out infinite 0.4s; }
+    .p3 { animation: cx-pip 6s ease-in-out infinite 0.8s; }
+    .p4 { animation: cx-pip 6s ease-in-out infinite 1.2s; }
+    .stA { animation: cx-pip 6s ease-in-out infinite 0s; }
+    .stB { animation: cx-pip 6s ease-in-out infinite 3s; }
+    @keyframes cx-k1 { 0%,100% { stop-color:#C77DFF; } 50% { stop-color:#E879DF; } }
+    @keyframes cx-k2 { 0%,100% { stop-color:#E879DF; } 50% { stop-color:#FF4D8D; } }
+    @keyframes cx-k3 { 0%,100% { stop-color:#FF4D8D; } 50% { stop-color:#E879DF; } }
+    .cxs1 { animation: cx-k1 12s ease-in-out infinite; }
+    .cxs2 { animation: cx-k2 12s ease-in-out infinite; }
+    .cxs3 { animation: cx-k3 12s ease-in-out infinite; }
+    @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+  </style>
+
+  <g clip-path="url(#cx-frame)">
+    <rect width="1200" height="400" fill="url(#cx-ground)"/>
+    <g class="cxbloom">
+      <rect width="1200" height="400" fill="url(#cx-bloomA)"/>
+      <rect width="1200" height="400" fill="url(#cx-bloomB)"/>
+      <rect width="1200" height="400" fill="url(#cx-bloomC)"/>
+    </g>
+  </g>
+  <rect x="0.5" y="0.5" width="1199" height="399" rx="13.5" fill="none" stroke="#1E2A42" stroke-width="1"/>
+
+  <g transform="translate(32.9,10.5) scale(2.074)">
+    <rect x="15.5" y="15.5" width="9" height="9" rx="1.2" fill="#E879DF" fill-opacity="0.20"/>
+    <g fill="#E879DF" fill-opacity="0.75">
+      <rect x="16.8" y="17.6" width="6.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="20.3" width="4.4" height="1.3" rx="0.65"/>
+      <rect x="16.8" y="23.0" width="5.6" height="1.3" rx="0.65"/>
+    </g>
+    <g fill="none" stroke-linejoin="miter" stroke-miterlimit="8">
+      <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="#E879DF" stroke-opacity="0.32" stroke-width="3"/>
+      <path class="cxlit" d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+            stroke="url(#cx-ink)" stroke-width="3" stroke-linecap="round"
+            pathLength="100" stroke-dasharray="8 92" stroke-dashoffset="-16"/>
+    </g>
+  </g>
+  <text class="disp" x="124" y="60" font-size="34" font-weight="800"
+        letter-spacing="-0.8" fill="url(#cx-word)">contextify</text>
+  <text class="mono kick" x="1156" y="60" text-anchor="end">ONE SOURCE, EVERY AGENT</text>
+
+  <line x1="44" y1="88" x2="1156" y2="88" stroke="url(#cx-rule)" stroke-width="1.25"/>
+  <line class="flowline" x1="44" y1="88" x2="1156" y2="88" stroke="url(#cx-rule)"
+        stroke-width="1.25" stroke-dasharray="3 9"/>
+
+  <text class="disp lede" x="44" y="126" textLength="1112" lengthAdjust="spacing">Tell every coding agent how your repo works. Then prove it is still true.</text>
+  <text class="mono eyeb" x="44" y="154" xml:space="preserve">AGENTS.md  -&gt;  CLAUDE.md  GEMINI.md  .cursor  copilot   |   <tspan fill="#E879DF">ctx-check: 0 tokens when fresh</tspan></text>
+
+  <text class="mono colhd" x="44"  y="184">ONE SOURCE</text>
+  <text class="mono colhd" x="448" y="184">EVERY AGENT</text>
+  <text class="mono colhd" x="852" y="184">STILL TRUE</text>
+
+  <rect x="44" y="196" width="340" height="144" rx="10" class="card"/>
+  <rect x="44" y="214" width="3" height="108" rx="1.5" fill="#E879DF"/>
+  <text class="mono name" x="66" y="224">AGENTS.md</text>
+  <text class="mono cite" x="364" y="224" text-anchor="end">42 lines</text>
+  <line x1="66" y1="236" x2="364" y2="236" stroke="#1E2A42" stroke-width="1"/>
+  <text class="mono body" x="66" y="262">Test:  pnpm -r test</text>
+  <text class="mono cite" x="66" y="280">cites package.json#scripts.test:14</text>
+  <text class="mono body" x="66" y="310">Build: pnpm build</text>
+  <text class="mono cite" x="66" y="328">cites package.json#scripts.build:13</text>
+
+  <g fill="none" stroke="#1E2A42" stroke-width="1.5">
+    <path d="M392 266 C 416 266, 420 211, 440 211"/>
+    <path d="M392 266 C 416 266, 420 247, 440 247"/>
+    <path d="M392 266 C 416 266, 420 283, 440 283"/>
+    <path d="M392 266 C 416 266, 420 319, 440 319"/>
+  </g>
+  <g class="fanline" fill="none" stroke="#E879DF" stroke-width="1.5"
+     stroke-dasharray="4 8" stroke-linecap="round" opacity="0.85">
+    <path d="M392 266 C 416 266, 420 211, 440 211"/>
+    <path d="M392 266 C 416 266, 420 247, 440 247"/>
+    <path d="M392 266 C 416 266, 420 283, 440 283"/>
+    <path d="M392 266 C 416 266, 420 319, 440 319"/>
+  </g>
+
+  <g fill="none" stroke="#E879DF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.8">
+    <path d="M434 206 L442 211 L434 216"/>
+    <path d="M434 242 L442 247 L434 252"/>
+    <path d="M434 278 L442 283 L434 288"/>
+    <path d="M434 314 L442 319 L434 324"/>
+  </g>
+  <g>
+    <rect x="448" y="196" width="340" height="30" rx="8" class="card"/>
+    <circle class="p1" cx="462" cy="211" r="3.2" fill="#E879DF"/>
+    <text class="mono body" x="476" y="215">CLAUDE.md</text>
+    <text class="mono cite" x="772" y="215" text-anchor="end">line 1: @AGENTS.md</text>
+
+    <rect x="448" y="232" width="340" height="30" rx="8" class="card"/>
+    <circle class="p2" cx="462" cy="247" r="3.2" fill="#E879DF"/>
+    <text class="mono body" x="476" y="251">GEMINI.md</text>
+    <text class="mono cite" x="772" y="251" text-anchor="end">3 lines</text>
+
+    <rect x="448" y="268" width="340" height="30" rx="8" class="card"/>
+    <circle class="p3" cx="462" cy="283" r="3.2" fill="#E879DF"/>
+    <text class="mono body" x="476" y="287">.cursor/rules/contextify.mdc</text>
+    <text class="mono cite" x="772" y="287" text-anchor="end">alwaysApply</text>
+
+    <rect x="448" y="304" width="340" height="30" rx="8" class="card"/>
+    <circle class="p4" cx="462" cy="319" r="3.2" fill="#E879DF"/>
+    <text class="mono body" x="476" y="323">.github/copilot-instructions.md</text>
+    <text class="mono cite" x="772" y="323" text-anchor="end">pointer</text>
+  </g>
+
+  <g fill="none" stroke="#1E2A42" stroke-width="1.5">
+    <path d="M796 265 H844"/>
+  </g>
+  <g class="fanline" fill="none" stroke="#C77DFF" stroke-width="1.5"
+     stroke-dasharray="4 8" stroke-linecap="round" opacity="0.85">
+    <path d="M796 265 H844"/>
+  </g>
+  <path d="M838 260 L846 265 L838 270" fill="none" stroke="#C77DFF"
+        stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+
+  <g>
+    <rect x="852" y="196" width="304" height="64" rx="10" class="card"/>
+    <rect x="852" y="212" width="3" height="32" rx="1.5" fill="#3DFFAB"/>
+    <text class="mono body" x="874" y="222">$ ctx-check</text>
+    <rect class="stA" x="874" y="236" width="7" height="7" rx="2" fill="#3DFFAB"/>
+    <text class="mono" x="890" y="243" font-size="12" fill="#3DFFAB">silent, exit 0, 0 tokens</text>
+
+    <rect x="852" y="270" width="304" height="70" rx="10" class="card"/>
+    <rect x="852" y="288" width="3" height="36" rx="1.5" fill="#E879DF"/>
+    <text class="mono body" x="874" y="296">$ ctx-check</text>
+    <rect class="stB" x="874" y="310" width="7" height="7" rx="2" fill="#E879DF"/>
+    <text class="mono" x="890" y="317" font-size="12" fill="#E879DF">scripts.test moved, 3 stale</text>
+    <text class="mono cite" x="874" y="333">8 lines, then: contextify update</text>
+  </g>
+
+  <text class="mono tag" x="44" y="372">one file holds the facts  &#183;  the rest point at it  &#183;  every line cites a file</text>
+  <text class="mono tag" x="1156" y="372" text-anchor="end">NO MODEL, NO NETWORK</text>
+</svg>

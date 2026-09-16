@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>contextify</title>
+<style>
+  :root{
+    --body:#0A0F1C; --body-top:#0E1524; --body-bot:#07070C;
+    --sheet:#F7F8FB; --shade:#E2E7F0;
+    --bone:#F2F6FF; --dim:#B6C2DA; --faint:#8494B0;
+    --sheet-ink:#A32698; --sheet-dim:#48546B; --sheet-hi:#07070C;
+    --rule-body:#1E2A42; --rule-sheet:#C8D0DE;
+    --accent:#E879DF; --accent-2:#FF4D8D; --accent-3:#C77DFF;
+    --pass:#3DFFAB;
+    --panel:#0E1524;
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{width:1280px;height:640px;overflow:hidden}
+  body{background:
+         radial-gradient(48% 54% at 10% 10%, rgba(232,121,223,.24), transparent 70%),
+         radial-gradient(54% 60% at 90% 90%, rgba(255,77,141,.21), transparent 70%),
+         radial-gradient(40% 44% at 55% 2%, rgba(199,125,255,.14), transparent 70%),
+         linear-gradient(160deg, var(--body-top) 0%, var(--body) 55%, var(--body-bot) 100%);
+       font-family:var(--sans);color:var(--bone)}
+  .card{width:100%;height:100%;padding:44px 64px;display:flex;flex-direction:column}
+
+  header{display:flex;align-items:center;justify-content:space-between;
+         padding-bottom:16px;border-bottom:1px solid var(--rule-body)}
+  .brand{display:flex;align-items:center;gap:22px}
+  .mark{width:86px;height:86px;flex:none}
+  .wordmark{font-size:48px;font-weight:800;letter-spacing:-1.2px;line-height:1;
+            background:linear-gradient(100deg,var(--accent-3),var(--accent) 46%,var(--accent-2));
+            -webkit-background-clip:text;background-clip:text;color:transparent}
+  .kicker{font-family:var(--mono);font-size:15px;letter-spacing:4px;color:var(--accent);
+          font-weight:600}
+
+  main{flex:1;display:flex;gap:40px;padding-top:26px;min-height:0}
+  .left{flex:1;display:flex;flex-direction:column;min-width:0}
+  h1{font-size:46px;font-weight:800;line-height:1.14;letter-spacing:-1px}
+  h1 em{font-style:normal;font-weight:500;color:var(--dim)}
+  .story{font-size:22px;font-weight:500;line-height:1.35;color:var(--faint);
+         margin-top:18px;max-width:492px;letter-spacing:-.2px}
+
+  .check{margin-top:auto;display:flex;flex-direction:column;gap:10px;font-family:var(--mono)}
+  .row{background:var(--panel);border:1px solid var(--rule-body);border-radius:12px;
+       padding:11px 18px 12px;display:flex;align-items:baseline;gap:16px;position:relative;
+       overflow:hidden}
+  .row::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:4px;
+               border-radius:2px;background:var(--pass)}
+  .row.moved::before{background:var(--accent)}
+  .row .cmd{color:var(--dim);font-size:15px;flex:none}
+  .row .out{font-size:15px;font-weight:600;color:var(--pass)}
+  .row.moved .out{color:var(--accent)}
+
+  .sheet{width:452px;background:var(--sheet);border-radius:6px;overflow:hidden;
+         align-self:flex-start;flex:none}
+  .clamp{height:16px;background:var(--shade);display:flex;align-items:center;
+         justify-content:space-between;padding:0 34px}
+  .clamp u{display:block;width:8px;height:8px;border-radius:50%;background:var(--rule-sheet)}
+  .sheet-in{padding:14px 22px 16px}
+  .sheet-hd{display:flex;align-items:baseline;justify-content:space-between;
+            font-family:var(--mono);font-weight:700;color:var(--sheet-hi);font-size:19px;
+            padding-bottom:8px;border-bottom:1px solid var(--rule-sheet)}
+  .sheet-hd em{font-style:normal;font-size:14px;color:var(--sheet-dim);font-weight:400}
+  .claim{font-family:var(--mono);padding:9px 0 7px;border-bottom:1px solid var(--rule-sheet)}
+  .claim b{display:block;font-size:14.5px;font-weight:600;color:var(--sheet-hi)}
+  .claim s{display:block;text-decoration:none;font-size:12.5px;color:var(--sheet-dim);
+           margin-top:2px}
+  .claim s i{font-style:normal;color:var(--sheet-ink);font-weight:600}
+  .pointers{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px;font-family:var(--mono);
+            font-size:12px}
+  .pointers span{border:1px solid var(--rule-sheet);border-radius:5px;padding:3px 8px;
+                 color:var(--sheet-dim)}
+  .pointers span b{font-weight:600;color:var(--sheet-ink)}
+
+  footer{display:flex;align-items:baseline;justify-content:space-between;
+         padding-top:18px;font-family:var(--mono);font-size:15px;color:var(--faint);
+         letter-spacing:1.4px;border-top:1px solid var(--rule-body);margin-top:20px}
+  footer .repo{font-size:14px;color:var(--faint)}
+</style>
+</head>
+<body>
+<div class="card">
+  <header>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 256 256" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="m-ink" gradientUnits="userSpaceOnUse" x1="38" y1="212" x2="218" y2="44">
+            <stop offset="0%" stop-color="#C77DFF"/><stop offset="52%" stop-color="#E879DF"/>
+            <stop offset="100%" stop-color="#FF4D8D"/>
+          </linearGradient>
+        </defs>
+        <g transform="translate(3,3) scale(6.25)">
+          <rect x="15.5" y="15.5" width="9" height="9" rx="1.2" fill="#E879DF" fill-opacity="0.20"/>
+          <g fill="#E879DF" fill-opacity="0.75">
+            <rect x="16.8" y="17.6" width="6.4" height="1.3" rx="0.65"/>
+            <rect x="16.8" y="20.3" width="4.4" height="1.3" rx="0.65"/>
+            <rect x="16.8" y="23.0" width="5.6" height="1.3" rx="0.65"/>
+          </g>
+          <g fill="none" stroke-linejoin="miter" stroke-miterlimit="8">
+            <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+                  stroke="#E879DF" stroke-opacity="0.32" stroke-width="3"/>
+            <path d="M14 8 H7 V32 H14 V26 H26 V32 H33 V8 H26 V14 H14 V8 Z"
+                  stroke="url(#m-ink)" stroke-width="3" stroke-linecap="round"
+                  pathLength="100" stroke-dasharray="8 92" stroke-dashoffset="-16"/>
+          </g>
+        </g>
+      </svg>
+      <span class="wordmark">contextify</span>
+    </div>
+    <span class="kicker">ONE SOURCE, EVERY AGENT</span>
+  </header>
+
+  <main>
+    <div class="left">
+      <h1>One file the agents read.<br><em>One check that proves it.</em></h1>
+      <p class="story">Tell every coding agent how your repo works. Then prove it is still true.</p>
+
+      <div class="check">
+        <div class="row">
+          <span class="cmd">$ ctx-check</span>
+          <span class="out">silent, exit 0, 0 tokens</span>
+        </div>
+        <div class="row moved">
+          <span class="cmd">$ ctx-check</span>
+          <span class="out">8 lines, names the file that moved</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="sheet">
+      <div class="clamp"><u></u><u></u></div>
+      <div class="sheet-in">
+        <div class="sheet-hd"><span>AGENTS.md</span><em>42 lines</em></div>
+        <div class="claim"><b>Test: pnpm -r test</b><s>cites <i>package.json#scripts.test:14</i></s></div>
+        <div class="claim"><b>Build: pnpm build</b><s>cites <i>package.json#scripts.build:13</i></s></div>
+        <div class="claim"><b>Migrations: prisma migrate deploy</b><s>cites <i>prisma/schema.prisma:1</i></s></div>
+        <div class="pointers">
+          <span>CLAUDE.md <b>@AGENTS.md</b></span>
+          <span>GEMINI.md <b>3 lines</b></span>
+          <span>.cursor/rules <b>alwaysApply</b></span>
+          <span>copilot-instructions <b>pointer</b></span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>every line cites a file &middot; no model, no network</span>
+    <span class="repo">github.com/Aboudjem/contextify</span>
+  </footer>
+</div>
+</body>
+</html>
