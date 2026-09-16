@@ -1,0 +1,29 @@
+# --- contextify's own state in THIS repo is committed on purpose ---
+# .contextify/stamp.json and .contextify/evidence.json are tracked here: the repo dogfoods its
+# own drift check, and a committed stamp is what lets every clone report "fresh" without a rerun.
+# Target repos decide for themselves; `contextify init` recommends committing the stamp too.
+# Only the local mistakes log stays private.
+.contextify/mistakes.md
+
+# --- run briefs and journals (local resumability only) ---
+.goal/
+docs/audit/
+
+# --- OS / editor noise ---
+.DS_Store
+Thumbs.db
+*.swp
+*~
+.idea/
+.vscode/
+*.code-workspace
+
+# --- Tooling ---
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.cache/
+.omc/
+.claude/

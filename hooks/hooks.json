@@ -1,0 +1,17 @@
+{
+  "description": "contextify: zero-token context drift check at session start. Prints nothing when AGENTS.md is fresh; prints a short notice when the evidence it was written from has moved or a quoted command no longer exists. Never rewrites a file, never blocks a session.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"${CLAUDE_PLUGIN_ROOT}/skills/contextify/scripts/ctx-check\" --hook claude",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "contextify",
+  "version": "0.1.0",
+  "description": "Tell every coding agent how your repo works. Then prove it is still true.",
+  "author": {
+    "name": "Adam Boudjemaa",
+    "url": "https://github.com/Aboudjem/contextify"
+  },
+  "homepage": "https://github.com/Aboudjem/contextify",
+  "repository": "https://github.com/Aboudjem/contextify",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "claude-code-plugin",
+    "contextify",
+    "agents-md",
+    "claude-md",
+    "context-engineering",
+    "agent-skills",
+    "gemini-md",
+    "cursor-rules",
+    "copilot-instructions"
+  ],
+  "skills": [
+    "contextify"
+  ]
+}

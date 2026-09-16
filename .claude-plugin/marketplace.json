@@ -1,0 +1,17 @@
+{
+  "name": "contextify-marketplace",
+  "owner": {
+    "name": "Adam Boudjemaa"
+  },
+  "metadata": {
+    "description": "Tell every coding agent how your repo works. Then prove it is still true."
+  },
+  "plugins": [
+    {
+      "name": "contextify",
+      "source": "./",
+      "description": "Tell every coding agent how your repo works. Then prove it is still true.",
+      "version": "0.1.0"
+    }
+  ]
+}

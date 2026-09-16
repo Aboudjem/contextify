@@ -1,0 +1,24 @@
+# gitleaks configuration for the contextify repo.
+#
+# contextify writes context files that name commands and paths, never credential values, so the
+# default rule set stays ON in full. This file adds one narrow allowlist for redacted examples in
+# documentation: a value that ends in a literal ellipsis is a truncated illustration, not a key,
+# because a real credential is never truncated. The allowlist is scoped to Markdown only.
+
+[extend]
+useDefault = true
+
+[[rules]]
+# Inert rule so `[allowlist]` has a valid parent without narrowing the default rule set.
+id = "contextify-placeholder-never-matches"
+description = "Inert rule. Present so the file is valid without redefining any default rule."
+regex = '''\$\^contextify-never-matches\$'''
+
+[allowlist]
+description = "Redacted credential examples in documentation. Every one ends in a literal ellipsis."
+paths = [
+  '''.*\.md$''',
+]
+regexes = [
+  '''(sk_live_|sk_test_|sk-|ghp_|github_pat_|AKIA|AIza|xoxb-|SG\.)[A-Za-z0-9_\-]{0,12}\.\.\.''',
+]
