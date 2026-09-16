@@ -1,0 +1,46 @@
+# contextify
+
+> Tell every coding agent how your repo works. Then prove it is still true.
+>
+> contextify is a Claude Code skill that reads one repository and writes AGENTS.md as the single
+> source of facts, with CLAUDE.md, GEMINI.md, an optional Cursor rule and a Copilot instructions file
+> as thin pointers back to it. Every command, path, port, branch and deploy fact in AGENTS.md traces
+> to the file and line that justifies it, or it is labelled unverified, or it is cut. A deterministic,
+> zero-token check at every session start notices when the evidence has moved or a quoted command no
+> longer resolves. The hook only ever reads and prints; it never rewrites a file.
+
+## Docs
+
+- [README](https://github.com/Aboudjem/contextify/blob/main/README.md): What contextify is, who it is for, how to install and use it.
+- [SKILL.md](https://github.com/Aboudjem/contextify/blob/main/skills/contextify/SKILL.md): The skill definition read by Claude Code and every other agent through the skills CLI.
+- [Quickstart](https://github.com/Aboudjem/contextify/blob/main/docs/quickstart.md): A first run in eight numbered steps: install, `init`, read the diff, commit the stamp, then see the hook stay silent until something drifts.
+- [Install in your editor](https://github.com/Aboudjem/contextify/blob/main/docs/editors.md): The `npx skills add` one-liner and the `-a` code, install paths and context file for Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI.
+- [FAQ](https://github.com/Aboudjem/contextify/blob/main/docs/faq.md): Short answers to the questions people actually ask, from why AGENTS.md is the source to whether the hook ever rewrites a file.
+- [Honest limits](https://github.com/Aboudjem/contextify/blob/main/docs/limits.md): What a clean run does not prove, opening on the line that a verified command was never executed and citing the ETH Zurich finding on context files.
+- [Hooks and CI](https://github.com/Aboudjem/contextify/blob/main/docs/hooks.md): The opt-in snippets for Codex, Gemini, Cursor, git and a GitHub Action, plus the one-command installer.
+- [Comparison](https://github.com/Aboudjem/contextify/blob/main/docs/comparison.md): contextify against ruler, rulesync, ClaudeForge, agentrules-architect, airul, agents-md-generator and the built-in `/init` commands, scoped to what each was actually read to do.
+- [Security policy](https://github.com/Aboudjem/contextify/blob/main/SECURITY.md): How to report a problem in contextify itself.
+- [LICENSE (MIT)](https://github.com/Aboudjem/contextify/blob/main/LICENSE): Permissive MIT license.
+
+## Install
+
+- Plugin (recommended): `claude plugin marketplace add Aboudjem/contextify` then `claude plugin install contextify@contextify-marketplace`.
+- Skills CLI, any agent: `npx skills add Aboudjem/contextify -a claude-code`, swapping the `-a` code for your agent.
+- Manual: `git clone https://github.com/Aboudjem/contextify`, then copy `skills/contextify` into your agent's skills directory. Copy the whole directory: `references/` and `scripts/` load by relative path.
+
+## Skill
+
+- [Skill directory](https://github.com/Aboudjem/contextify/tree/main/skills/contextify): `SKILL.md` plus `references/`, loaded only when a run reaches the area a reference covers.
+- [Scripts](https://github.com/Aboudjem/contextify/tree/main/skills/contextify/scripts): the deterministic layer, `ctx-check`, `ctx_write.py`, `ctx_stamp.py`, `verify_claims.py`, `install_hooks.sh`. The model writes a draft; only these scripts touch a target file.
+- Every pointer file generated (`CLAUDE.md`, `GEMINI.md`, the optional `.mdc`, the Copilot instructions file) links back to `AGENTS.md` rather than duplicating it.
+
+## Examples
+
+- `examples/`: two worked examples, a Next.js app and a Python service, each showing a real `AGENTS.md`, its pointer files, and a drift notice after a deliberate change.
+
+## Optional
+
+- [Evals](https://github.com/Aboudjem/contextify/tree/main/evals): deterministic checks and behavioral scenarios. Skip if a shorter context is needed.
+- [Changelog](https://github.com/Aboudjem/contextify/blob/main/CHANGELOG.md): release history. Skip if a shorter context is needed.
+- [Contributing](https://github.com/Aboudjem/contextify/blob/main/CONTRIBUTING.md): how to propose a change. Skip if a shorter context is needed.
+- `READMEs/` translations: they may lag the English README. Skip if a shorter context is needed.
