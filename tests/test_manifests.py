@@ -68,9 +68,22 @@ REQUIRED_FILES = [
     "evals/scenarios.md",
     "evals/check_skill.py",
     "tests/test_manifests.py",
+    "tests/test_ctx_check.py",
+    "tests/test_verify_claims.py",
+    "hooks/hooks.json",
+    "docs/hooks.md",
+    "docs/comparison.md",
+    "docs/design/DECISIONS.md",
+    f"skills/{NAME}/scripts/ctx-check",
+    f"skills/{NAME}/scripts/ctx_check.py",
+    f"skills/{NAME}/scripts/ctx_write.py",
+    f"skills/{NAME}/scripts/ctx_stamp.py",
+    f"skills/{NAME}/scripts/verify_claims.py",
+    f"skills/{NAME}/scripts/detect_repo.sh",
+    f"skills/{NAME}/scripts/install_hooks.sh",
     SKILL_MD,
 ]
-REQUIRED_DIRS = ["assets", "examples", f"skills/{NAME}/references"]
+REQUIRED_DIRS = ["assets", "examples", f"skills/{NAME}/references", f"skills/{NAME}/scripts", "hooks"]
 TRANSLATIONS = ["es", "fr", "ja", "zh-CN"]
 
 
@@ -334,6 +347,88 @@ for lang in TRANSLATIONS:
           f"{rel} has no language switcher pointing at ../README.md")
     check(f"{rel} carries the may-lag marker", "<!-- may-lag -->" in t,
           f"{rel} must carry the literal `<!-- may-lag -->` marker")
+
+# --- 8b. contextify-specific: the hook manifest and the scripts ---
+# hooks/hooks.json is what makes the drift check a rule rather than a suggestion. It has to parse,
+# live at the plugin root (never under .claude-plugin/), resolve its command through
+# ${CLAUDE_PLUGIN_ROOT}, and point at a script that exists and is executable.
+_hooks, _hooks_err = load_json("hooks/hooks.json")
+check("hooks/hooks.json parses as valid JSON", not _hooks_err, _hooks_err)
+check("no hooks/ directory under .claude-plugin/",
+      not os.path.exists(os.path.join(ROOT, ".claude-plugin", "hooks")),
+      "the docs say only plugin.json goes inside .claude-plugin/")
+_ss = (_hooks.get("hooks") or {}).get("SessionStart") or []
+check("hooks/hooks.json declares a SessionStart hook", bool(_ss), "no SessionStart entry")
+_cmds = [h.get("command", "") for grp in _ss for h in (grp.get("hooks") or [])]
+check("every SessionStart hook is a command hook with a 5 s timeout",
+      bool(_cmds) and all(h.get("type") == "command" and h.get("timeout") == 5
+                          for grp in _ss for h in (grp.get("hooks") or [])),
+      "type must be command and timeout must be 5 so a hung check can never stall a launch")
+for _c in _cmds:
+    _m = re.search(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s\"]+)", _c)
+    check(f"hook command resolves through ${{CLAUDE_PLUGIN_ROOT}}: {_c[:60]}", bool(_m),
+          "the plugin's install dir is only known at run time")
+    if _m:
+        _rel = _m.group(1)
+        _abs = os.path.join(ROOT, _rel)
+        check(f"hook script exists and is executable: {_rel}",
+              os.path.isfile(_abs) and os.access(_abs, os.X_OK), f"{_rel} missing or not chmod +x")
+    check(f"hook command passes --hook claude: {_c[:60]}", "--hook claude" in _c,
+          "the envelope flag picks the Claude Code JSON shape")
+    check("hook matcher covers startup|resume|clear",
+          any(grp.get("matcher") == "startup|resume|clear" for grp in _ss),
+          "compact and fork are omitted on purpose: a compaction resume would re-inject the notice")
+
+# Every script is zero-dependency: executable, correct shebang, and no import outside the
+# standard library. A dependency here would break `npx skills add` installs, which copy files
+# and install nothing.
+_scripts_dir = os.path.join(ROOT, "skills", NAME, "scripts")
+_STDLIB_OK = {"argparse", "collections", "dataclasses", "datetime", "difflib", "errno", "fnmatch",
+              "functools", "glob", "hashlib", "io", "itertools", "json", "os", "pathlib", "re",
+              "shlex", "shutil", "stat", "string", "subprocess", "sys", "tempfile", "textwrap",
+              "time", "tomllib", "typing", "unicodedata", "ctxlib", "__future__", "posixpath",
+              "contextlib", "enum", "math", "signal", "platform", "copy", "operator", "traceback",
+              "codecs", "locale", "select", "fcntl"}
+for _fn in sorted(os.listdir(_scripts_dir)) if os.path.isdir(_scripts_dir) else []:
+    _fp = os.path.join(_scripts_dir, _fn)
+    if not os.path.isfile(_fp) or _fn.startswith("."):
+        continue
+    check(f"script is executable: scripts/{_fn}", os.access(_fp, os.X_OK), "chmod +x it")
+    _first = read(f"skills/{NAME}/scripts/{_fn}").splitlines()[:1]
+    _sheb = _first[0] if _first else ""
+    if _fn.endswith(".py"):
+        check(f"script has the python3 shebang: scripts/{_fn}",
+              _sheb.startswith("#!/usr/bin/env python3"), f"got {_sheb!r}")
+        _imports = set()
+        for _ln in read(f"skills/{NAME}/scripts/{_fn}").splitlines():
+            _mi = re.match(r"^\s*(?:from\s+([A-Za-z_][\w.]*)\s+import|import\s+([A-Za-z_][\w.]*))", _ln)
+            if _mi:
+                _imports.add((_mi.group(1) or _mi.group(2)).split(".")[0])
+        _bad = sorted(i for i in _imports if i not in _STDLIB_OK)
+        check(f"script imports only the standard library: scripts/{_fn}", not _bad,
+              "non-stdlib import(s): " + ", ".join(_bad))
+    elif _fn == "ctx-check":
+        check("ctx-check is POSIX sh (#!/bin/sh)", _sheb == "#!/bin/sh", f"got {_sheb!r}")
+    elif _fn.endswith(".sh"):
+        check(f"script has a bash shebang: scripts/{_fn}",
+              _sheb.startswith("#!/usr/bin/env bash") or _sheb.startswith("#!/bin/bash"),
+              f"got {_sheb!r}")
+
+# The em dash is banned in every committed text file, and CI relies on this test for it.
+_EM = "\u2014"
+_em_hits = []
+for _rel in subprocess.run(["git", "ls-files"], capture_output=True, text=True,
+                           cwd=ROOT).stdout.splitlines():
+    if os.path.splitext(_rel)[1].lower() not in (".md", ".json", ".svg", ".txt", ".yml", ".yaml",
+                                                  ".py", ".sh", ".html", ".mdc", ".toml", ""):
+        continue
+    try:
+        for _n, _line in enumerate(read(_rel).splitlines(), 1):
+            if _EM in _line:
+                _em_hits.append(f"{_rel}:{_n}")
+    except (OSError, UnicodeDecodeError):
+        continue
+check("no em dash (U+2014) in any tracked text file", not _em_hits, ", ".join(_em_hits[:6]))
 
 # --- 9. no secrets (the CI patterns, mirrored so a local run catches them too) ---
 SECRETS = [re.compile(p) for p in (
