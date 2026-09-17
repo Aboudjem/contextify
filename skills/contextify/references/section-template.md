@@ -142,3 +142,7 @@ Claude Code's own experimental init flow states the rule plainly: every line mus
 | `Single test: \`pnpm run test -- src/lib/pricing.test.ts\`` | Kept | Without it, an agent asked to run one test either invents a filter flag or reruns the whole suite; removing it causes a real mistake. |
 | `This project uses React and TypeScript for the frontend.` | Cut | `package.json` already states this; removing the line changes nothing an agent would get wrong, since it can read the manifest directly. |
 | `Write clean, readable code.` | Cut | Generic and not actionable; there is no concrete mistake this line prevents, and no repo evidence backs it. |
+
+## Optional depth
+
+Keep this entry point short. Link existing maintained architecture and workflow docs first. If missing detail warrants new files, use the optional two-document contract in [supporting-docs.md](supporting-docs.md), with per-line provenance and independent verification. These documents have their own budgets and are read on demand, never automatically imported into AGENTS.

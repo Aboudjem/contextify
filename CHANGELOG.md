@@ -4,6 +4,19 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2026-09-17
+
+### Added
+
+- Optional `docs/context/architecture.md` and `docs/context/workflows.md`, generated only when useful, with per-line evidence, managed updates and drift detection.
+- A 120-line ceiling per supporting document, including preserved human content. AGENTS remains the short entry point, with links for on-demand reading.
+- Git pre-commit and pre-push templates, an explicit activation option with existing-hook protection, and a read-only Git checker mode.
+
+### Changed
+
+- Git checkpoints are the default hook setup. The package no longer registers an automatic SessionStart hook; host session hooks remain explicitly opt-in.
+- Git checks warn by default and can block on drift with `--strict`. Checks inspect the working tree, not a staged or pushed snapshot.
+
 ## [0.1.0] - 2026-09-16
 
 First release. Tell every coding agent how your repo works. Then prove it is still true.
@@ -35,3 +48,5 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 - **Tests and evals** covering the deterministic scripts and the skill's behavioral scenarios.
 
 [0.1.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.1.0
+
+[0.2.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.2.0

@@ -23,6 +23,7 @@ contextify est un skill qui rédige des instructions courtes à partir des fichi
 - Rédige un seul `AGENTS.md`, avec des fichiers de renvoi pour les autres agents. Il vise 20, 40 ou 60 lignes selon la taille du dépôt et refuse de dépasser 150 lignes.
 - Rattache les commandes et chemins aux fichiers du dépôt. Toute affirmation sans preuve doit être signalée `unverified` ou omise ; un autre agent vérifie le brouillon.
 - Détecte les changements sans appeler de modèle. Aucun message lorsque tout est à jour ; les mises à jour affichent un diff et préservent le contenu humain hors des blocs gérés.
+- Ajoute des notes d’architecture ou de travail seulement si elles sont utiles, avec des liens depuis `AGENTS.md`. Réutilise d’abord les documents existants qui sont à jour.
 
 ## Installation
 
@@ -45,11 +46,11 @@ Demandez ensuite à votre agent de lancer contextify sur le dépôt courant. Dan
 /contextify init
 ```
 
-Vérifiez le diff proposé, puis commitez les fichiers de contexte et les métadonnées `.contextify/`. Les scripts nécessitent Git, les outils shell POSIX, Bash et Python 3, sans paquet Python supplémentaire ni serveur MCP. L'installateur utilise Node.js via `npx`. [Installation par éditeur](../docs/editors.md).
+Vérifiez le diff proposé, puis commitez les fichiers de contexte et les métadonnées `.contextify/`. Les scripts nécessitent Git, les outils shell POSIX, Bash et Python 3.11+, sans paquet Python supplémentaire ni serveur MCP. L'installateur utilise Node.js via `npx`. [Installation par éditeur](../docs/editors.md).
 
 ## Ce que vous obtenez
 
-Extrait d’un essai réel sur une copie isolée de HazeLab, une application Next.js, le 17 septembre 2026. Codex a rédigé les instructions et Contextify a écrit les fichiers. [Sortie complète et preuves](../examples/nextjs/README.md).
+Exemple historique de la **v0.1.0**, qui ne valide pas les ajouts de la 0.2.0. Extrait d’un essai réel sur une copie isolée de HazeLab, une application Next.js, le 17 septembre 2026. Codex a rédigé les instructions et Contextify a écrit les fichiers. [Sortie complète et preuves](../examples/nextjs/README.md).
 
 ```markdown
 ## Commands
@@ -88,10 +89,12 @@ Les valeurs ci-dessous concernent les nouveaux fichiers. Le contenu humain déj�
 | `GEMINI.md` | Gemini CLI, via `@AGENTS.md` | 3 |
 | `.cursor/rules/contextify.mdc` | Cursor ; facultatif, car il lit aussi `AGENTS.md` | 9 |
 | `.github/copilot-instructions.md` | GitHub Copilot | 4 |
+| `docs/context/architecture.md` | Architecture, composants et circulation des données, si utile | Maximum 120 |
+| `docs/context/workflows.md` | Développement, tests et publication, si utile | Maximum 120 |
 | `.contextify/evidence.json` | Sources enregistrées par Contextify | Selon le dépôt |
 | `.contextify/stamp.json` | Vérification de fraîcheur par Contextify | Selon le dépôt |
 
-Seules les cibles sélectionnées reçoivent un fichier de renvoi. Voir les [règles de chargement et leurs limites](../docs/editors.md).
+Seules les cibles choisies reçoivent un fichier de renvoi. Les documents complémentaires sont facultatifs, limités à 120 lignes chacun et lus au besoin. Voir les [documents complémentaires](../docs/supporting-docs.md) et les [règles de chargement](../docs/editors.md).
 
 ## Fonctionnement
 
@@ -106,7 +109,14 @@ Seules les cibles sélectionnées reçoivent un fichier de renvoi. Voir les [rè
 
 `init --dry-run` affiche les fichiers proposés et leur taille en lignes et octets. `--yes` évite les questions courantes, mais ne contourne ni un conflit dans un bloc géré ni une limite stricte.
 
-Le plugin Claude Code inclut un hook au démarrage de session. Les [hooks Codex, Gemini, Cursor, Git et CI](../docs/hooks.md) sont facultatifs. La vérification ne consomme aucun token de modèle ; son message d'alerte occupe du contexte lorsqu'un agent le lit. La CI avertit par défaut ; `--ci --strict` la fait échouer en cas de dérive.
+Le plugin n’active aucun hook au démarrage de session. L’installateur propose des vérifications Git `pre-commit` et `pre-push` ; l’écriture des fichiers et leur activation sont deux étapes explicites. Depuis une copie de Contextify, en indiquant le dépôt cible :
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
+```
+
+Les hooks vérifient les fichiers de travail actuels, pas l’état placé dans l’index ni les commits poussés. Ils avertissent par défaut sans réécrire de fichier ; le mode strict est facultatif. L’activation refuse de remplacer des hooks existants ou un chemin de hooks personnalisé ou global. [Installation, migration et CI](../docs/hooks.md).
 
 ## Comparaison
 
@@ -133,24 +143,16 @@ Le hook ne réécrit jamais les fichiers. La génération et la révision utilis
 
 [Contribuer](../CONTRIBUTING.md) · [Sécurité](../SECURITY.md) · [Historique des versions](../CHANGELOG.md) · [Licence MIT](../LICENSE) · [Catalogue de plugins 10x](https://github.com/Aboudjem/10x)
 
-Vérifications locales du **17 septembre 2026** : les six commandes ci-dessous ont terminé avec le code 0. Ces résultats ne prouvent pas que la CI publiée a réussi. Le [guide d’évaluation](../evals/README.md) précise leur portée.
+Exécutez ces vérifications sur la révision examinée. Les résultats historiques du [rapport v0.1.0](../evals/dogfood.md) ne prouvent pas que les nouveaux changements ont été validés.
 
 ```bash
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
 python3 tests/test_hooks.py
 python3 tests/test_regressions.py
+python3 tests/test_supporting_docs.py
 python3 tests/test_manifests.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 ```
-
-| Vérification | Résultat |
-| --- | ---: |
-| Dérive et écriture | 119/119 |
-| Résolution des affirmations | 30/30 |
-| Hooks | 6/6 |
-| Tests de régression | 23/23 |
-| Manifestes | 135/135 |
-| Contrat du skill | 110/110 |
 
 Traduction réalisée avec l'aide d'un modèle. Elle peut avoir du retard sur la [version anglaise](../README.md), qui fait référence. Les documents liés restent en anglais.

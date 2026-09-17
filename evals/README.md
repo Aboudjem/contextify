@@ -3,8 +3,7 @@
 The reason this repo carries an eval suite at all: contextify writes files other coding agents
 read as fact, and every line in them is supposed to be evidence-backed, omitted, or labelled
 `unverified`. A skill that invents a command, or a script that reports a repo fresh when a claim
-already died, fails silently in someone else's project. CI here is the only place that gets caught
-before it ships.
+already died, fails silently in someone else's project. Local and CI checks catch these failures before release.
 
 ## a. `check_skill.py`: the design lock as assertions on `SKILL.md`
 
@@ -57,6 +56,7 @@ fails an oversized file, exit is 1 on any stale claim.
 python3 tests/test_manifests.py
 python3 tests/test_regressions.py
 python3 tests/test_hooks.py
+python3 tests/test_supporting_docs.py
 ```
 
 Every manifest parses and agrees on one version, every required repo file exists, `SKILL.md`'s
@@ -84,7 +84,9 @@ judge it, mechanically where the deterministic suite already covers the shape, b
 
 ## f. The dogfood record: measured, not promised
 
-[dogfood.md](dogfood.md) records the current Codex runs on isolated copies of maintained repositories. It distinguishes measured script behavior, independently reviewed drafts, initial failures and any remaining host-specific validation. The [RED baseline](RED-baseline.md) remains the historical Claude/Codex/Gemini experiment from 2026-09-16.
+[dogfood.md](dogfood.md) records historical 0.1 Codex runs on isolated copies of maintained repositories. It distinguishes measured script behavior, independently reviewed drafts, initial failures and any remaining host-specific validation. The [RED baseline](RED-baseline.md) remains the historical Claude/Codex/Gemini experiment from 2026-09-16.
+
+[supporting-docs.md](supporting-docs.md) records the 0.2 extension: optional architecture/workflow outputs, Git checkpoints, a generated self-example and current deterministic results.
 
 The independent Codex review also led to adversarial cases in `tests/test_regressions.py` and hook-installation cases in `tests/test_hooks.py`. These test boundary escapes, byte preservation, budgets after merging, provenance, previews, and portable hook installation.
 
@@ -98,6 +100,7 @@ python3 tests/test_verify_claims.py
 python3 tests/test_manifests.py
 python3 tests/test_regressions.py
 python3 tests/test_hooks.py
+python3 tests/test_supporting_docs.py
 ```
 
 ## What a green run proves, and what it does not

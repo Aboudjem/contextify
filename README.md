@@ -19,6 +19,7 @@ contextify is an Agent Skill that writes short repository instructions from file
 - Writes one `AGENTS.md`, with thin pointers for your other agents. Targets 20, 40 or 60 lines by repository size; refuses files above 150 lines.
 - Records commands and paths against repository evidence. Unsupported claims must be labelled `unverified` or omitted; a separate agent reviews the draft.
 - Checks for drift without calling a model. Fresh checks are silent; updates show a diff and preserve human content outside the managed blocks.
+- Adds focused architecture or workflow notes when the repository needs them, with links from `AGENTS.md`. Reuses accurate existing docs first.
 
 ## Install
 
@@ -41,11 +42,11 @@ Then ask your agent to run contextify on the current repository. In Claude Code,
 /contextify init
 ```
 
-Review the proposed diff, then commit the generated context files and `.contextify/` metadata. The scripts need Git, POSIX shell tools, Bash and Python 3; there are no Python package dependencies or MCP server. The installer uses Node.js through `npx`. [Editor-specific setup](docs/editors.md).
+Review the proposed diff, then commit the generated context files and `.contextify/` metadata. The scripts need Git, POSIX shell tools, Bash and Python 3.11+; there are no Python package dependencies or MCP server. The installer uses Node.js through `npx`. [Editor-specific setup](docs/editors.md).
 
 ## What you get
 
-Excerpt from a real run on an isolated copy of HazeLab, a Next.js app, on 2026-09-17. Codex drafted the instructions and Contextify wrote the files. [Full output and evidence](examples/nextjs/README.md).
+Historical **v0.1.0** example; this is not evidence of the 0.2.0 extension. Excerpt from a real run on an isolated copy of HazeLab, a Next.js app, on 2026-09-17. Codex drafted the instructions and Contextify wrote the files. [Full output and evidence](examples/nextjs/README.md).
 
 ```markdown
 ## Commands
@@ -84,10 +85,12 @@ Defaults below describe newly generated files. Human content already present sti
 | `GEMINI.md` | Gemini CLI, through `@AGENTS.md` | 3 |
 | `.cursor/rules/contextify.mdc` | Cursor; optional because it also reads `AGENTS.md` | 9 |
 | `.github/copilot-instructions.md` | GitHub Copilot | 4 |
+| `docs/context/architecture.md` | Optional map of components, boundaries and data flow | Maximum 120 |
+| `docs/context/workflows.md` | Optional development, testing and release procedures | Maximum 120 |
 | `.contextify/evidence.json` | Contextify's evidence records | Depends on repository |
 | `.contextify/stamp.json` | Contextify's freshness check | Depends on repository |
 
-Only selected targets get pointer files. See [loading rules and caveats](docs/editors.md).
+Only selected targets get pointer files. Supporting documents are optional, capped at 120 lines each, and read when relevant. See [supporting documents](docs/supporting-docs.md) and [loading rules](docs/editors.md).
 
 ## How it works
 
@@ -102,7 +105,14 @@ Only selected targets get pointer files. See [loading rules and caveats](docs/ed
 
 `init --dry-run` shows the proposed files and their line/byte costs. `--yes` skips routine questions, never a managed-block conflict or a hard ceiling.
 
-The Claude Code plugin includes a session-start hook. [Codex, Gemini, Cursor, Git and CI hooks](docs/hooks.md) are opt-in. The check itself uses no model tokens; a drift notice occupies context when an agent reads it. CI warns by default; use `--ci --strict` to fail on drift.
+The plugin registers no session-start hook by default. The installer proposes Git `pre-commit` and `pre-push` checks; applying files and activating them are explicit steps. From a Contextify checkout, with the target repository path supplied:
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
+```
+
+Git checks inspect the current working tree, not the staged snapshot or pushed commits. They warn by default and never rewrite files; strict mode is optional. Activation refuses to replace existing hooks or a custom/global hooks path. [Installation, migration and CI](docs/hooks.md).
 
 ## Compared with
 
@@ -129,22 +139,14 @@ The hook never rewrites files. Generation and revision use your coding agent; th
 
 [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE) · [10x plugin hub](https://github.com/Aboudjem/10x)
 
-Local verification on **2026-09-17**: all six commands below exited 0. These are local results; they do not establish that published CI has passed. The [evaluation guide](evals/README.md) explains their scope.
+Run these local checks for the revision you are reviewing. Historical results belong to the [v0.1.0 evaluation](evals/dogfood.md); they do not establish that new changes passed.
 
 ```bash
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
 python3 tests/test_hooks.py
 python3 tests/test_regressions.py
+python3 tests/test_supporting_docs.py
 python3 tests/test_manifests.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 ```
-
-| Check | Passed |
-| --- | ---: |
-| Drift and writer fixtures | 119/119 |
-| Claim resolver fixtures | 30/30 |
-| Hook fixtures | 6/6 |
-| Regression tests | 23/23 |
-| Manifest checks | 135/135 |
-| Skill contract | 110/110 |

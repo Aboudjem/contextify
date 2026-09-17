@@ -25,15 +25,15 @@ is deliberately sparse and why the line budgets exist at all.
 
 ## The hook never rewrites
 
-`ctx-check` only reads and prints. A stale `AGENTS.md` stays stale, and the notice keeps appearing at
-every session start, until a human or an agent runs `/contextify update`.
+Git and host-session checks only read and print; CI may append its job summary. A stale `AGENTS.md` stays stale, and the notice keeps appearing at
+each installed commit/push checkpoint until a human or an agent runs `/contextify update`. Session checks are optional.
 
 ## Bounded parsers leave some evidence unverified
 
-YAML is read with a bounded line-based reader, not a full YAML library. Makefile/justfile includes and computed build targets are outside the current parser. A target supplied only by an include may be reported missing; review that result against the real build tool instead of treating it as proof of a dead command. See
+YAML is read with a bounded line-based reader, not a full YAML library. Makefile/justfile includes and computed build targets are outside the current parser. Makefile targets supplied only by an include remain unverified; review them against the real build tool instead of treating them as dead commands. See
 [D15](design/DECISIONS.md).
 
-## Some runner forms are unverified in 0.1.0
+## Some runner forms remain unverified
 
 `uv run`, `poetry run`, `task`, and `mise` are not in the resolver table yet, so a quoted command using
 one of them is reported `unverified` rather than resolved or marked stale. See
@@ -48,7 +48,7 @@ CLI deduplicates `AGENTS.md` when both combined discovery and an explicit import
 ## A check belongs to one working tree
 
 Run `ctx-check` in the checkout you want to inspect. Git worktrees have separate indexes; a passing
-check in one worktree says nothing about another. Hook input selects the working directory.
+check in one worktree says nothing about another. Git hooks inspect the current working tree, including unstaged edits. They do not reconstruct the staged commit or pushed refs. Activation in linked worktrees is refused to avoid changing shared hook configuration; manual checks still work there.
 
 ## Cursor's .mdc rule is optional
 
@@ -62,9 +62,13 @@ default. It exists only for a project that wants an explicit, always-applied poi
 when contextify finds it recorded in `.codex/config.toml`; an override set some other way is not
 detected, so the preflight check may still assume the default. See [D12](design/DECISIONS.md).
 
-## No Windows testing in 0.1.0
+## Platform verification has limits
 
 The scripts use POSIX shell tools, Bash and Python 3.11 or newer. Local checks run on macOS; the GitHub workflow runs on Linux. Consult the current CI result for that revision. Windows behavior, including WSL, has not been verified for this release.
+
+## Supporting prose still needs review
+
+Architecture and workflow documents use the same provenance and drift checks as instructions. A source digest establishes that a line has not changed; it does not establish that a description of data flow or component responsibility is correct. More files can add maintenance cost. Prefer accurate existing docs and generate only what a concrete task needs.
 
 ## Related
 
@@ -73,4 +77,4 @@ The scripts use POSIX shell tools, Bash and Python 3.11 or newer. Local checks r
 
 ## Plugin validation and contributor context
 
-The root `CLAUDE.md` imports this repository's contributor instructions. Claude's plugin validator warns that a plugin-root `CLAUDE.md` is not loaded as distributed project context. The installed skill lives in `skills/contextify/SKILL.md`. Marketplace validation passes with `--strict`; plugin manifest validation passes with this warning, and therefore does not pass `--strict`.
+The root `CLAUDE.md` imports this repository's contributor instructions. Claude's plugin validator warns that a plugin-root `CLAUDE.md` is not loaded as distributed project context. The installed skill lives in `skills/contextify/SKILL.md`. For the historical 0.1.0 release, marketplace validation passed with `--strict`; plugin manifest validation reported this warning and did not pass `--strict`. Re-run validation for the revision being released.

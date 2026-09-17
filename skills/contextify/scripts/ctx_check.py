@@ -10,7 +10,7 @@ Exit contract (D9), locked in every mode:
   0 with stdout         drift, at most 12 lines and 2,048 bytes
   3                     no stamp yet
   1                     the check itself broke (stderr only, stdout empty)
-Never 2. --ci --strict is the one opt-in that turns drift into exit 1.
+Never 2. --ci --strict and --git --strict turn drift into exit 1.
 """
 
 import json
@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import ctxlib  # noqa: E402
 
-USAGE = """Usage: ctx_check.py [--root PATH] [--hook claude|codex|gemini|cursor] [--ci]
+USAGE = """Usage: ctx_check.py [--root PATH] [--hook claude|codex|gemini|cursor] [--ci | --git]
                     [--strict] [--json] [--quiet-if-fresh] [PATH]
 
 Prints nothing when the context files are fresh.
@@ -32,7 +32,7 @@ Prints nothing when the context files are fresh.
 
 def parse_args(argv):
     opts = {"root": None, "hook": None, "ci": False, "strict": False, "json": False,
-            "quiet": False, "path": None}
+            "quiet": False, "path": None, "git": False}
     i = 0
     while i < len(argv):
         arg = argv[i]
@@ -53,6 +53,8 @@ def parse_args(argv):
             opts["hook"] = arg.split("=", 1)[1]
         elif arg == "--ci":
             opts["ci"] = True
+        elif arg == "--git":
+            opts["git"] = True
         elif arg == "--strict":
             opts["strict"] = True
         elif arg == "--json":
@@ -64,6 +66,8 @@ def parse_args(argv):
         elif opts["path"] is None:
             opts["path"] = arg
         i += 1
+    if opts["git"] and (opts["ci"] or opts["hook"] or opts["json"]):
+        raise ctxlib.CtxError("--git cannot be combined with --ci, --hook or --json", 1)
     return opts
 
 
@@ -120,12 +124,18 @@ def main(argv):
     if start is None and opts["hook"]:
         start = read_hook_cwd()
     if start is None:
-        start = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+        start = os.getcwd() if opts["git"] else os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
     if not os.path.isdir(start):
+        if opts["git"]:
+            sys.stderr.write("contextify: check failed: directory does not exist\n")
+            return 1
         return 0
 
     root = ctxlib.repo_root(start)
     if root is None:
+        if opts["git"]:
+            sys.stderr.write("contextify: check failed: not a Git repository\n")
+            return 1
         return 0
 
     if os.path.exists(os.path.join(root, ctxlib.JOURNAL_REL)):
@@ -149,9 +159,11 @@ def main(argv):
             sys.stdout.write(json.dumps(ctxlib.json_report(result),
                                         ensure_ascii=False) + "\n")
         else:
-            emit(sys.stdout, text, opts["hook"])
+            emit(sys.stderr if opts["git"] else sys.stdout, text, opts["hook"])
         if opts["ci"]:
             append_summary(text)
+            return 1 if opts["strict"] else 0
+        if opts["git"]:
             return 1 if opts["strict"] else 0
         return 3
 
@@ -170,10 +182,12 @@ def main(argv):
     if opts["json"]:
         sys.stdout.write(json.dumps(ctxlib.json_report(result), ensure_ascii=False) + "\n")
     else:
-        emit(sys.stdout, text, opts["hook"])
+        emit(sys.stderr if opts["git"] else sys.stdout, text, opts["hook"])
     if opts["ci"]:
         append_summary(text)
         return 1 if opts["strict"] else 0
+    if opts["git"] and opts["strict"]:
+        return 1
     return 0
 
 

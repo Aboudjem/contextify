@@ -23,6 +23,7 @@ contextify es una skill que redacta instrucciones breves a partir de los archivo
 - Escribe un único `AGENTS.md`, con archivos que remiten a él para los demás agentes. El objetivo es de 20, 40 o 60 líneas según el tamaño del repositorio; rechaza archivos de más de 150 líneas.
 - Vincula comandos y rutas con las fuentes del repositorio. Las afirmaciones sin respaldo deben marcarse como `unverified` u omitirse; otro agente revisa el borrador.
 - Detecta cambios sin llamar a un modelo. Si todo sigue vigente, no muestra nada; las actualizaciones presentan un diff y conservan el contenido humano fuera de los bloques gestionados.
+- Añade notas de arquitectura o de trabajo cuando hacen falta, enlazadas desde `AGENTS.md`. Primero reutiliza la documentación existente que siga siendo correcta.
 
 ## Instalación
 
@@ -45,11 +46,11 @@ Después pide a tu agente que ejecute contextify en el repositorio actual. En Cl
 /contextify init
 ```
 
-Revisa el diff propuesto y guarda en un commit los archivos de contexto y los metadatos de `.contextify/`. Los scripts necesitan Git, herramientas de shell POSIX, Bash y Python 3, sin paquetes de Python adicionales ni servidor MCP. El instalador utiliza Node.js mediante `npx`. [Configuración por editor](../docs/editors.md).
+Revisa el diff propuesto y guarda en un commit los archivos de contexto y los metadatos de `.contextify/`. Los scripts necesitan Git, herramientas de shell POSIX, Bash y Python 3.11+, sin paquetes de Python adicionales ni servidor MCP. El instalador utiliza Node.js mediante `npx`. [Configuración por editor](../docs/editors.md).
 
 ## Qué obtienes
 
-Extracto de una ejecución real en una copia aislada de HazeLab, una aplicación Next.js, el 17 de septiembre de 2026. Codex redactó las instrucciones y Contextify escribió los archivos. [Salida completa y pruebas](../examples/nextjs/README.md).
+Ejemplo histórico de **v0.1.0**; no valida la ampliación de 0.2.0. Extracto de una ejecución real en una copia aislada de HazeLab, una aplicación Next.js, el 17 de septiembre de 2026. Codex redactó las instrucciones y Contextify escribió los archivos. [Salida completa y pruebas](../examples/nextjs/README.md).
 
 ```markdown
 ## Commands
@@ -88,10 +89,12 @@ Estos valores corresponden a archivos nuevos. El contenido humano que ya exista 
 | `GEMINI.md` | Gemini CLI, mediante `@AGENTS.md` | 3 |
 | `.cursor/rules/contextify.mdc` | Cursor; opcional porque también lee `AGENTS.md` | 9 |
 | `.github/copilot-instructions.md` | GitHub Copilot | 4 |
+| `docs/context/architecture.md` | Componentes, límites y flujo de datos, si hace falta | Máximo 120 |
+| `docs/context/workflows.md` | Desarrollo, pruebas y publicación, si hace falta | Máximo 120 |
 | `.contextify/evidence.json` | Registro de fuentes de Contextify | Depende del repositorio |
 | `.contextify/stamp.json` | Comprobación de vigencia de Contextify | Depende del repositorio |
 
-Solo se escriben archivos de referencia para los destinos seleccionados. Consulta las [reglas de carga y sus limitaciones](../docs/editors.md).
+Solo los destinos seleccionados reciben archivos de referencia. Los documentos complementarios son opcionales, tienen un máximo de 120 líneas cada uno y se leen cuando hacen falta. Consulta los [documentos complementarios](../docs/supporting-docs.md) y las [reglas de carga](../docs/editors.md).
 
 ## Cómo funciona
 
@@ -106,7 +109,14 @@ Solo se escriben archivos de referencia para los destinos seleccionados. Consult
 
 `init --dry-run` muestra los archivos propuestos y su tamaño en líneas y bytes. `--yes` omite las preguntas habituales, pero nunca evita un conflicto en un bloque gestionado ni un límite estricto.
 
-El plugin de Claude Code incluye un hook al iniciar sesión. Los [hooks para Codex, Gemini, Cursor, Git y CI](../docs/hooks.md) son opcionales. La comprobación no consume tokens del modelo; el aviso de cambios ocupa contexto cuando un agente lo lee. La CI avisa por defecto; usa `--ci --strict` para que falle si detecta cambios.
+El plugin no registra hooks de inicio de sesión por defecto. El instalador propone comprobaciones Git `pre-commit` y `pre-push`; escribir los archivos y activarlos son pasos explícitos. Desde una copia de Contextify, indicando el repositorio de destino:
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
+```
+
+Los hooks comprueban el árbol de trabajo actual, no la instantánea del índice ni los commits enviados. Por defecto solo avisan y nunca reescriben archivos; el modo estricto es opcional. La activación rechaza reemplazar hooks existentes o una ruta de hooks personalizada o global. [Instalación, migración y CI](../docs/hooks.md).
 
 ## Comparación
 
@@ -133,24 +143,16 @@ El hook nunca reescribe archivos. La generación y la revisión utilizan tu agen
 
 [Contribuir](../CONTRIBUTING.md) · [Seguridad](../SECURITY.md) · [Historial de cambios](../CHANGELOG.md) · [Licencia MIT](../LICENSE) · [Catálogo de plugins 10x](https://github.com/Aboudjem/10x)
 
-Verificación local del **17 de septiembre de 2026**: los seis comandos siguientes terminaron con código 0. Estos resultados no demuestran que la CI publicada haya pasado. La [guía de evaluación](../evals/README.md) explica su alcance.
+Ejecuta estas comprobaciones sobre la revisión que estés evaluando. Los resultados históricos de la [evaluación v0.1.0](../evals/dogfood.md) no demuestran que los cambios nuevos hayan pasado.
 
 ```bash
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
 python3 tests/test_hooks.py
 python3 tests/test_regressions.py
+python3 tests/test_supporting_docs.py
 python3 tests/test_manifests.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 ```
-
-| Comprobación | Superadas |
-| --- | ---: |
-| Detección de cambios y escritura | 119/119 |
-| Resolución de afirmaciones | 30/30 |
-| Hooks | 6/6 |
-| Pruebas de regresión | 23/23 |
-| Manifiestos | 135/135 |
-| Contrato del skill | 110/110 |
 
 Traducción asistida por un modelo. Puede ir por detrás de la [versión inglesa](../README.md), que es la referencia. Los documentos enlazados están en inglés.

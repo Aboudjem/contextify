@@ -23,6 +23,7 @@ contextify 是一个 Agent Skill，根据代理读过的文件编写简短的仓
 - 将共用说明写入一个 `AGENTS.md`，为其他代理生成引用文件。根据仓库规模，以20、40或60行为目标，拒绝超过150行的文件。
 - 将命令和路径关联到仓库中的依据。没有依据的陈述必须标为 `unverified` 或省略，草稿由另一个代理审核。
 - 不调用模型即可检测变化。内容仍有效时不输出消息；更新时展示差异，并保留管理区块外的人工内容。
+- 仅在需要时补充架构或工作流程文档，从 `AGENTS.md` 链接。优先复用准确的现有文档。
 
 ## 安装
 
@@ -45,11 +46,11 @@ npx skills add Aboudjem/contextify
 /contextify init
 ```
 
-审核差异后，将生成的上下文文件和 `.contextify/` 元数据提交到 Git。脚本需要 Git、POSIX shell 工具、Bash 和 Python 3，无需额外的 Python 包或 MCP 服务器。安装器通过 `npx` 使用 Node.js。[各编辑器的安装方式](../docs/editors.md)。
+审核差异后，将生成的上下文文件和 `.contextify/` 元数据提交到 Git。脚本需要 Git、POSIX shell 工具、Bash 和 Python 3.11+，无需额外的 Python 包或 MCP 服务器。安装器通过 `npx` 使用 Node.js。[各编辑器的安装方式](../docs/editors.md)。
 
 ## 输出示例
 
-以下内容摘自2026年9月17日在 Next.js 应用 HazeLab 的隔离副本上的真实运行。Codex 起草说明，Contextify 写入文件。[完整输出和依据](../examples/nextjs/README.md)。
+这是 **v0.1.0** 的历史示例，不能证明 0.2.0 的新增功能已通过验证。以下内容摘自2026年9月17日在 Next.js 应用 HazeLab 的隔离副本上的真实运行。Codex 起草说明，Contextify 写入文件。[完整输出和依据](../examples/nextjs/README.md)。
 
 ```markdown
 ## Commands
@@ -88,10 +89,12 @@ Accept   unavailable until the stale command is corrected
 | `GEMINI.md` | Gemini CLI，通过 `@AGENTS.md` 引用 | 3 |
 | `.cursor/rules/contextify.mdc` | Cursor；可选，因为它也直接读取 `AGENTS.md` | 9 |
 | `.github/copilot-instructions.md` | GitHub Copilot | 4 |
+| `docs/context/architecture.md` | 按需记录组件、边界和数据流 | 最多120 |
+| `docs/context/workflows.md` | 按需记录开发、测试和发布流程 | 最多120 |
 | `.contextify/evidence.json` | Contextify 的依据记录 | 取决于仓库 |
 | `.contextify/stamp.json` | Contextify 的时效检查 | 取决于仓库 |
 
-只为选中的目标生成引用文件。参见[加载规则和注意事项](../docs/editors.md)。
+仅为选中的目标生成引用文件。补充文档是可选的，每个文件最多120行，按需读取。参阅[补充文档](../docs/supporting-docs.md)和[加载规则](../docs/editors.md)。
 
 ## 工作方式
 
@@ -106,7 +109,14 @@ Accept   unavailable until the stale command is corrected
 
 `init --dry-run` 展示拟生成的文件及其行数、字节数。`--yes` 跳过常规提问，但不会绕过管理区块冲突或硬性上限。
 
-Claude Code 插件自带会话启动 hook。[Codex、Gemini、Cursor、Git 和 CI 的 hook](../docs/hooks.md)需自行选择安装。检查本身不消耗模型 token；代理读取变化通知时，通知会占用上下文。CI 默认只警告，使用 `--ci --strict` 可在检测到变化时使检查失败。
+插件默认不注册会话启动钩子。安装器默认建议 Git `pre-commit` 和 `pre-push` 检查，写入文件与启用钩子都需要显式操作。在 Contextify 的本地副本中指定目标仓库：
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
+```
+
+Git 钩子检查当前工作树，而非暂存区快照或推送的提交。默认只发出提醒，不改写文件；严格模式可选。启用操作不会覆盖现有钩子或自定义、全局钩子路径。[安装、迁移和 CI](../docs/hooks.md)。
 
 ## 与其他工具比较
 
@@ -133,24 +143,15 @@ Hook 不会重写文件。生成和修订使用你的编程代理；时效检查
 
 [参与贡献](../CONTRIBUTING.md) · [安全](../SECURITY.md) · [更新日志](../CHANGELOG.md) · [MIT 许可证](../LICENSE) · [10x 插件目录](https://github.com/Aboudjem/10x)
 
-**2026年9月17日**的本地验证中，以下六条命令均以退出码0完成。这些结果不能证明已发布的 CI 运行成功。[评估指南](../evals/README.md)说明验证范围。
+请在所评审的版本上运行以下检查。[v0.1.0 评估记录](../evals/dogfood.md)属于历史结果，不能证明新增修改已经通过验证。
 
 ```bash
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
 python3 tests/test_hooks.py
 python3 tests/test_regressions.py
+python3 tests/test_supporting_docs.py
 python3 tests/test_manifests.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 ```
-
-| 检查 | 通过 |
-| --- | ---: |
-| 变化检测与写入 | 119/119 |
-| 声明解析 | 30/30 |
-| Hooks | 6/6 |
-| 回归测试 | 23/23 |
-| 清单 | 135/135 |
-| 技能规范 | 110/110 |
-
 本译文由模型辅助完成，可能落后于[英文版](../README.md)，请以英文版为准。链接指向的文档仍为英文。

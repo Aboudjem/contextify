@@ -1,152 +1,341 @@
 {
-  "generatedAt": "2026-09-17T08:15:36Z",
+  "generatedAt": "2026-09-17T09:18:21Z",
   "provenance": [
     {
       "file": "AGENTS.md",
       "line": 6,
       "lineHash": "sha256:d993810bf1f1842d683b2a1660b1d1e5b6cfc6e44c2b373dae2c97b566a1f4bf",
-      "source": ".github/workflows/validate.yml:195",
+      "source": ".github/workflows/validate.yml:200",
       "sourceDigest": "sha256:e579276a32e63a1b62b6f0a9129e7ff383e7d458657a1fce67bf8fc8a1c99e90"
     },
     {
       "file": "AGENTS.md",
       "line": 7,
       "lineHash": "sha256:62d312384a10cdb2ef815d6d8654042b424e01ea7639f792374f071ebb57dd3a",
-      "source": ".github/workflows/validate.yml:199",
+      "source": ".github/workflows/validate.yml:204",
       "sourceDigest": "sha256:7c77dda5a45da9f642eae5ae389bfb79698155933df96b0253830e0b7435eabb"
     },
     {
       "file": "AGENTS.md",
       "line": 8,
       "lineHash": "sha256:7f6ee11da159bcf4854c25d9c7dcd7c5287eb65264a31c6f13c654881482542a",
-      "source": ".github/workflows/validate.yml:188",
+      "source": ".github/workflows/validate.yml:193",
       "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
     },
     {
       "file": "AGENTS.md",
       "line": 9,
       "lineHash": "sha256:ff1aa39b0ae117a97df242ff6640f7db63baebc1643772e0e0a75795b524515f",
-      "source": ".github/workflows/validate.yml:181",
+      "source": ".github/workflows/validate.yml:186",
       "sourceDigest": "sha256:d7d1a2c4c0efa868a552e0f334c58ee6752f3fee91385dba460f7a715bb0e9a9"
     },
     {
       "file": "AGENTS.md",
       "line": 10,
       "lineHash": "sha256:5ebf5583bc7385dfc8976677757c68d9fe8fb663c0f59a617e3b4bdd45907035",
-      "source": ".github/workflows/validate.yml:213",
+      "source": ".github/workflows/validate.yml:222",
       "sourceDigest": "sha256:ee95a9d7d7646cc7681c9866d07429a027493ffe4e98d70a8df652176cad6900"
     },
     {
       "file": "AGENTS.md",
       "line": 13,
-      "lineHash": "sha256:4529de96d1973a49940a4c30494f0d0658a133cf419edff9d59359f4ee739b70",
-      "source": "skills/contextify/SKILL.md:130",
-      "sourceDigest": "sha256:0ef5222c6b95d7b1f9dde6e60f9281bc539116766539903dbb38411ee06157f5"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 13,
-      "lineHash": "sha256:4529de96d1973a49940a4c30494f0d0658a133cf419edff9d59359f4ee739b70",
-      "source": "skills/contextify/SKILL.md:83",
-      "sourceDigest": "sha256:6613de40ceae8eb93bb0e29f2f81497e9e84adc487d1b6a60f562dc6cdaab01e"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 14,
-      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
-      "source": "skills/contextify/scripts/ctx_check.py:24",
-      "sourceDigest": "sha256:3c3d137f9ca2b84c3abbded89d3491800a948dd7b18ae193988282b2f39ac0bb"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 14,
-      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
-      "source": "skills/contextify/scripts/ctxlib.py:1189",
-      "sourceDigest": "sha256:59b399d762260abb1323ec6b896b8d6f1b275ad21e6e3afc5ca5d546c09e046a"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 14,
-      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
-      "source": "skills/contextify/scripts/ctxlib.py:906",
-      "sourceDigest": "sha256:3575b66bc49ebe45e2901d3e9a2cbebd1afa9e356611d4f6e12a8a7538e75b12"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 14,
-      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
-      "source": "skills/contextify/scripts/ctxlib.py:1506",
-      "sourceDigest": "sha256:985c49a84d358238a46baa36c94f866261190e2d3985337c4a2d4d16bd8713ce"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 15,
-      "lineHash": "sha256:b0093e2f7f3369a39ffb6f82d4633bfc4401185eb825b54197457913cc979da9",
-      "source": "hooks/hooks.json:10",
-      "sourceDigest": "sha256:6e1170fab26f026350392c334b585dab66dd64a1cb75585ed3f059553457c5fa"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 18,
-      "lineHash": "sha256:ae13143381dcba85a72c1c559aaf5b94ae8af93dbbd24caa2744935b5f8c7069",
-      "source": ".github/workflows/validate.yml:5",
-      "sourceDigest": "sha256:f733c68e4f5db039f493e8a8bf54cc60cf86d58e4d707349c6b1d59add3fff24"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 19,
-      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
-      "source": ".github/workflows/release.yml:37",
-      "sourceDigest": "sha256:b891fe6a6bd9b71a164e30e8b5e5ca7528a2b1d8f643a836af83340ea569eead"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 19,
-      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
-      "source": ".github/workflows/release.yml:6",
-      "sourceDigest": "sha256:5a3c7106d3427b41e78ab68ea06460823de1df2848a6e16ccf531401b26a08cf"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 19,
-      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
-      "source": ".github/workflows/release.yml:46",
-      "sourceDigest": "sha256:8ef6d45b9cde32ee44a7f335bd53f2919080cba6d0d875c263c4d062d880aa00"
-    },
-    {
-      "file": "AGENTS.md",
-      "line": 20,
       "lineHash": "sha256:40f93380baefa9abd8ee4ec761369b73a563ef92f11df69c6c286014668ec190",
-      "source": "CONTRIBUTING.md:33",
+      "source": "CONTRIBUTING.md:32",
       "sourceDigest": "sha256:89f15be70b9fb2518adecb5663c967e2235305bec744eddce61013dca9102799"
     },
     {
       "file": "AGENTS.md",
-      "line": 20,
+      "line": 13,
       "lineHash": "sha256:40f93380baefa9abd8ee4ec761369b73a563ef92f11df69c6c286014668ec190",
-      "source": "CONTRIBUTING.md:70",
+      "source": "CONTRIBUTING.md:71",
       "sourceDigest": "sha256:10d77ad7474f54f25dd20460c2efeb2d4812c10904f5580d40d21495829ab37a"
     },
     {
       "file": "AGENTS.md",
-      "line": 23,
-      "lineHash": "sha256:5095d93bbc173f202bb8baf770f74070d5e4e7509acd28d5d4bf94e69809800e",
-      "source": "docs/design/SCRIPTS-SPEC.md:1",
-      "sourceDigest": "sha256:c3cfd1c3f964069cd300acbdf19c52764f12aeccd36e9050c81f879e5bb25e36"
+      "line": 14,
+      "lineHash": "sha256:aa72d179175766c9042babf832b96a73e142bff0001fe6bac92165f7f3184454",
+      "source": "skills/contextify/SKILL.md:139",
+      "sourceDigest": "sha256:0ef5222c6b95d7b1f9dde6e60f9281bc539116766539903dbb38411ee06157f5"
     },
     {
       "file": "AGENTS.md",
-      "line": 23,
-      "lineHash": "sha256:5095d93bbc173f202bb8baf770f74070d5e4e7509acd28d5d4bf94e69809800e",
-      "source": "docs/design/DECISIONS.md:1",
-      "sourceDigest": "sha256:61601497da5b461c06d895fa6246a58c0b2c766ac3f360e379b0e381a32ddd6f"
+      "line": 14,
+      "lineHash": "sha256:aa72d179175766c9042babf832b96a73e142bff0001fe6bac92165f7f3184454",
+      "source": "skills/contextify/SKILL.md:84",
+      "sourceDigest": "sha256:6613de40ceae8eb93bb0e29f2f81497e9e84adc487d1b6a60f562dc6cdaab01e"
     },
     {
-      "file": "AGENTS.md",
-      "line": 24,
-      "lineHash": "sha256:c76d4946f2b37d5888f38abd77c031b7a45d3184534cdca776a393dadb025d7b",
+      "file": "docs/context/architecture.md",
+      "line": 6,
+      "lineHash": "sha256:b4e4cfb1c6ed714bc7ae87c33ceabe9c1a2d48a5c1e6c7d90aad65a445e76b6c",
+      "source": "skills/contextify/SKILL.md:87",
+      "sourceDigest": "sha256:a94b340c4f64c4b5105f439b6843bd04e61eb5aabad496396c2d65be485ebe1a"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 6,
+      "lineHash": "sha256:b4e4cfb1c6ed714bc7ae87c33ceabe9c1a2d48a5c1e6c7d90aad65a445e76b6c",
+      "source": "skills/contextify/SKILL.md:84",
+      "sourceDigest": "sha256:6613de40ceae8eb93bb0e29f2f81497e9e84adc487d1b6a60f562dc6cdaab01e"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 7,
+      "lineHash": "sha256:b5ab094459dad5b57cd8c86804000b45ac62ec03ae0eb0a2275b656fa984e714",
+      "source": "skills/contextify/scripts/ctx_write.py:247",
+      "sourceDigest": "sha256:547a2d21970e446d0a0851d5f58816b7ba4f51a6a9e7787faf970cbacc07ff85"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 7,
+      "lineHash": "sha256:b5ab094459dad5b57cd8c86804000b45ac62ec03ae0eb0a2275b656fa984e714",
+      "source": "skills/contextify/scripts/ctx_write.py:454",
+      "sourceDigest": "sha256:efd9db38426f65d0343cd814e0d8c50b6181bc092b36741d1be5da4d6e427480"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 7,
+      "lineHash": "sha256:b5ab094459dad5b57cd8c86804000b45ac62ec03ae0eb0a2275b656fa984e714",
+      "source": "skills/contextify/scripts/ctx_write.py:459",
+      "sourceDigest": "sha256:edd3218ac88b2dc4e7ddd64df95fca58cf50fdca39ace2e69fa017624c7255ec"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 7,
+      "lineHash": "sha256:b5ab094459dad5b57cd8c86804000b45ac62ec03ae0eb0a2275b656fa984e714",
+      "source": "skills/contextify/scripts/ctx_write.py:466",
+      "sourceDigest": "sha256:bd9dff71c9b2eb5f9e8a7b566d1e216401851a8ee1ac04e466b700cf48ef1073"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 8,
+      "lineHash": "sha256:0a1efea186f736ddd259942fc93fb4494d9b003e8f11a9093f042970aca412a3",
+      "source": "skills/contextify/scripts/ctx_write.py:545",
+      "sourceDigest": "sha256:3081c281071e00b24e598a53e29e0d44efec91bd8efe33906abafed9f4942af4"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 8,
+      "lineHash": "sha256:0a1efea186f736ddd259942fc93fb4494d9b003e8f11a9093f042970aca412a3",
+      "source": "skills/contextify/scripts/ctx_write.py:562",
+      "sourceDigest": "sha256:e596e1d9af0b8ebe039223d7f937745f779a7ebee7052ac1002b745638a0e56d"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 8,
+      "lineHash": "sha256:0a1efea186f736ddd259942fc93fb4494d9b003e8f11a9093f042970aca412a3",
+      "source": "skills/contextify/scripts/ctx_write.py:564",
+      "sourceDigest": "sha256:7b756b4c85f1e7687db27d89827c5d7640e7761c83ae217be04895209ce230bd"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 11,
+      "lineHash": "sha256:ee329176363b40097a2c2ce7e5601b6fc8e70c482eb35c2beb8bad63d8462389",
+      "source": "skills/contextify/scripts/ctxlib.py:958",
+      "sourceDigest": "sha256:3575b66bc49ebe45e2901d3e9a2cbebd1afa9e356611d4f6e12a8a7538e75b12"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 11,
+      "lineHash": "sha256:ee329176363b40097a2c2ce7e5601b6fc8e70c482eb35c2beb8bad63d8462389",
+      "source": "skills/contextify/scripts/ctxlib.py:1262",
+      "sourceDigest": "sha256:59b399d762260abb1323ec6b896b8d6f1b275ad21e6e3afc5ca5d546c09e046a"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 11,
+      "lineHash": "sha256:ee329176363b40097a2c2ce7e5601b6fc8e70c482eb35c2beb8bad63d8462389",
+      "source": "skills/contextify/scripts/ctx_check.py:147",
+      "sourceDigest": "sha256:6e0dbeb1a3ec4df9ed554897a95e99dadfa3e30c94fd1dbe4e3b8313dadd4a3d"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 12,
+      "lineHash": "sha256:d2c3a4493e30ccb2bb16b06469e6f6f309990a0c4213b95fa6abc011c8de56a7",
+      "source": "skills/contextify/scripts/ctxlib.py:1920",
+      "sourceDigest": "sha256:0723f84d2813bafcf2b879cf26e542f7589cdc3b8fdd406bd9e91a09a7376284"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 12,
+      "lineHash": "sha256:d2c3a4493e30ccb2bb16b06469e6f6f309990a0c4213b95fa6abc011c8de56a7",
+      "source": "skills/contextify/scripts/ctxlib.py:1967",
+      "sourceDigest": "sha256:5415c37a3bf2a62f2fd464ec7e7fafa7021e450a7199447cffaa7582571b79da"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 12,
+      "lineHash": "sha256:d2c3a4493e30ccb2bb16b06469e6f6f309990a0c4213b95fa6abc011c8de56a7",
+      "source": "skills/contextify/scripts/ctxlib.py:2198",
+      "sourceDigest": "sha256:27cfe4bdade1f4d033d01b7002f01eccb555d56a5d518a629c4bbf0aceecfdf5"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 13,
+      "lineHash": "sha256:c4e7264dde7075fe11598b5ac0bd20fcdc7d69db20782fc3e5da8416d9e97dfa",
+      "source": "skills/contextify/scripts/ctxlib.py:311",
+      "sourceDigest": "sha256:9c17afc3471d80cd1597d1aa9eb5511a59451a351f30b0668c41fe5b088e7f37"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 13,
+      "lineHash": "sha256:c4e7264dde7075fe11598b5ac0bd20fcdc7d69db20782fc3e5da8416d9e97dfa",
+      "source": "skills/contextify/scripts/ctxlib.py:1109",
+      "sourceDigest": "sha256:6a3a990c564a8797f19562cc0442d9e285248d2c596ee00e551f5cbdae5651ad"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 16,
+      "lineHash": "sha256:6cd6e795b8b7bc44c03f55ee7754ab7c429ec391fe8ad5f6eab51bf0d49fdc4d",
+      "source": "skills/contextify/scripts/install_hooks.sh:18",
+      "sourceDigest": "sha256:ab5619f20640422e010da2c58e4f49bc3ad0de83890f700446f99d02f39d8490"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 16,
+      "lineHash": "sha256:6cd6e795b8b7bc44c03f55ee7754ab7c429ec391fe8ad5f6eab51bf0d49fdc4d",
+      "source": "skills/contextify/scripts/install_hooks.sh:150",
+      "sourceDigest": "sha256:789a07a09cb3dc543390a8bbec3549e15a73ee973a4562285088c6155ded9df9"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 16,
+      "lineHash": "sha256:6cd6e795b8b7bc44c03f55ee7754ab7c429ec391fe8ad5f6eab51bf0d49fdc4d",
+      "source": "hooks/hooks.json:3",
+      "sourceDigest": "sha256:083b51ac7539a9000809933ef1ee3b5e95255519eaae7939020a65c44233255f"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 17,
+      "lineHash": "sha256:89f0cf45f70fa75934800ce1c8a2eb42ee02e6ac3ee1ab47e79abe4e5a4d5ce7",
+      "source": "skills/contextify/scripts/ctx_check.py:69",
+      "sourceDigest": "sha256:2f6cc16f47c5b74f6e70c01c2b176d41c2283cbba94402bcca58068f009a00f6"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 17,
+      "lineHash": "sha256:89f0cf45f70fa75934800ce1c8a2eb42ee02e6ac3ee1ab47e79abe4e5a4d5ce7",
+      "source": "skills/contextify/scripts/ctx_check.py:194",
+      "sourceDigest": "sha256:93c12227e64f0bb8b058868e0b9f80c876219e5bb59fda081eba994aa071bd7f"
+    },
+    {
+      "file": "docs/context/architecture.md",
+      "line": 17,
+      "lineHash": "sha256:89f0cf45f70fa75934800ce1c8a2eb42ee02e6ac3ee1ab47e79abe4e5a4d5ce7",
+      "source": "skills/contextify/scripts/ctx_check.py:147",
+      "sourceDigest": "sha256:6e0dbeb1a3ec4df9ed554897a95e99dadfa3e30c94fd1dbe4e3b8313dadd4a3d"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 6,
+      "lineHash": "sha256:263f8ddbb6530cc8688d91b74b673869d0669bfe408a37fbdcd60f21bd6dba4f",
+      "source": ".github/workflows/validate.yml:200",
+      "sourceDigest": "sha256:e579276a32e63a1b62b6f0a9129e7ff383e7d458657a1fce67bf8fc8a1c99e90"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 7,
+      "lineHash": "sha256:6976b568c7d4bd79f4e47c974d2b92d467a9c55616e179fed0eed6ef7e1bfddb",
+      "source": ".github/workflows/validate.yml:204",
+      "sourceDigest": "sha256:7c77dda5a45da9f642eae5ae389bfb79698155933df96b0253830e0b7435eabb"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 8,
+      "lineHash": "sha256:7d1da7d92ba074b9ced407e986e40487d3598ded4de0be843578936840d6ba41",
+      "source": ".github/workflows/validate.yml:207",
+      "sourceDigest": "sha256:cba188d70741883846d97a96d9affb46d96a3f798c4fcc691d5e8a3af4de4765"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 8,
+      "lineHash": "sha256:7d1da7d92ba074b9ced407e986e40487d3598ded4de0be843578936840d6ba41",
+      "source": ".github/workflows/validate.yml:214",
+      "sourceDigest": "sha256:8934cdd2d0a10e3538fb0fac80752216ed8778acf09633d0c6c0d470423a7d0b"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 9,
+      "lineHash": "sha256:c44a30777c745d682fdc50ce84f9f9b1382829b0677b29ede99db0f3c326c6b9",
+      "source": ".github/workflows/validate.yml:193",
+      "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 9,
+      "lineHash": "sha256:c44a30777c745d682fdc50ce84f9f9b1382829b0677b29ede99db0f3c326c6b9",
+      "source": ".github/workflows/validate.yml:186",
+      "sourceDigest": "sha256:d7d1a2c4c0efa868a552e0f334c58ee6752f3fee91385dba460f7a715bb0e9a9"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 12,
+      "lineHash": "sha256:357806ee5f9348e31527d02ae1b06dbccb40b8e6fe3594466f9cfd69c5462d52",
       "source": "skills/contextify/references/update-in-place.md:5",
       "sourceDigest": "sha256:68b7082d3a3a265f5c965fc5d28748b2d59b6ea918d86773c86803f1957e8dcd"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 12,
+      "lineHash": "sha256:357806ee5f9348e31527d02ae1b06dbccb40b8e6fe3594466f9cfd69c5462d52",
+      "source": "skills/contextify/references/supporting-docs.md:5",
+      "sourceDigest": "sha256:17f562310f40dc70bf0b61fcb7c35829a332b1e71c30a7c0e0abd0989b4bcc0e"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 13,
+      "lineHash": "sha256:f75fd2a67c627c502eb308dfad5265609e81f97b91183878c927c09748c6fae2",
+      "source": "skills/contextify/SKILL.md:136",
+      "sourceDigest": "sha256:1a7a9e082450b5c95ddaa349e9072253e713467cd76d01b70e8ed8354f3367fc"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 13,
+      "lineHash": "sha256:f75fd2a67c627c502eb308dfad5265609e81f97b91183878c927c09748c6fae2",
+      "source": "skills/contextify/SKILL.md:139",
+      "sourceDigest": "sha256:0ef5222c6b95d7b1f9dde6e60f9281bc539116766539903dbb38411ee06157f5"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 16,
+      "lineHash": "sha256:88bdc0e31d6dcf019765b22671ef1d287ecd73bb5c68db5dba6b0d71ebeb9fab",
+      "source": ".github/workflows/validate.yml:4",
+      "sourceDigest": "sha256:9ceb67319dee716866caff20da8b740ce18611345eb412757845ff03d941e2fa"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 16,
+      "lineHash": "sha256:88bdc0e31d6dcf019765b22671ef1d287ecd73bb5c68db5dba6b0d71ebeb9fab",
+      "source": ".github/workflows/validate.yml:5",
+      "sourceDigest": "sha256:f733c68e4f5db039f493e8a8bf54cc60cf86d58e4d707349c6b1d59add3fff24"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 17,
+      "lineHash": "sha256:a1c476b97eb2e06ee013ee8939bb5f6d19fcbf24e4145667e985f3c035ab3057",
+      "source": ".github/workflows/release.yml:6",
+      "sourceDigest": "sha256:5a3c7106d3427b41e78ab68ea06460823de1df2848a6e16ccf531401b26a08cf"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 17,
+      "lineHash": "sha256:a1c476b97eb2e06ee013ee8939bb5f6d19fcbf24e4145667e985f3c035ab3057",
+      "source": ".github/workflows/release.yml:37",
+      "sourceDigest": "sha256:b891fe6a6bd9b71a164e30e8b5e5ca7528a2b1d8f643a836af83340ea569eead"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 17,
+      "lineHash": "sha256:a1c476b97eb2e06ee013ee8939bb5f6d19fcbf24e4145667e985f3c035ab3057",
+      "source": ".github/workflows/release.yml:46",
+      "sourceDigest": "sha256:8ef6d45b9cde32ee44a7f335bd53f2919080cba6d0d875c263c4d062d880aa00"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 18,
+      "lineHash": "sha256:c9905a94bf196eb82b722bf3ec08c941ccc0af39506cc05f5e0cd68352d3ef73",
+      "source": ".github/workflows/release.yml:65",
+      "sourceDigest": "sha256:1e4ff6ada946f79d71337ff4334e301df7bfd8c99aff5446f7298d9b51de224c"
     }
   ],
   "records": [
@@ -179,6 +368,7 @@
           "validate": {
             "name": "Validate skill",
             "runs": [
+              "git config --global user.name \"Adam Boudjemaa\"\ngit config --global user.email \"boudjemaa.adam@gmail.com\"",
               "python3 - <<'PY'\nimport re, sys\n\npath = \"skills/contextify/SKILL.md\"\ntry:\nwith open(path, \"r\", encoding=\"utf-8\") as f:\ntext = f.read()\nexcept FileNotFoundError:\nprint(f\"FAIL: {path} not found\")\nsys.exit(1)\n\nm = re.match(r\"^---\\s*\\n(.*?)\\n---\\s*(?:\\n|$)\", text, re.DOTALL)\nif not m:\nprint(f\"FAIL: no YAML frontmatter block found in {path}\")\nsys.exit(1)\nblock = m.group(1)\n\n# Minimal YAML parse for top-level 'name' and 'description'.\n# Supports plain scalars and folded/literal block scalars (>- , | , etc.).\ndef parse_frontmatter(block):\ndata = {}\nlines = block.split(\"\\n\")\ni = 0\nkey_re = re.compile(r\"^([A-Za-z0-9_-]+):\\s*(.*)$\")\nwhile i < len(lines):\nline = lines[i]\nif not line.strip() or line.lstrip().startswith(\"#\"):\ni += 1\ncontinue\nif line[:1] in (\" \", \"\\t\"):\ni += 1\ncontinue\nkm = key_re.match(line)\nif not km:\ni += 1\ncontinue\nkey, rest = km.group(1), km.group(2).strip()\nif rest.startswith((\"|\", \">\")):\ncollected = []\ni += 1\nwhile i < len(lines):\nnxt = lines[i]\nif nxt.strip() == \"\":\ncollected.append(\"\")\ni += 1\ncontinue\nif nxt[:1] in (\" \", \"\\t\"):\ncollected.append(nxt.strip())\ni += 1\nelse:\nbreak\ndata[key] = \" \".join(c for c in collected if c != \"\").strip()\ncontinue\nval = rest\nif len(val) >= 2 and val[0] == val[-1] and val[0] in (\"'\", '\"'):\nval = val[1:-1]\ndata[key] = val\ni += 1\nreturn data\n\nfm = parse_frontmatter(block)\nok = True\n\nname = fm.get(\"name\", \"\")\n# The Agent Skills spec: 1-64 chars, [a-z0-9-], and no leading, trailing or\n# consecutive hyphens. The stricter pattern below rejects all three.\nif not re.fullmatch(r\"[a-z0-9]+(?:-[a-z0-9]+)*\", name or \"\"):\nprint(f\"FAIL: 'name' must match ^[a-z0-9]+(-[a-z0-9]+)*$ \"\nf\"(no leading, trailing or consecutive hyphens; got: {name!r})\")\nok = False\nelif len(name) > 64:\nprint(f\"FAIL: 'name' must be <= 64 chars (got {len(name)})\")\nok = False\nelif name != \"contextify\":\nprint(f\"FAIL: 'name' must be 'contextify' to match skills/contextify/ (got {name!r})\")\nok = False\nelse:\nprint(f\"PASS: 'name' is valid ({name!r})\")\n\ndesc = fm.get(\"description\", \"\")\nif not desc or not desc.strip():\nprint(\"FAIL: 'description' must be non-empty\")\nok = False\nelif len(desc) > 1024:\nprint(f\"FAIL: 'description' must be <= 1024 chars (got {len(desc)})\")\nok = False\nelse:\nprint(f\"PASS: 'description' is valid ({len(desc)} chars)\")\n\nif not ok:\nsys.exit(1)\nprint(\"PASS: frontmatter check passed\")\nPY",
               "python3 - <<'PY'\nimport json, re, sys\n\nMANIFESTS = {\n\".claude-plugin/plugin.json\": lambda d: d.get(\"version\"),\n\".claude-plugin/marketplace.json\": lambda d: (d.get(\"plugins\") or [{}])[0].get(\"version\"),\n\".cursor-plugin/plugin.json\": lambda d: d.get(\"version\"),\n\".copilot-plugin/plugin.json\": lambda d: d.get(\"version\"),\n}\n\nok = True\nversions = {}\nfor path, get in MANIFESTS.items():\ntry:\nwith open(path, \"r\", encoding=\"utf-8\") as f:\ndata = json.load(f)\nexcept FileNotFoundError:\nprint(f\"FAIL: {path} not found\")\nok = False\ncontinue\nexcept json.JSONDecodeError as e:\nprint(f\"FAIL: invalid JSON in {path}: {e}\")\nok = False\ncontinue\nprint(f\"PASS: {path} parses as valid JSON\")\nversions[path] = get(data)\n\ntry:\nwith open(\"CHANGELOG.md\", \"r\", encoding=\"utf-8\") as f:\nchangelog = f.read()\nm = re.search(r\"^##\\s*\\[(\\d+\\.\\d+\\.\\d+)\\]\", changelog, re.MULTILINE)\nversions[\"CHANGELOG.md latest entry\"] = m.group(1) if m else None\nif not m:\nprint(\"FAIL: CHANGELOG.md has no `## [x.y.z]` release heading\")\nok = False\nexcept FileNotFoundError:\nprint(\"FAIL: CHANGELOG.md not found\")\nok = False\n\ndistinct = set(versions.values())\nif len(distinct) != 1 or None in distinct:\nprint(\"FAIL: the version must be identical everywhere it is declared:\")\nfor k, v in versions.items():\nprint(f\"  {k} = {v!r}\")\nok = False\nelse:\nprint(f\"PASS: every manifest and CHANGELOG.md name version {distinct.pop()}\")\n\nsys.exit(0 if ok else 1)\nPY",
               "python3 evals/check_skill.py skills/contextify/SKILL.md",
@@ -187,8 +377,9 @@
               "python3 tests/test_verify_claims.py",
               "python3 tests/test_hooks.py",
               "python3 tests/test_regressions.py",
-              "set -o pipefail\nout=$(sh skills/contextify/scripts/ctx-check); rc=$?\nif [ \"$rc\" -ne 0 ] || [ -n \"$out\" ]; then\necho \"FAIL: ctx-check exit=$rc output=[$out]\"; exit 1\nfi\necho \"PASS: ctx-check is fresh and silent\"\npython3 skills/contextify/scripts/verify_claims.py --budget AGENTS.md CLAUDE.md",
-              "python3 - <<'PY'\nimport json, os, re, sys\nh = json.load(open(\"hooks/hooks.json\"))\nok = True\nif os.path.exists(\".claude-plugin/hooks\"):\nprint(\"FAIL: hooks/ must not live under .claude-plugin/\"); ok = False\ncmds = [x[\"command\"] for grp in h[\"hooks\"].get(\"SessionStart\", []) for x in grp[\"hooks\"]]\nfor c in cmds:\nm = re.search(r\"\\$\\{CLAUDE_PLUGIN_ROOT\\}/([^\\s\\\"]+)\", c)\nif not m:\nprint(\"FAIL: hook command does not use the CLAUDE_PLUGIN_ROOT variable: \" + c); ok = False; continue\nrel = m.group(1)\nif not os.path.isfile(rel):\nprint(f\"FAIL: hook names a missing script: {rel}\"); ok = False\nelif not os.access(rel, os.X_OK):\nprint(f\"FAIL: hook script is not executable: {rel}\"); ok = False\nelse:\nprint(f\"PASS: hook runs {rel}\")\nsys.exit(0 if ok else 1)\nPY",
+              "python3 tests/test_supporting_docs.py",
+              "set -o pipefail\nout=$(sh skills/contextify/scripts/ctx-check); rc=$?\nif [ \"$rc\" -ne 0 ] || [ -n \"$out\" ]; then\necho \"FAIL: ctx-check exit=$rc output=[$out]\"; exit 1\nfi\necho \"PASS: ctx-check is fresh and silent\"\npython3 skills/contextify/scripts/verify_claims.py --strict --budget AGENTS.md CLAUDE.md docs/context/architecture.md docs/context/workflows.md",
+              "python3 - <<'PYCODE'\nimport json\nfrom pathlib import Path\nhooks = json.loads(Path(\"hooks/hooks.json\").read_text())\nassert hooks.get(\"hooks\") == {}, \"The package must not register automatic host events\"\nassert not Path(\".claude-plugin/hooks\").exists()\nprint(\"PASS: no automatic session hooks are registered\")\nPYCODE",
               "python3 - <<'PY'\nimport re, subprocess, sys\n\nfiles = subprocess.run(\n[\"git\", \"ls-files\"],\ncapture_output=True, text=True, check=True,\n).stdout.splitlines()\n\n# Provider-specific, length-anchored patterns: broad enough to catch a real\n# leak, narrow enough not to fire on prose that merely mentions a prefix.\nPATTERNS = [\n(\"AWS access key id\", re.compile(r\"AKIA[0-9A-Z]{16}\")),\n(\"private key header\",\nre.compile(r\"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----\")),\n(\"GitHub personal access token\", re.compile(r\"ghp_[A-Za-z0-9]{36}\")),\n(\"GitHub fine-grained token\", re.compile(r\"github_pat_[A-Za-z0-9_]{22,}\")),\n(\"GitHub OAuth/app/refresh token\", re.compile(r\"gh[osur]_[A-Za-z0-9]{36}\")),\n(\"Anthropic API key\", re.compile(r\"sk-ant-[A-Za-z0-9_\\-]{24,}\")),\n(\"OpenAI-style API key\", re.compile(r\"sk-(?:proj-)?[A-Za-z0-9]{32,}\")),\n(\"Slack token\", re.compile(r\"xox[baprs]-[A-Za-z0-9-]{10,}\")),\n(\"Slack webhook\", re.compile(r\"https://hooks\\.slack\\.com/services/[A-Za-z0-9/+]{20,}\")),\n(\"Google API key\", re.compile(r\"AIza[0-9A-Za-z_\\-]{35}\")),\n(\"Stripe secret key\", re.compile(r\"sk_live_[0-9a-zA-Z]{24,}\")),\n(\"npm token\", re.compile(r\"npm_[A-Za-z0-9]{36}\")),\n(\"Supabase service-role JWT\", re.compile(r\"eyJ[A-Za-z0-9_\\-]{10,}\\.eyJ[A-Za-z0-9_\\-]{40,}\\.[A-Za-z0-9_\\-]{20,}\")),\n]\n\nfindings = []\nfor path in files:\nif path.startswith(\".git/\") or path == \".git\":\ncontinue\ntry:\nwith open(path, \"r\", encoding=\"utf-8\", errors=\"ignore\") as f:\ndata = f.read()\nexcept (IsADirectoryError, FileNotFoundError, OSError):\ncontinue\nfor ln, line in enumerate(data.splitlines(), 1):\nfor kind, rx in PATTERNS:\nif rx.search(line):\nfindings.append((path, ln, kind))\n\nif findings:\nprint(\"FAIL: potential secret(s) found:\")\nfor path, ln, kind in findings:\nprint(f\"  {path}:{ln}: {kind}\")\nsys.exit(1)\nprint(f\"PASS: no credentials matched {len(PATTERNS)} secret patterns in tracked files\")\nPY",
               "set -o pipefail\nshopt -s nullglob\nfail=0\nfor f in assets/*.svg assets/*.html; do\nif grep -q '<script' \"$f\"; then\necho \"FAIL: <script> found in $f\"; fail=1\nfi\nif grep -Eq 'href=\"https?:|xlink:href=\"https?:|<image|@import|url\\(https?:|src=\"https?:' \"$f\"; then\necho \"FAIL: external reference found in $f\"; fail=1\nfi\ncase \"$f\" in\n*.svg)\npython3 -c \"import xml.dom.minidom,sys; xml.dom.minidom.parse('$f')\" \\\n&& echo \"PASS: $f is well-formed, script-free, self-contained\" \\\n|| { echo \"FAIL: $f is not well-formed XML\"; fail=1; }\nif ! grep -Eq '@keyframes|<animate|<set[ >]' \"$f\"; then\necho \"PASS: $f is static; no motion guard needed\"\nelif grep -q 'prefers-reduced-motion' \"$f\"; then\necho \"PASS: $f honours prefers-reduced-motion\"\nelse\necho \"FAIL: $f has no prefers-reduced-motion guard\"; fail=1\nfi\n;;\n*) echo \"PASS: $f is script-free and self-contained\" ;;\nesac\ndone\nexit $fail",
               "python3 - <<'PY'\nimport os, re, subprocess, sys\nfrom urllib.parse import unquote\n\nmd_files = subprocess.run(\n[\"git\", \"ls-files\", \"*.md\"],\ncapture_output=True, text=True, check=True,\n).stdout.splitlines()\n\nlink_re = re.compile(r\"\\[[^\\]]*\\]\\(([^)]+)\\)\")\nfence_re = re.compile(r\"^\\s*(`{3,}|~{3,})\")\ninline_code_re = re.compile(r\"`[^`]*`\")\n\nbroken = []\nchecked = 0\nfor md in md_files:\ntry:\nwith open(md, \"r\", encoding=\"utf-8\", errors=\"ignore\") as f:\nlines = f.readlines()\nexcept (IsADirectoryError, FileNotFoundError, OSError):\ncontinue\n\nin_fence = False\nbase_dir = os.path.dirname(md)\nfor line in lines:\nif fence_re.match(line):\nin_fence = not in_fence\ncontinue\nif in_fence:\ncontinue\nline = inline_code_re.sub(\"\", line)\nfor raw in link_re.findall(line):\ntarget = raw.strip()\nif \" \" in target:\ntarget = target.split(\" \", 1)[0].strip()\ntarget = target.strip(\"<>\")\nif not target:\ncontinue\nlow = target.lower()\nif low.startswith((\"http://\", \"https://\", \"mailto:\", \"tel:\",\n\"#\", \"ftp://\", \"data:\")):\ncontinue\npath_part = target.split(\"#\", 1)[0].split(\"?\", 1)[0]\npath_part = unquote(path_part)\nif not path_part:\ncontinue\nif path_part.startswith(\"/\"):\nresolved = path_part.lstrip(\"/\")\nelse:\nresolved = os.path.normpath(os.path.join(base_dir, path_part))\nchecked += 1\nif not os.path.exists(resolved):\nbroken.append((md, target, resolved))\n\nif broken:\nprint(\"FAIL: broken relative markdown link(s):\")\nfor md, target, resolved in broken:\nprint(f\"  {md}: '{target}' -> '{resolved}' (missing)\")\nsys.exit(1)\nprint(f\"PASS: all {checked} relative markdown link(s) resolve\")\nPY",
@@ -203,23 +394,35 @@
     },
     {
       "claims": [
-        "22224c23d556",
+        "043334f5febb",
+        "0c0f659d59aa",
+        "21179c3cdc35",
+        "214f8b8122a4",
+        "24e65a68a6fe",
         "294cf8d6cc82",
-        "3698b374815d",
+        "2d77bcfa5994",
+        "30cfd22426a0",
+        "363b91bbab15",
+        "39d082e7ec9c",
+        "3a982367e51a",
         "3ab6a98bfab8",
+        "5278777ce731",
+        "561fabc10505",
+        "567f96a92eb3",
         "5ab27fb2a642",
+        "5ce09a75d5bf",
         "72f7d37f4c93",
-        "8030f2315034",
-        "83894371288a",
         "85a86cb82b4a",
-        "a0c51eee561f",
+        "8cf1a813650a",
+        "8d66f4ad1d07",
+        "8dd2de75286b",
+        "9194703eaf59",
         "a702caf9f72c",
-        "ade022fd77eb",
+        "ac3885045a83",
+        "b08a5094f80f",
+        "d3199a447076",
         "d5228ee3491c",
-        "dcd7cd5aa7a6",
-        "f216daaed22b",
-        "f8383f239a11",
-        "fb45284c0adf"
+        "f216daaed22b"
       ],
       "key": "tree#depth2",
       "source": {
@@ -263,6 +466,7 @@
         "docs/hooks.md",
         "docs/limits.md",
         "docs/quickstart.md",
+        "docs/supporting-docs.md",
         "evals/README.md",
         "evals/RED-baseline.md",
         "evals/check_skill.py",
@@ -270,9 +474,12 @@
         "evals/dogfood.md",
         "evals/red-baseline/",
         "evals/scenarios.md",
+        "evals/supporting-docs-results.json",
+        "evals/supporting-docs.md",
         "examples/README.md",
         "examples/nextjs/",
         "examples/python-service/",
+        "examples/supporting-docs/",
         "examples/tiny/",
         "hooks/hooks.json",
         "llms.txt",
@@ -281,6 +488,7 @@
         "tests/test_hooks.py",
         "tests/test_manifests.py",
         "tests/test_regressions.py",
+        "tests/test_supporting_docs.py",
         "tests/test_verify_claims.py"
       ]
     }

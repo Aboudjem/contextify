@@ -1,5 +1,7 @@
 # Dogfood: Codex continuation, 17 September 2026
 
+Historical0.1.0 report. For optional supporting docs and Git checkpoints in0.2, see [the feature verification](supporting-docs.md).
+
 These are new runs against isolated copies of real repositories. Codex read the skill and primary
 files, drafted the managed bodies, and an independent Codex agent re-derived every factual line
 before the writer applied them. No Claude model was called. This proves the adapted Codex

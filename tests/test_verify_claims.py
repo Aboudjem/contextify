@@ -65,8 +65,6 @@ def new_repo(files):
     repo = tempfile.mkdtemp(prefix="ctxclaims-")
     _tempdirs.append(repo)
     run(["git", "init", "-q"], cwd=repo)
-    run(["git", "config", "user.name", "contextify tests"], cwd=repo)
-    run(["git", "config", "user.email", "tests@example.invalid"], cwd=repo)
     for rel, text in files.items():
         path = os.path.join(repo, rel)
         parent = os.path.dirname(path)

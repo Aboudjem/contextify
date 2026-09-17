@@ -1,0 +1,117 @@
+{
+  "at": "2026-09-17T09:16:15.669580+00:00",
+  "results": [
+    {
+      "argv": [
+        "python3",
+        "tests/test_ctx_check.py"
+      ],
+      "exit": 0,
+      "tail": [
+        "PASS: 22f a second run changes nothing",
+        "------------------------------------------------------------",
+        "119/119 checks passed",
+        "All checks passed."
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/test_verify_claims.py"
+      ],
+      "exit": 0,
+      "tail": [
+        "PASS: 6c --help prints usage and exits 0",
+        "------------------------------------------------------------",
+        "30/30 checks passed",
+        "All checks passed."
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/test_hooks.py"
+      ],
+      "exit": 0,
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 20 tests in 19.466s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/test_regressions.py"
+      ],
+      "exit": 0,
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 23 tests in 26.180s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/test_supporting_docs.py"
+      ],
+      "exit": 0,
+      "tail": [
+        "----------------------------------------------------------------------",
+        "Ran 16 tests in 21.745s",
+        "",
+        "OK"
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "tests/test_manifests.py"
+      ],
+      "exit": 0,
+      "tail": [
+        "PASS: no tracked file matches a credential pattern (231 tracked)",
+        "------------------------------------------------------------",
+        "130/130 checks passed",
+        "All checks passed."
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "evals/check_skill.py",
+        "skills/contextify/SKILL.md"
+      ],
+      "exit": 0,
+      "tail": [
+        "PASS: gate self-test: a quoted specimen counts as a specimen, not a hit",
+        "PASS: gate self-test: an order is not caught",
+        "------------------------------------------------------------",
+        "114/114 checks passed for skills/contextify/SKILL.md"
+      ]
+    }
+  ],
+  "version": "0.2.0",
+  "source_sha256": {
+    "evals/check_skill.py": "7f287b4b5af2b3623bc26658a573fab1af3745e274204675a2ebef608428ef58",
+    "skills/contextify/SKILL.md": "19ac501dcc30eef1382a94edb312b2c007e0bd7c3f3e188eff7459109bac60bd",
+    "skills/contextify/scripts/ctx-check": "c63170ba86d90c16fd410928e507bca6788a527b6a19785e4c1ec45fbf2cfffc",
+    "skills/contextify/scripts/ctx_check.py": "4e755b1e4f328fc22acf475108f924288fd439912c682e6796ceec378f85aca3",
+    "skills/contextify/scripts/ctx_stamp.py": "5aaacbff276d0fb1e3a275195c2d927a4de97416dddef8a682880191abe31b43",
+    "skills/contextify/scripts/ctx_write.py": "c17273db101350ac528b6d691acf5be384b21c4fcc4f1006dd15a45f4259743b",
+    "skills/contextify/scripts/ctxlib.py": "f84ef132bbeb154a12649b523a0b4862e8cceb7abe98d08965e1a0b679f846d5",
+    "skills/contextify/scripts/detect_repo.sh": "132890d156b84f0cc3c12395a689115498078ed66d8f4e02db225384bb4a6cf8",
+    "skills/contextify/scripts/install_hooks.sh": "e19b4dfd5b19d187ed7e797b2a215929d8bd1ca8c494061e438c89d49aad5657",
+    "skills/contextify/scripts/verify_claims.py": "fcdddfbd7e2371dc7535eb2c7b54ad8089cd848e82a0f5aaead56f15d1163c7a",
+    "tests/test_ctx_check.py": "26fb3222d20d080ae69e981cae08f9b56dcf18d593349ffc4749c8caa03ba2b5",
+    "tests/test_hooks.py": "76e443e261ec7f8b1b9abbf89fa6c6fa76dc066ea8373af3c7be2fa8c9f237c5",
+    "tests/test_manifests.py": "f4c46b6432659592b262477d8e6df07317e88d19a70194c91e6ac745235fec10",
+    "tests/test_regressions.py": "27703718efb6605a55ec07fecd070557a6d6f0f5dd8484f9ad39a15ab5922260",
+    "tests/test_supporting_docs.py": "ae786ec9a0a72b3af5bc1c5b9e112f7e54810afd19c3fa6526ef0e92b3fdfd72",
+    "tests/test_verify_claims.py": "5ff163ec0bdbfb908f69cf3817d9a00f7eb0bcd58a1e13fdbdfd004ddbaf8152"
+  },
+  "scope": "Local deterministic suites; not a Claude model behavior evaluation."
+}

@@ -3,7 +3,7 @@
   <title>contextify</title>
   <desc>Dark-mode hero. One source file carries the repository facts and every claim names the
   file and line it came from. Every other agent file is a thin pointer at that one source. The
-  session-start check stays silent while the evidence still holds, and names what moved when it
+  commit/push check stays silent while the evidence still holds, and names what moved when it
   does not.</desc>
   <defs>
     <linearGradient id="cx-ground" x1="0" y1="0" x2="0.4" y2="1">

@@ -1,17 +1,17 @@
 # Quickstart
 
-A first run on a repository at `/Users/you/tidemark`. Yours prints your real paths. contextify reads
-your repository and writes `AGENTS.md` as the one file that carries the facts; every other agent file
-it writes is a thin pointer back to it.
+Contextify writes a short `AGENTS.md`, pointers for selected editors, and evidence records. It can also add focused architecture or workflow documents when the repository needs them.
 
 ## 1. Install
+
+For Claude Code:
 
 ```bash
 claude plugin marketplace add Aboudjem/contextify
 claude plugin install contextify@contextify-marketplace
 ```
 
-For Codex, the same skill directory:
+For Codex:
 
 ```bash
 npx skills add Aboudjem/contextify -a codex
@@ -19,79 +19,43 @@ npx skills add Aboudjem/contextify -a codex
 
 ## 2. Run it
 
-Run `/contextify init` in Claude Code. In Codex, ask the installed Contextify skill to initialize the current repository.
+Run `/contextify init` in Claude Code. In another agent, ask the installed Contextify skill to initialize the current repository.
 
-## 3. What you see
+The agent reads repository evidence, reviews existing documentation and drafts concise instructions. It reuses accurate architecture/workflow docs first. When useful information needs its own page, it proposes `docs/context/architecture.md` or `docs/context/workflows.md`, each capped at 120 lines. `AGENTS.md` links to them for tasks that need more detail.
 
-`init` discovers evidence, package.json scripts, CI workflow run lines, tsconfig paths, a Makefile,
-whatever the repository actually has, classifies the repository as tiny, medium or monorepo, drafts
-`AGENTS.md` against the line budget for that class, and writes the pointer files you selected. It ends
-with a summary block. This is an example rendering, not a measured result:
+## 3. Review the proposed diff
 
-```text
-contextify init
+Use `init --dry-run` to see proposed files and their line/byte costs without applying them. Check that commands, component relationships and workflow steps are supported by files actually read. A resolved command has not necessarily been executed. Another agent reviews the draft before the writer applies it.
 
-Result   written
-Scope    .
-Targets  claude, gemini, cursor-rule, copilot
+Updates preserve human text outside managed blocks. A conflicting edit inside a managed block requires deliberate resolution. `--yes` skips routine questions; it cannot bypass hard ceilings or silently overwrite conflicts.
 
-Files written                              Lines
-AGENTS.md                                     60
-CLAUDE.md                                      4
-GEMINI.md                                      3
-.cursor/rules/contextify.mdc                   9
-.github/copilot-instructions.md                4
-.contextify/evidence.json                     84
-.contextify/stamp.json                        72
+## 4. Commit the context
 
-Evidence     18 records
-Unverified    0 claims
-Next         /contextify check
+Commit `AGENTS.md`, selected editor pointers, any supporting documents, `.contextify/stamp.json` and `.contextify/evidence.json`. The committed records let each clone check the same reviewed instructions. Temporary drafts are ignored.
+
+## 5. Install Git checks
+
+No session-start hook is registered by default. From a Contextify checkout, preview the Git hook files for your project, then apply and activate them:
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
 ```
 
-## 4. Read the diff before you approve it
+The default creates `.githooks/pre-commit` and `.githooks/pre-push`. `--yes` writes the files; `--activate` also requests safe repository-local activation. Activation refuses to replace an existing custom/global hooks path, hide executable default hooks, or change shared configuration from a linked worktree. Use the existing hook manager's integration mechanism in those cases. See [hooks and CI](hooks.md).
 
-Every write goes through a diff first. Every command, path, port, branch and deploy fact that lands in
-`AGENTS.md` traces back to a file contextify actually read; anything it could not confirm is labelled
-`unverified` or left out. Read that diff the way you would read any pull request before merging it.
+## 6. Check at commit or push
 
-## 5. Commit AGENTS.md, CLAUDE.md and .contextify/
+When the context is fresh, the Git checks print nothing. If evidence changes, they report the drift. They are advisory by default, so they do not block your commit or push. Strict checking is optional.
 
-Commit `AGENTS.md`, `CLAUDE.md`, the other pointer files you generated, and `.contextify/stamp.json`
-plus `.contextify/evidence.json`. Committing the stamp is what makes the freshness check useful past
-your own machine: one person runs `/contextify update` after a refactor, and every clone that pulls
-the new commit quiets down at its next session start, instead of every teammate separately noticing
-the same drift.
+The checks inspect the **current working tree**, not the staged index or the exact commits being pushed. They never rewrite context, refresh metadata or stage files.
 
-## 6. Open a new session, see nothing
+You can also ask the agent to run `/contextify check` at any time.
 
-Start a fresh Claude Code session in the repository. The plugin's `SessionStart` hook runs `ctx-check`
-and, when nothing has moved since the stamp, prints nothing at all. A silent hook costs zero tokens.
+## 7. Update or accept
 
-## 7. Change something, start a session, see the notice
-
-Remove a script from `package.json` that `AGENTS.md` quotes, or add one, and start a new session. The
-hook now injects a short notice. This is an example rendering, eight lines here, twelve the hard max:
-
-```text
-contextify: drift
-Scope    .
-Changed  package.json#scripts
-Removed  script lint:css
-Stale    AGENTS.md:14 references npm run lint:css
-Files    0 written
-Next     /contextify update
-Accept   unavailable until the stale command is corrected
-```
-
-## 8. Update or accept
-
-If the notice names a real change, run `/contextify update` to re-read the evidence and revise the
-affected content. If `AGENTS.md` is still right and only the evidence moved, a claim's source line
-shifted, run `/contextify accept` after reviewing the evidence: it re-digests metadata and leaves context files byte-identical. A removed or renamed source needs its provenance mapping updated first; accepting cannot invent the replacement source.
+Run `/contextify update` when instructions need revising. Run `/contextify accept` only after confirming that the instructions remain correct and the evidence alone changed. It refreshes metadata while leaving context files byte-identical. A missing or renamed source needs its provenance mapping corrected; accepting cannot invent a replacement source or adopt edited managed prose.
 
 ## Next
 
-- [Install in your editor](editors.md), the skill in Cursor, Codex, Gemini CLI and others
-- [Hooks and CI](hooks.md), the opt-in snippets for agents the plugin does not hook automatically
-- [Honest limits](limits.md), what a clean run does not prove. Read it before you trust a stamp
+[Supporting documents](supporting-docs.md) · [Editor setup](editors.md) · [Hooks and CI](hooks.md) · [Limits](limits.md)

@@ -49,7 +49,7 @@ Gated behind `CLAUDE_CODE_NEW_INIT=1` (also `tengu_slate_harbor_experiment`), fo
 
 **What contextify keeps.** The line-by-line test from Phase 4, "would removing this cause a mistake," is the same instinct behind D3's evidence rule and D1's per-section allowances: every line has to earn its place. The include/exclude list (exclude file-by-file structure, generic advice, long references; use `@path/to/import` instead) matches D6's thin pointers exactly.
 
-**What contextify does differently, and why.** This flow is a full interactive product, single-agent, Claude-only, that asks the human questions and scaffolds skills and hooks unattended. Contextify runs the same deterministic evidence extraction across all ten D23 targets at once rather than one interactive session per agent, asks at most three questions total (D13) instead of a multi-phase interview, and ships a committed stamp (D14) so staleness is detected on every session start rather than depending on someone remembering to re-run `/init`.
+**What contextify does differently, and why.** This flow is a full interactive product, single-agent, Claude-only, that asks the human questions and scaffolds skills and hooks unattended. Contextify runs the same deterministic evidence extraction across all ten D23 targets at once rather than one interactive session per agent, asks at most three questions total (D13) instead of a multi-phase interview, and ships a committed stamp (D14) so staleness is checked at configured Git checkpoints rather than depending on someone remembering to re-run `/init`.
 
 ## Gemini CLI, `/init`
 

@@ -3,11 +3,10 @@
 Thanks for wanting to help. `contextify` is a skill-only Claude Code plugin: Markdown plus
 zero-dependency scripts, no npm package, no MCP server. Installed from GitHub
 `Aboudjem/contextify`, it gives you one command, `/contextify init|update|check|accept`, that
-writes lean, evidence-backed context files for any repo. `AGENTS.md` is the single source of
-truth: every command, path, port, or branch fact in it traces to a file the run actually read,
+writes lean, evidence-backed context files for any repo. `AGENTS.md` is the short entry point. Every factual statement in its managed content and optional supporting documents traces to a file the run actually read,
 or it is omitted, or it is labelled `unverified`. Thin pointer files (`CLAUDE.md`, `GEMINI.md`,
 `.cursor/rules/contextify.mdc`, `.github/copilot-instructions.md`) point back at it. This guide
-explains how to contribute without breaking that contract.
+explains how to contribute without breaking that contract. Supporting architecture/workflow documents are optional, at most 120 lines each, and linked on demand.
 
 ## What we want
 
@@ -16,7 +15,7 @@ explains how to contribute without breaking that contract.
 - **New target agents**, added as a data-table row rather than special-cased code.
 - **Budget or skeleton improvements**, backed by a source: a real repo where the current
   60-line target or 150-line ceiling for `AGENTS.md`, or the 30-line ceiling for `CLAUDE.md`,
-  produced a bad result.
+  or a 120-line supporting-document ceiling produced a bad result.
 - **Dogfood reports**: run contextify on a real repo and report the measured line counts,
   what was correct, and what was missed or labelled `unverified` incorrectly.
 
@@ -32,6 +31,7 @@ Open an issue first if you want to discuss a larger change before writing it.
 - **No emoji in headings**, in this repo's Markdown or in anything the skill generates.
 - **Zero dependencies.** Scripts are POSIX sh safe on bash 3.2, or python3 using stdlib only.
   Nothing contextify ships requires `pip install` or `npm install` to run.
+- **Checks stay read-only.** Git hooks are advisory by default, inspect the working tree and never update context or the index. Session hooks are opt-in. Hook installation must preserve existing hooks and configuration.
 - **The drift check stays fast and safe.** Aim for a warm median below 100 ms and keep the
   regression ceiling below 250 ms. No cache may skip a changed source, context file or evidence
   record. `ctx-check` must never exit 2; hook input reads must be bounded.
@@ -43,12 +43,13 @@ python3 tests/test_manifests.py
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
 python3 tests/test_regressions.py
+python3 tests/test_supporting_docs.py
 python3 tests/test_hooks.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 claude plugin validate . --strict
 ```
 
-All seven must exit 0 before you open a PR.
+Run all eight for your revision before opening a PR. Add relevant new test modules when a change extends the writer or hook contract; historical counts are not current verification.
 
 ## How to add a normalizer
 
@@ -72,11 +73,11 @@ All seven must exit 0 before you open a PR.
 
 ## PR checklist
 
-- [ ] All seven local checks pass (see above).
+- [ ] All eight local checks pass (see above).
 - [ ] Every new or changed claim in `SKILL.md` or `references/` cites a primary source.
 - [ ] No em dash, no emoji in headings.
 - [ ] `AGENTS.md` stays within its 60-line target and 150-line ceiling; `CLAUDE.md` stays under
-      30 lines, if your change touches either.
+      30 lines; each supporting document stays at or below 120 lines, including preserved human content.
 - [ ] New normalizer: fixture case added. New target agent: table row and doc URL added.
 - [ ] Commit messages follow conventional commits, with no AI attribution trailer.
 

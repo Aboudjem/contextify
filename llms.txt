@@ -2,22 +2,23 @@
 
 > Tell every coding agent how your repo works. Then prove it is still true.
 >
-> contextify is a Claude Code skill that reads one repository and writes AGENTS.md as the single
-> source of facts, with CLAUDE.md, GEMINI.md, an optional Cursor rule and a Copilot instructions file
-> as thin pointers back to it. Every command, path, port, branch and deploy fact in AGENTS.md traces
-> to the file and line that justifies it, or it is labelled unverified, or it is cut. A deterministic,
-> zero-token check at every session start notices when the evidence has moved or a quoted command no
-> longer resolves. The hook only ever reads and prints; it never rewrites a file.
+> contextify is an Agent Skill that writes a short AGENTS.md and thin editor pointers. It reuses
+> accurate existing documentation first and can add docs/context/architecture.md or workflows.md
+> when needed, each capped at 120 lines. Factual managed lines map to repository evidence.
+> Installed Git hooks check at commit and push; session hooks are explicitly opt-in.
+> The deterministic checker makes no model or network calls and never rewrites context.
+> Git checks inspect the working tree, not staged snapshots or pushed refs, and warn by default.
 
 ## Docs
 
 - [README](https://github.com/Aboudjem/contextify/blob/main/README.md): What contextify is, who it is for, how to install and use it.
 - [SKILL.md](https://github.com/Aboudjem/contextify/blob/main/skills/contextify/SKILL.md): The skill definition read by Claude Code and every other agent through the skills CLI.
-- [Quickstart](https://github.com/Aboudjem/contextify/blob/main/docs/quickstart.md): A first run in eight numbered steps: install, `init`, read the diff, commit the stamp, then see the hook stay silent until something drifts.
+- [Quickstart](https://github.com/Aboudjem/contextify/blob/main/docs/quickstart.md): Install, draft, review, commit context and evidence, then activate Git checks safely.
 - [Install in your editor](https://github.com/Aboudjem/contextify/blob/main/docs/editors.md): The `npx skills add` one-liner and the `-a` code, install paths and context file for Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI.
+- [Supporting documents](https://github.com/Aboudjem/contextify/blob/main/docs/supporting-docs.md): When to reuse existing docs or add evidence-backed architecture and workflow notes.
 - [FAQ](https://github.com/Aboudjem/contextify/blob/main/docs/faq.md): Short answers to the questions people actually ask, from why AGENTS.md is the source to whether the hook ever rewrites a file.
 - [Honest limits](https://github.com/Aboudjem/contextify/blob/main/docs/limits.md): What a clean run does not prove, opening on the line that a verified command was never executed and citing the ETH Zurich finding on context files.
-- [Hooks and CI](https://github.com/Aboudjem/contextify/blob/main/docs/hooks.md): The opt-in snippets for Codex, Gemini, Cursor, git and a GitHub Action, plus the one-command installer.
+- [Hooks and CI](https://github.com/Aboudjem/contextify/blob/main/docs/hooks.md): Default Git pre-commit/pre-push setup, safe activation, migration from session defaults, optional host adapters and CI.
 - [Comparison](https://github.com/Aboudjem/contextify/blob/main/docs/comparison.md): contextify against ruler, rulesync, ClaudeForge, agentrules-architect, airul, agents-md-generator and the built-in `/init` commands, scoped to what each was actually read to do.
 - [Security policy](https://github.com/Aboudjem/contextify/blob/main/SECURITY.md): How to report a problem in contextify itself.
 - [LICENSE (MIT)](https://github.com/Aboudjem/contextify/blob/main/LICENSE): Permissive MIT license.

@@ -95,12 +95,29 @@ def fail(message, code):
 
 
 def read_draft(draft_dir):
-    """(agents_body, claude_body, nested {reldir: body}). Bodies are line lists."""
+    """Root bodies, nested instructions and optional allowlisted supporting drafts."""
     agents_path = os.path.join(draft_dir, ctxlib.AGENTS_MD)
     agents = ctxlib.read_text(agents_path)
     if agents is None:
         raise ctxlib.CtxError("draft %s is missing AGENTS.md" % draft_dir, 4)
     claude = ctxlib.read_text(os.path.join(draft_dir, ctxlib.CLAUDE_MD))
+    supporting = {}
+    support_dir = os.path.join(draft_dir, "docs", "context")
+    if os.path.lexists(support_dir):
+        ctxlib.safe_path(draft_dir, "docs/context")
+        if not os.path.isdir(support_dir):
+            raise ctxlib.CtxError("refused: draft docs/context must be a directory", 4)
+        for name in os.listdir(support_dir):
+            rel = "docs/context/" + name
+            if rel not in ctxlib.SUPPORTING_DOCS:
+                raise ctxlib.CtxError("refused: unknown supporting draft %s" % rel, 4)
+            path = ctxlib.safe_path(draft_dir, rel)
+            if not os.path.isfile(path):
+                raise ctxlib.CtxError("refused: supporting draft %s must be a file" % rel, 4)
+            text = ctxlib.read_text(path)
+            if text is None:
+                raise ctxlib.CtxError("refused: unreadable supporting draft %s" % rel, 4)
+            supporting[rel] = text.splitlines()
     nested = {}
     for dirpath, dirnames, filenames in os.walk(draft_dir):
         dirnames[:] = [d for d in dirnames if not d.startswith(".")]
@@ -111,7 +128,7 @@ def read_draft(draft_dir):
             nested[rel] = ctxlib.read_text(os.path.join(dirpath, ctxlib.AGENTS_MD))
     return (agents.splitlines(),
             claude.splitlines() if claude is not None else None,
-            {k: (v or "").splitlines() for k, v in nested.items()})
+            {k: (v or "").splitlines() for k, v in nested.items()}, supporting)
 
 
 def check_content_rules(body_lines, rel):
@@ -119,7 +136,7 @@ def check_content_rules(body_lines, rel):
         if ctxlib.FENCE_RE.match(line):
             raise ctxlib.CtxError(
                 "refused: %s draft line %d opens a fenced code block; a generated "
-                "AGENTS.md carries no code blocks (D3)" % (rel, idx), 4)
+                "context document carries no code blocks" % (rel, idx), 4)
 
 
 def resolve_targets(spec):
@@ -134,12 +151,14 @@ def resolve_targets(spec):
     return ids
 
 
-def build_outputs(root, targets, agents_body, claude_body, nested, meta):
+def build_outputs(root, targets, agents_body, claude_body, nested, meta, supporting=None):
     """Ordered [(rel, rendered_text)] for every file this run would produce."""
     out = [(ctxlib.AGENTS_MD, ctxlib.render_agents(agents_body, meta))]
     for rel in sorted(nested):
         out.append((rel + "/" + ctxlib.AGENTS_MD,
                     ctxlib.render_agents(nested[rel], meta)))
+    for rel, body in sorted((supporting or {}).items()):
+        out.append((rel, ctxlib.render_agents(body, meta)))
     if "claude" in targets:
         out.append((ctxlib.CLAUDE_MD, ctxlib.render_claude(claude_body or [], meta)))
     if "gemini" in targets:
@@ -199,11 +218,12 @@ def check_claims(root, outputs, scope, strict):
     stale = []
     unverified = []
     for rel, text in outputs:
-        if os.path.basename(rel) != ctxlib.AGENTS_MD:
+        if os.path.basename(rel) != ctxlib.AGENTS_MD and ctxlib.supporting_scope(rel) is None:
             continue
         for claim in ctxlib.extract_claims(text, rel, "."):
             if scope != ".":
-                ctxlib.safe_path(ctxlib.safe_path(root, scope), os.path.relpath(os.path.join(root, claim.cwd), os.path.join(root, scope)))
+                owner_root = ctxlib.safe_path(root, scope)
+                ctxlib.safe_path(owner_root, os.path.relpath(os.path.join(root, claim.cwd), owner_root))
             ctxlib.resolve_claim(claim, root)
             if claim.status == "stale":
                 stale.append(claim)
@@ -248,8 +268,8 @@ def merge_all(root, outputs, stamp, yes, force):
                     if not (yes and force):
                         raise ctxlib.CtxError(
                             "conflict: the managed block in %s was edited since it was "
-                            "stamped; rerun with --yes --force-managed to overwrite it, or "
-                            "run /contextify accept to adopt the edit" % rel, 2)
+                            "stamped; restore the block, or review its draft and rerun with "
+                            "--yes --force-managed to replace it" % rel, 2)
         keep = "@AGENTS.md" if os.path.basename(rel) == ctxlib.CLAUDE_MD else None
         new_text, note = ctxlib.merge_block(existing, rendered, None, keep_first_line=keep)
         merged.append((rel, new_text, existing, note))
@@ -271,6 +291,8 @@ def cost_table(merged, targets, notes):
         base = os.path.basename(rel)
         if base == ctxlib.AGENTS_MD:
             ceiling = "%d lines" % ctxlib.AGENTS_LINE_CEILING
+        elif ctxlib.supporting_scope(rel) is not None:
+            ceiling = "%d lines" % ctxlib.SUPPORTING_LINE_CEILING
         elif base == ctxlib.CLAUDE_MD:
             ceiling = "%d lines" % ctxlib.CLAUDE_LINE_CEILING
         else:
@@ -377,19 +399,36 @@ def main(argv):
 
 
 def run(root, opts):
+    draft = read_draft(opts["draft"])
+    scope = opts["scope"]
+    previous = ctxlib.load_json_file(ctxlib.safe_path(root, ctxlib.STAMP_REL)) or {}
+    targets = set(resolve_targets(opts["targets"])) | set(previous.get("targets", []))
+    relatives = {ctxlib.AGENTS_MD, *draft[3]}
+    relatives.update(rel + "/" + ctxlib.AGENTS_MD for rel in draft[2])
+    relatives.update(path for target, path in (("claude", ctxlib.CLAUDE_MD), ("gemini", ctxlib.GEMINI_MD),
+                                              ("cursor-rule", ctxlib.CURSOR_RULE), ("copilot", ctxlib.COPILOT_MD)) if target in targets)
+    planned = {rel if scope == "." else scope + "/" + rel for rel in relatives}
+    # Excluding exactly the proposed outputs gives identical evidence before/after write.
+    with ctxlib.planned_outputs(root, planned):
+        return run_with_draft(root, opts, draft)
+
+
+def run_with_draft(root, opts, draft):
     scope = opts["scope"]
     size_class, file_count, unit_count = ctxlib.classify(root)
     previous_stamp = ctxlib.load_json_file(ctxlib.safe_path(root, ctxlib.STAMP_REL)) or {}
     targets = sorted(set(resolve_targets(opts["targets"])) | set(previous_stamp.get("targets", [])))
-    agents_body, claude_body, nested = read_draft(opts["draft"])
+    agents_body, claude_body, nested, supporting = draft
 
     check_content_rules(agents_body, ctxlib.AGENTS_MD)
     for rel, body in nested.items():
         check_content_rules(body, rel + "/" + ctxlib.AGENTS_MD)
+    for rel, body in supporting.items():
+        check_content_rules(body, rel)
 
     meta = ctxlib.Meta(ctxlib.tool_version(), opts["generated_by"] or "unknown",
                        ctxlib.now_rfc3339(), ctxlib.head_commit(root))
-    outputs = build_outputs(root, targets, agents_body, claude_body, nested, meta)
+    outputs = build_outputs(root, targets, agents_body, claude_body, nested, meta, supporting)
     if scope != ".":
         outputs = [(scope + "/" + rel, text) for rel, text in outputs]
 
@@ -399,6 +438,19 @@ def run(root, opts):
             ctxlib.safe_path(ctxlib.safe_path(root, scope), os.path.relpath(os.path.join(root, rel), os.path.join(root, scope)))
 
     stamp = ctxlib.load_json_file(os.path.join(root, ctxlib.STAMP_REL))
+    for rel, entry in (stamp or {}).get("contextFiles", {}).items():
+        if ctxlib.supporting_scope(rel) is None or rel in dict(outputs):
+            continue
+        text = ctxlib.read_text(ctxlib.safe_path(root, rel))
+        if text is None:
+            raise ctxlib.CtxError("refused: previously generated %s is missing; include its reviewed draft to restore it" % rel, 4)
+        body = ctxlib.managed_body_of(text)
+        recorded = entry.get("managedBlockDigest")
+        if recorded and (body is None or ctxlib.block_digest(body) != recorded):
+            raise ctxlib.CtxError("conflict: omitted supporting document %s has an edited managed block; include a reviewed draft before replacing it" % rel, 2)
+        problems = ctxlib.budget_report(root, rel, text)
+        if problems:
+            raise ctxlib.CtxError("refused: " + problems[0], 4)
     merged = merge_all(root, outputs, stamp, opts["yes"], opts["force"])
     merged.append((".gitignore", ctxlib.gitignore_merged_text(root),
                    ctxlib.read_text(os.path.join(root, ".gitignore")), ""))
@@ -549,7 +601,7 @@ def validate_journal(root, journal):
             raise ctxlib.CtxError("refused: malformed recovery target", 6)
         rel = entry.get("path")
         ctxlib.safe_path(root, rel)
-        allowed = rel in (".gitignore", ctxlib.STAMP_REL, ctxlib.EVIDENCE_REL) or rel in ctxlib.GENERATED_FILES or any(rel.endswith("/" + target) for target in ctxlib.GENERATED_FILES)
+        allowed = rel in (".gitignore", ctxlib.STAMP_REL, ctxlib.EVIDENCE_REL) or rel in ctxlib.GENERATED_FILES or ctxlib.supporting_scope(rel) is not None or any(rel.endswith("/" + target) for target in ctxlib.GENERATED_FILES)
         previous = entry.get("previous")
         if not allowed or rel in seen or (previous is not None and not isinstance(previous, str)):
             raise ctxlib.CtxError("refused: invalid recovery target", 6)

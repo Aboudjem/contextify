@@ -142,8 +142,6 @@ def new_repo(files, commit=True):
     repo = tempfile.mkdtemp(prefix="ctxtest-repo-")
     _tempdirs.append(repo)
     git(repo, "init", "-q")
-    git(repo, "config", "user.name", "contextify tests")
-    git(repo, "config", "user.email", "tests@example.invalid")
     for rel, text in files.items():
         write(repo, rel, text)
     if commit:
@@ -984,10 +982,10 @@ r = run(["bash", INSTALL_HOOKS, "--yes", "--targets", "codex,gemini,cursor,git,g
 check("22a install_hooks.sh exits 0", r.returncode == 0,
       "exit %d stderr=%r" % (r.returncode, r.stderr))
 expected22 = [".codex/hooks.json", ".gemini/settings.json", ".cursor/hooks.json",
-              ".githooks/pre-commit", ".github/workflows/contextify-check.yml"]
+              ".githooks/pre-commit", ".githooks/pre-push", ".github/workflows/contextify-check.yml"]
 missing22 = [rel for rel in expected22
              if not os.path.isfile(os.path.join(repo22, rel))]
-check("22b all five snippets are written", not missing22,
+check("22b all six snippets are written", not missing22,
       "missing: %s" % ", ".join(missing22))
 
 bad_json = []
@@ -1000,7 +998,7 @@ check("22c every JSON snippet parses as JSON", not bad_json, "; ".join(bad_json)
 
 no_path = [rel for rel in expected22[:-1] if CTX_CHECK not in read(repo22, rel)]
 workflow22 = read(repo22, expected22[-1])
-portable22 = (CTX_CHECK not in workflow22 and '--branch v0.1.0' in workflow22
+portable22 = (CTX_CHECK not in workflow22 and '--branch v0.2.0' in workflow22
               and '$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check' in workflow22)
 check("22d local hooks use this installation and CI fetches a portable release",
       not no_path and portable22, "local missing: %s; portable CI=%s" % (no_path, portable22))

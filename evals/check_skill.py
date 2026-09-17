@@ -127,6 +127,7 @@ REFERENCE_FILES = [
     "monorepo.md",
     "comparison.md",
     "init-prompts.md",
+    "supporting-docs.md",
 ]
 
 # 7. The deterministic layer (SCRIPTS-SPEC.md). The skill drives these by name; a rename that
@@ -442,8 +443,14 @@ def main():
                    "scripts directory next to this file" in low, ""))
     checks.append(("cross-harness: the body names the npx skills add install line",
                    "npx skills add" in body, ""))
-    checks.append(("cross-harness: the body says the SessionStart hook is not shipped elsewhere",
-                   "install_hooks.sh" in body and "not installed" in low, ""))
+    checks.append(("cross-harness: Git checkpoints are the default, sessions explicitly opt-in",
+                   "git checkpoints are the default" in low and "no automatic sessionstart" in low
+                   and "pre-commit" in low and "pre-push" in low, ""))
+    checks.append(("supporting docs: both optional paths and evidence guide are named",
+                   "docs/context/architecture.md" in body and "docs/context/workflows.md" in body
+                   and "references/supporting-docs.md" in body, ""))
+    checks.append(("supporting docs: own bounded budget and existing-document reuse",
+                   "120 physical lines" in low and "instead of duplicating" in low, ""))
     checks.append(("honest limits: the ETH finding is quoted exactly, with no invented figure",
                    "do not generally improve task success rates, while increasing inference "
                    "cost by over 20% on average" in flat and "2602.11988" in body, ""))

@@ -1,6 +1,6 @@
 {
   "name": "contextify",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tell every coding agent how your repo works. Then prove it is still true.",
   "author": {
     "name": "Adam Boudjemaa",

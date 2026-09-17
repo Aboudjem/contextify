@@ -17,7 +17,7 @@ The skill (SKILL.md, run by the model) does the reading and the prose. The scrip
 | `ctx_write.py` | python3 | the writer: takes a draft dir, merges managed blocks into every target, preflight, `--dry-run` cost report, diff, journaled atomic write, then stamps and self-checks |
 | `ctx_stamp.py` | python3 | writes `.contextify/evidence.json` + `.contextify/stamp.json` from the current tree and context files; `--accept` mode |
 | `verify_claims.py` | python3 | lint a context file: every quoted command and path resolves; `--budget` enforces line ceilings; exit 1 on a miss |
-| `install_hooks.sh` | bash 3.2 | opt-in writer of the Codex / Gemini / Cursor / git pre-commit / GitHub Action snippets; idempotent; diff first; `--yes` |
+| `install_hooks.sh` | bash 3.2 | Git pre-commit/pre-push writer with opt-in host and CI adapters; idempotent; diff first; `--yes` |
 
 Every script accepts `--help` and prints a usage block. Every script is executable (`chmod +x`) and has the right shebang (`#!/bin/sh` for ctx-check, `#!/usr/bin/env bash` for the two bash scripts, `#!/usr/bin/env python3` for the rest). No script imports anything outside the standard library.
 
@@ -62,7 +62,7 @@ Plus the tree at depth two (`tree#depth2`), computed from `git ls-files` names o
 
 ## `ctx-check` (POSIX sh)
 
-Usage: `ctx-check [--hook claude|codex|gemini|cursor] [--ci] [--strict] [--json] [--quiet-if-fresh] [PATH]`
+Usage: `ctx-check [--hook claude|codex|gemini|cursor] [--ci|--git] [--strict] [--json] [--quiet-if-fresh] [PATH]`
 
 The entry point resolves its script directory before changing working directory and delegates to `ctx_check.py`. The earlier index-only shortcut missed deleted quoted sources, nested context and untracked evidence; it is not used to certify freshness. Every check uses the complete evidence and claim evaluation. Git-list caching is limited to one read-only check invocation.
 
@@ -78,10 +78,11 @@ Same flags. Steps: load stamp and evidence; recompute every normalizer over the 
 - Otherwise: the drift notice (D11), max 12 lines and 2,048 bytes, dead claims first. Exit 0 with the notice on stdout.
 - With `--hook claude` or `--hook gemini`: wrap the notice as `{"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "<notice>"}}` on one line; with `--hook codex`: `{"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "<notice>"}}` as well (same shape, kept separate in code so it can diverge); with `--hook cursor`: `{"additional_context": "<notice>"}`. Fresh prints nothing under every envelope.
 - `--json`: one line of JSON `{"status": "fresh|drift|nostamp|broken", "changed": [...], "removed": [...], "added": [...], "stale": [{"file","line","text","reason"}], "next": "..."}`; fresh still prints nothing unless `--ci`.
+- `--git`: check the working tree without reading hook stdin or writing a CI summary; fresh is silent. Drift and missing stamps return0 with diagnostics unless `--strict` is set. Internal checker errors return1; installed advisory wrappers convert failures to warnings with exit0. Git wrappers also make a missing runner advisory by default. Mode combinations with `--ci` or host `--hook` refuse.
 - `--ci`: print the notice (or `contextify: fresh` when fresh) to stdout, and also append the same to `$GITHUB_STEP_SUMMARY` if that variable is set. Exit 0 always, except with `--strict`: exit 1 on drift or no stamp.
 - Any internal exception: one line on stderr `contextify: check failed: <reason>`, stdout empty, exit 1.
 
-## Evidence normalizers (D15, condensed to what ships in 0.1.0)
+## Evidence normalizers (D15, current implementation)
 
 Each normalizer is a function `normalize_<name>(root) -> dict[key, value]` where `value` is a JSON-serializable canonical structure; the stored digest is `sha256` over canonical JSON (sorted keys, compact separators). Keys:
 
@@ -91,7 +92,7 @@ YAML is parsed with a bounded line-based reader (jobs, steps, `run:` scalars inc
 
 ## Claim extraction and resolvers (D16)
 
-Extract from every context file: inline code spans and fenced `sh`/`bash`/`shell`/unlabelled blocks. Split commands on `&&`, `||`, `;`, `|`; strip leading `VAR=value`; track `cd DIR &&`. Forms and resolvers exactly as in D16's table, plus `npx <bin>` (resolves to a dependency name or a bin in `node_modules/.bin` when present, otherwise `unverified`), `pnpm exec <bin>` / `pnpm dlx` (unverified in 0.1.0), `uv run X` / `poetry run X` (unverified in 0.1.0), and a backticked relative path (must contain `/` or an extension, and not look like a URL, flag, or version). A token that looks like a command but matches no resolver is `unverified`, never `stale`. Only a positive miss (the script name, target, recipe, module or path is provably absent) is `stale`.
+Extract from every context file: inline code spans and fenced `sh`/`bash`/`shell`/unlabelled blocks. Split commands on `&&`, `||`, `;`, `|`; strip leading `VAR=value`; track `cd DIR &&`. Forms and resolvers exactly as in D16's table, plus `npx <bin>` (resolves to a dependency name or a bin in `node_modules/.bin` when present, otherwise `unverified`), `pnpm exec <bin>` / `pnpm dlx` (unverified in the current implementation), `uv run X` / `poetry run X` (unverified in the current implementation), and a backticked relative path (must contain `/` or an extension, and not look like a URL, flag, or version). A token that looks like a command but matches no resolver is `unverified`, never `stale`. Only a positive miss (the script name, target, recipe, module or path is provably absent) is `stale`.
 
 ## Managed blocks (D5)
 
@@ -105,9 +106,9 @@ Usage: `ctx_write.py --root PATH --draft DIR [--targets LIST] [--dry-run] [--yes
 
 `DIR` also accepts `evidence.tsv`: SHA-256 of the complete draft line, a tab, then a repository source path and line number (`file:line`). Supplied rows must resolve; unknown hashes or malformed sources refuse. Evidence JSON persists those line identities and source digests across updates and acceptance. A separate agent still checks that the source actually supports the prose.
 
-`DIR` holds `AGENTS.md` (the managed body: no markers, no header, no footer; the writer adds them), optional `CLAUDE.md` (Claude-only addendum body, may be empty or absent), optional nested `<dir>/AGENTS.md` bodies. Steps, in order, failing closed at the first problem:
+`DIR` holds `AGENTS.md` (the managed body: no markers, no header, no footer; the writer adds them), optional `CLAUDE.md` (Claude-only addendum body, may be empty or absent), optional nested `<dir>/AGENTS.md` bodies, and optional `docs/context/architecture.md` / `docs/context/workflows.md` bodies. Supporting files use the same evidence and managed-block rules. Unknown files in draft `docs/context/` refuse. Omitted previous outputs remain checked, never implicitly deleted. Steps, in order, failing closed at the first problem:
 
-1. Size and budget: classify the repo (D2: tiny / medium / monorepo) and print the class; count final merged lines including human content; refuse (exit 4, message names the count and the ceiling) if `AGENTS.md` would exceed 150 rendered lines or `CLAUDE.md` 30; warn (not refuse) above the size-class target.
+1. Size and budget: classify the repo (D2: tiny / medium / monorepo) and print the class; count final merged lines including human content; refuse (exit 4, message names the count and the ceiling) if `AGENTS.md` would exceed 150 rendered lines or `CLAUDE.md` 30, or either supporting document 120; warn (not refuse) above the size-class target.
 2. Content rules (D3): refuse a fenced code block inside the AGENTS.md draft (exit 4, names the line).
 3. Preflight per target (D12): final merged lines and bytes; each actual Codex root-to-leaf instruction chain vs 32,768 (or `project_doc_max_bytes` found in `.codex/config.toml`); refuse (exit 4) when the AGENTS.md chain would exceed the Codex ceiling and `codex` is among the targets; report `AGENTS.override.md` shadowing when present at any level.
 4. Claims: run the extractor + resolvers over the rendered AGENTS.md; a `stale` claim refuses (exit 4, names file:line); `unverified` claims are counted and, with `--strict`, refused.
@@ -129,7 +130,11 @@ Usage: `verify_claims.py [--root PATH] [--budget] [--json] FILE...`. For each fi
 
 ## `install_hooks.sh`
 
-Usage: `install_hooks.sh [--yes] [--targets codex,gemini,cursor,git,github] [PATH]`. For each requested target, render the documented hook shape, show a diff against the existing file, propose without applying unless `--yes`, and merge idempotently (JSON merges add the hook entry once; a second run changes nothing). Targets: `.codex/hooks.json`, `.gemini/settings.json` (hooks + offers the `context.fileName` switch separately), `.cursor/hooks.json`, `.githooks/pre-commit` + prints the `git config core.hooksPath .githooks` line, `.github/workflows/contextify-check.yml`. The local Codex, Gemini, Cursor and git snippets call the installed plugin's `ctx-check` by its absolute path. The GitHub workflow instead clones release tag `v0.1.0` into `$RUNNER_TEMP/contextify` and runs that checkout's checker; it requires the tag to be published. Both git and GitHub checks are advisory by default; adding `--strict` makes drift block the commit or CI job.
+Usage: `install_hooks.sh [--yes] [--activate] [--strict] [--targets LIST] [PATH]`. Default target `git` proposes `.githooks/pre-commit` and `.githooks/pre-push`; both invoke the installed checker by absolute path with `--git`. The package has no automatic SessionStart event. `claude,codex,gemini,cursor` session adapters and `github` CI are explicitly selected targets.
+
+Without `--yes`, show differences and make no file or Git-configuration changes. Applying hooks and activating them are distinct: `--activate` configures `.githooks` only in a compatible normal repository. Refuse before writes if that would mask an effective custom/global hooksPath or executable default hooks; refuse linked-worktree activation to avoid changing sibling configuration. Never change global config. Existing differing hooks require a manual merge; JSON settings merge without erasing unrelated keys. A repeated identical run is a no-op. Report activation failures accurately and preserve prior configuration/files.
+
+The GitHub workflow clones released tag `v0.2.0`; local hooks do not rely on a future network request. Advisory is the default; installer `--strict` opts into blocking Git checks. Git checkpoints inspect the current working tree, not staged or pushed snapshots.
 
 ## Terminal output rules
 
@@ -137,4 +142,10 @@ Plain text, aligned with spaces, no ANSI output or color flag, one final summary
 
 ## Optional mode not implemented
 
-The regular pointer-file workflow is supported. `ctx_write.py --symlink` refuses without changing files in 0.1.0; the original design described this optional future mode.
+The regular pointer-file workflow is supported. `ctx_write.py --symlink` refuses without changing files in the current implementation; the original design described this optional future mode.
+
+## Supporting document scope and ownership
+
+Supporting documents resolve quoted repository commands/paths from their owning root or package scope, while Markdown links remain relative to the containing file. Planned navigation links are validated without temporary writes; pure Architecture/Workflows navigation cannot stand in for evidence for factual prose.
+
+Only planned, stamped or valid managed supporting files are treated as generated outputs and excluded from self-evidence where needed. Human documents with the same filename remain ordinary evidence until explicitly adopted. Planned and actual exclusions must agree so the first check and second write are stable. New output paths are included in recovery's narrow allowlist and the existing containment checks.

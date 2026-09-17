@@ -82,3 +82,7 @@ A pointer file is a handful of physical lines: `CLAUDE.md` is 4, `GEMINI.md` is 
 Copilot link-following behavior varies by feature and is not treated here as a guaranteed native import. Measure actual host loading rather than inferring token savings from file length.
 
 Whether Claude Code's `@AGENTS.md` import, once resolved, counts the same way against the importing file's own 200-line guidance is `uncertain`: the memory page documents the import mechanic and the size guidance separately, and neither 01 nor 07 states whether an imported file's lines count against the importing file's own budget.
+
+## Supporting documentation
+
+`docs/context/architecture.md` and `docs/context/workflows.md` are optional managed documents, not agent-specific pointer files. The AGENTS entry point links them for relevant tasks. They are not automatically imported and each has its own120-line ceiling. Reuse existing accurate documentation first; see [supporting-docs.md](supporting-docs.md).

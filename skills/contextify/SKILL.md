@@ -8,11 +8,12 @@ description: >-
   Gemini CLI, Cursor and Copilot, so the same instructions are never copied into five files. Every
   line traces to a file the run read, or it is omitted, or it is labelled unverified. The drift check
   is a shell script: it spends zero tokens, calls no model, and never rewrites a file on its own.
-  Use this when a one-off /init file needs a committed stamp for later deterministic drift checks.
+  Use this when a one-off /init file needs a committed stamp, supporting architecture or workflow
+  docs, or checks at Git commit and push instead of session startup.
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
-  version: "0.1.0"
+  version: "0.2.0"
 ---
 
 # contextify
@@ -27,7 +28,8 @@ is worse than no file at all: it sends an agent somewhere the repo does not go, 
 before anyone notices.
 
 So contextify does two things. It generates one `AGENTS.md` from evidence, with thin pointer files
-for the agents that read something else. Then it records what each line was derived from, and ships
+for the agents that read something else. Add supporting architecture and workflow documents only
+when the repository needs detail that does not belong in the always-loaded file. Then it records what each line was derived from, and ships
 a deterministic check that tells you when that evidence moved.
 
 **The whole skill rests on one rule. Do not break it:**
@@ -62,18 +64,17 @@ The current writer refuses the optional `--symlink` mode. Pointer files are regu
 **Use when:** a repo has no `AGENTS.md`; an existing `AGENTS.md` or `CLAUDE.md` contradicts how the
 project actually builds, tests or deploys; a team runs more than one coding agent and the same
 instructions have been pasted into three files; a monorepo package needs its own nested file; the
-session-start check just reported drift; someone asks whether the context file is still true.
+commit or push check just reported drift; someone asks whether the context file is still true.
 
 **Do not use for:** end-user product documentation or a README, which is written for humans and has a
-different job; an API reference, which belongs to a doc generator; a single-file script with nothing
+different job; an exhaustive API reference, which belongs to a doc generator; a single-file script with nothing
 an agent could get wrong; a repository the user does not own and does not want written to (run
 `check` and hand over the notice instead).
 
-**Against Claude Code's built-in `/init`:** `/init` writes `CLAUDE.md`, for Claude Code, in one pass,
+**Against the Claude Code `/init` flow inspected on 2026-09-16:** `/init` writes `CLAUDE.md`, for Claude Code, in one pass,
 and it is good at that. It records nothing about where a line came from, so no later run can tell
 whether the line is still true, and it serves one agent. contextify writes the file every agent
-reads, keeps the per-line evidence, and ships the check. Use `/init` when Claude Code is the only
-agent and the repo is small. The full matrix is in `references/comparison.md`.
+reads, keeps the per-line evidence, and ships the check. This comparison is a dated observation, not a claim about later `/init` releases. The full matrix is in `references/comparison.md`.
 
 ## The run
 
@@ -112,11 +113,19 @@ You write a draft. You never write a target file yourself.
    an action that needs approval. Whether to apply the displayed changes. Ask nothing the repo
    already answers. Skip all three under `--yes`, under `--dry-run`, or when input is not
    interactive. Exact wording and defaults: `references/init-prompts.md`.
-6. **Draft the managed body** into `.contextify/draft/AGENTS.md`, following the section order in
+6. **Choose supporting documents, then draft the entry point.** Read existing architecture,
+   development and operations docs first. Link accurate existing documents instead of duplicating
+   them. For missing, useful detail, draft `docs/context/architecture.md` and/or
+   `docs/context/workflows.md` under `.contextify/draft/`, following
+   `references/supporting-docs.md`. Omit files with insufficient evidence; never generate a standard
+   documentation pack just to fill headings. Keep `AGENTS.md` concise and link these files for
+   task-specific reading, without an automatic import.
+   **Draft the managed body** into `.contextify/draft/AGENTS.md`, following the section order in
    `references/section-template.md` and the budget for the size class (see Hard rules). Commands
    first. Omit any section with no evidence: no heading, no placeholder, no TODO. Record the support
    for every line in `.contextify/draft/evidence.tsv`, one row per line, as
-   `line-hash<TAB>file:line`. Write a single-test line only when a working directory, an exact
+   `line-hash<TAB>file:line`. Include factual lines from the supporting drafts in the same evidence
+   table. Write a single-test line only when a working directory, an exact
    command and a real test path all exist; otherwise write `Single test: unverified` or leave it out,
    and never invent a filter flag. No code blocks in the draft. Style rules in
    `references/budget-and-style.md`.
@@ -135,7 +144,12 @@ You write a draft. You never write a target file yourself.
 10. **Apply.** Re-run the same `ctx_write.py` command with `--yes` instead of `--dry-run`. It
     journals the write, replaces each target atomically, writes the stamp last, and then runs the
     check against what it just wrote. A check that is not clean rolls the whole write back.
-11. **Report.** Print the summary block from The output, then the next command. Do not paraphrase the
+11. **Configure Git checkpoints when requested.** Run
+    `bash "${CLAUDE_SKILL_DIR}/scripts/install_hooks.sh" <path>` to preview the default
+    pre-commit and pre-push hooks. Use `--yes --activate` to apply and activate in a compatible
+    repository. Preserve existing hooks: an activation conflict requires integration, never a
+    global configuration override. See `references/hooks-and-ci.md`.
+12. **Report.** Print the summary block from The output, then the next command. Do not paraphrase the
     numbers the script printed.
 
 ### update
@@ -145,7 +159,8 @@ You write a draft. You never write a target file yourself.
 2. **Re-read only the evidence that moved.** Open the files the notice named. Do not re-derive the
    whole repository, and do not regenerate a file that has no reported problem.
 3. **Revise only the affected lines** in `.contextify/draft/AGENTS.md`, starting from the current
-   managed block. Keep every still-true managed line byte-identical. Keep every human line outside
+   managed block, including affected supporting documents at their existing paths. Keep every
+   still-true managed line byte-identical. Keep every human line outside
    the block byte-identical.
 4. **Show the diff, verify, apply.** Same three steps as `init`: `--dry-run` for the diff and the
    cost table, the separate verifier lane for the changed lines, then `--yes`.
@@ -186,20 +201,25 @@ Find no source, and the line is cut or carries `unverified`. Never soften a gues
 for medium, 60 for a monorepo. Scaling only ever goes down, so a target of 60 lines is the most any
 repository gets, and a hard ceiling of 150 lines caps `AGENTS.md` in every class, human content
 included. Keep `CLAUDE.md` under 30 lines. `ctx_write.py` warns above a target and refuses above a
-ceiling. Every later mention of the budget in this file means these numbers.
+ceiling. Each optional supporting document has its own hard ceiling of 120 physical lines,
+including human content. These files are read on demand, not counted as automatically loaded
+AGENTS instructions. Every later mention of the budget refers back to these numbers.
 
 **Update in place. Never clobber.** Rewrite only what is between `<!-- contextify:begin v1 -->` and
 `<!-- contextify:end -->`. Preserve every byte outside it, line endings included. Show the full diff
 before the write, every time, including under `--yes`.
 
-**Never rewrite a file from a hook.** The session-start hook reads and reports. It has five seconds,
-no model, and no write permission. A hook that edits files during startup gets blamed for everything
-else in the session and switched off inside a week.
+**Never rewrite a file from a hook.** Git checkpoints read and report. They call no model,
+change no context files, and never update the stamp or index. The package registers no session-start
+hook. Session hooks are optional adapters and must be explicitly selected.
 
 **The check reports, and that is all.** `ctx-check` must never exit 2, never call a model, never
-touch the git index, never write. Exit 0 with empty output is fresh, exit 0 with a notice is drift,
+touch the git index, or rewrite context or metadata. CI mode may append its report to
+`GITHUB_STEP_SUMMARY`; Git mode is read-only. Exit 0 with empty output is fresh, exit 0 with a notice is drift,
 exit 3 is no stamp yet, exit 1 is the check itself breaking. When the repo is fresh it prints
-nothing, which is why the hook costs zero tokens.
+nothing, which is why a fresh hook adds no output. Git mode (`--git`) is read-only and silent when
+fresh. Default Git wrappers warn without blocking; `--strict` opts into blocking drift, missing
+stamps or errors. They check the working tree, not the staged index or the refs being pushed.
 
 **Read-only for any live fact.** Cloud, deploy and CI reads are describe, list and get calls only,
 and only when the CLI and credentials already exist. Credentials absent means skip in silence and
@@ -218,6 +238,12 @@ spans are fine. Blocks are not.
 
 **A Do-not list only when the repo shows a real hazard.** Every entry names the evidence and says
 what to do instead. No all-caps bans, no invented danger, and no section at all when nothing fires.
+
+**Supporting docs are selective.** Link existing maintained documentation first. Generate only
+the two supported document paths when their content prevents mistakes on real tasks. Do not invent
+design decisions, deployment procedures or hazards. Every factual line follows the same evidence
+and separate-verification rules as AGENTS. Pure navigation links use the exact forms in
+`references/supporting-docs.md`; a link cannot substitute for evidence for prose.
 
 **No README duplication.** The README explains the product to a person. `AGENTS.md` carries what an
 agent gets wrong without it. A line that does not change agent behaviour is cut, however true.
@@ -288,6 +314,8 @@ Accept   unavailable until the stale command is corrected
 | `GEMINI.md` | Gemini CLI | 3 |
 | `.cursor/rules/contextify.mdc` | Cursor, only with `--targets cursor-rule` | 9 |
 | `.github/copilot-instructions.md` | GitHub Copilot, written when `.github/` exists | 4 |
+| `docs/context/architecture.md` | Agents when the task needs components or data flow | optional, own ceiling |
+| `docs/context/workflows.md` | Agents when the task needs build, test or release detail | optional, own ceiling |
 | `.contextify/evidence.json` | no agent. It is the record of what each line was derived from | n/a |
 | `.contextify/stamp.json` | no agent. It is what the check compares the repo against | n/a |
 
@@ -306,6 +334,7 @@ Load one when the run reaches it. Do not paste a reference into the conversation
 | File | Load it when |
 | --- | --- |
 | `references/agents-and-files.md` | Choosing targets. Which agent reads which file, the literal pointer contents, the flag table. |
+| `references/supporting-docs.md` | Deciding whether to create architecture/workflow docs, drafting evidence and task-specific navigation. |
 | `references/section-template.md` | Drafting `AGENTS.md`. The section order, the per-section line allowance, and what earns a line. |
 | `references/detection-signals.md` | After the detector runs. The file to fact to section map. |
 | `references/budget-and-style.md` | Writing the prose. Size classes, the ceiling, sentence rules, what to cut first. |
@@ -385,11 +414,12 @@ Three things change outside Claude Code, and each degrades honestly.
 the scripts directory next to this file. The scripts are POSIX `sh`, bash 3.2 safe, and python3
 standard library only, so they need no install.
 
-**The session-start hook is not shipped.** The plugin's one hook is a Claude Code `SessionStart`
-entry, and it is not installed for any other harness. Install the opt-in equivalent for Codex,
-Gemini, Cursor, a git `pre-commit` hook or a GitHub Action with
-`bash "${CLAUDE_SKILL_DIR}/scripts/install_hooks.sh" [PATH]`, which shows a diff and asks before it
-writes. The snippets are in `references/hooks-and-ci.md`.
+**Git checkpoints are the default.** The package has no automatic SessionStart registration in
+any harness. Hooks are not installed merely by installing the skill.
+`bash "${CLAUDE_SKILL_DIR}/scripts/install_hooks.sh" [PATH]` proposes pre-commit and pre-push
+hooks. Apply with `--yes`; activate with `--activate` only when existing Git hooks are preserved.
+Select Claude, Codex, Gemini or Cursor session hooks explicitly through `--targets` only when
+requested. GitHub CI is also opt-in. See `references/hooks-and-ci.md`.
 
 **Questions become prompts.** `AskUserQuestion` may not exist in the host harness. Ask the three
 `init` questions as plain text, wait once, and apply the documented default when the answer does not

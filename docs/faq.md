@@ -1,14 +1,11 @@
 # FAQ
 
-Tell every coding agent how your repo works. Then prove it is still true. contextify reads your
-repository, writes `AGENTS.md` as the one source of facts, points every other agent file at it, and
-checks at every session start whether anything it wrote still resolves.
+Tell every coding agent how your repo works. Then prove it is still true. Contextify writes a short `AGENTS.md`, optional supporting documents and editor pointers. Installed Git hooks check for drift at commit and push.
 
 ## Why AGENTS.md and not CLAUDE.md as the source
 
 Because AGENTS.md is the file Codex, Cursor and, nearest-wins, GitHub Copilot read natively, while
-Claude Code reads `CLAUDE.md`. Writing the facts once into `AGENTS.md` and pointing every other file
-at it, rather than writing the same facts several times, is the whole single-source design. See
+Claude Code reads `CLAUDE.md`. The entry point carries common instructions; editor pointers refer to it. Longer architecture or workflow explanations can live in linked supporting documents without being copied into every editor file. See
 [the design decisions](design/DECISIONS.md), D6.
 
 ## Does Claude Code read AGENTS.md
@@ -26,23 +23,24 @@ while increasing inference cost by over 20% on average." Claude Code's own `/ini
 a context file "target under 200 lines". contextify's ceiling sits well under that. See
 [D1 and D2](design/DECISIONS.md).
 
+## Can it write architecture or workflow documents
+
+Yes, when they fill an evidenced gap. Contextify first reuses accurate existing docs. It can generate `docs/context/architecture.md` and `docs/context/workflows.md`, each capped at 120 lines, and link them from `AGENTS.md`. It does not automatically create an ADR collection, API reference or security policy. See [supporting documents](supporting-docs.md).
+
 ## Why no code blocks
 
 Because a pasted snippet rots silently the moment the code it describes changes, and an agent greps a
-one-line fact faster than it reads a fenced block. The writer rejects fenced code blocks in generated drafts. See
+one-line fact faster than it reads a fenced block. The writer rejects fenced code blocks in `AGENTS.md` drafts. Supporting documents should keep commands short and reference source files instead of copying large examples. See
 [D3](design/DECISIONS.md).
 
 ## Does the hook rewrite my files
 
-Never. `ctx-check` only reads and prints. Nothing is written by any hook, in Claude Code or in any of
-the opt-in snippets for other agents. Only `/contextify init`, `update`, and `accept` write, and each
+Never. `ctx-check` only reads and prints. Git and host-session checks do not modify files. The optional CI mode may write the GitHub job summary, but never repository context. Only `/contextify init`, `update`, and `accept` write, and each
 shows a diff first.
 
 ## What does the hook cost
 
-Zero tokens when the repository is fresh: `ctx-check` prints nothing and nothing is injected. When
-something has moved, it costs the length of the drift notice, at most 12 lines and 2,048 bytes. See
-[D9 and D11](design/DECISIONS.md).
+The checker makes no model calls. A fresh Git check is silent; a drift notice costs context only if an agent later reads it. Notices are bounded to 12 lines and 2,048 bytes. Runtime depends on the repository and machine; see [limits](limits.md).
 
 ## Why commit .contextify/stamp.json
 
@@ -67,9 +65,7 @@ claim. See [D17](design/DECISIONS.md).
 
 ## Does it work with Codex, Gemini, Cursor, Copilot
 
-Yes, for the files: `AGENTS.md` and its pointers are ordinary Markdown any agent can read. The
-`SessionStart` hook is Claude-Code-only out of the box; the equivalent for the others is an opt-in
-snippet you install yourself. See [editors](editors.md) and [hooks](hooks.md).
+Yes, for the files: `AGENTS.md` and its pointers are ordinary Markdown any agent can read. No session hook is enabled by default. Git hooks are editor-independent; host-session adapters are optional. See [editors](editors.md) and [hooks](hooks.md).
 
 ## What about monorepos
 
@@ -77,7 +73,7 @@ A monorepo is classified by build units, directories with their own manifest and
 declared build, test or executable entry point, joined by workspace configuration. It targets 60
 lines and can carry nested `<package>/AGENTS.md` bodies. See [D2](design/DECISIONS.md).
 
-## Does it run a model at session start
+## Does a check call a model
 
 No. `ctx-check` runs local shell and Python code. Generation and revision use your coding agent when you invoke `init` or `update`. The `accept` script revalidates and refreshes metadata without a model call; deciding whether prose remains correct still requires a review.
 
@@ -98,8 +94,7 @@ The supported default is a regular `CLAUDE.md` containing `@AGENTS.md`. It can c
 
 ## Can I turn the hook off
 
-Yes: uninstall the plugin, or remove the `SessionStart` entry from `hooks/hooks.json` if you copied
-the skill in by hand. Nothing else in contextify depends on the hook running.
+Yes. Remove the Contextify calls from your active Git hooks, or restore your previous hooks configuration. Do not delete hooks owned by other tools. Removing the plugin does not remove independently installed Git hooks or project session settings. Manual checks continue to work. See [hooks and migration](hooks.md).
 
 ## More
 

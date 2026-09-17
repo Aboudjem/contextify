@@ -1,79 +1,32 @@
 # Security Policy
 
-`contextify` is a Claude Code plugin that writes context files for a repo: `AGENTS.md`, plus
-thin pointers (`CLAUDE.md`, `GEMINI.md`, `.cursor/rules/contextify.mdc`,
-`.github/copilot-instructions.md`). It is skill-only: Markdown plus zero-dependency scripts, no
-npm package, no MCP server, no service of its own. This file says how contextify is built to be
-safe, and how to report a hole in contextify itself.
+Contextify is an Agent Skill and Claude Code plugin: Markdown plus standard-library scripts, with no service or MCP server. It writes repository instructions, optional supporting documents and evidence records.
 
-## How contextify is built to be safe
+## Security boundaries
 
-- **No network calls.** The skill and its scripts never make an outbound request. Optional
-  live cloud or deploy reads are read-only, opt-in, and skipped entirely when credentials are
-  absent.
-- **No telemetry.** Nothing about your repo, your commands, or your usage is sent anywhere.
-- **Reads broadly, writes narrowly.** contextify reads the repo to gather evidence. It writes
-  only `AGENTS.md`, the pointer files listed above, and its own state under `.contextify/`
-  (`stamp.json`, `evidence.json`, an optional bounded `mistakes.md`).
-- **Never writes a secret value.** contextify reads `.env.example` **key names only**. It never
-  reads `.env`, never reads a secret's value, and never writes a value into `AGENTS.md`, a
-  pointer file, the stamp, or the evidence file.
-- **Atomic writes.** Every file contextify writes goes to a tempfile first, then an atomic
-  rename onto the target path. A crash mid-write leaves the original file intact, never a
-  half-written one.
-- **Refuses paths outside the repo root.** Every path contextify reads or writes is resolved
-  and checked against the repo root before use. A path that resolves outside it is refused.
-- **Refuses to follow symlinks out of the repo.** A symlink that resolves outside the repo root
-  is not followed for reads and is never a write target.
-- **The hook never runs a model.** `ctx-check`, the SessionStart hook, is a deterministic
-  script: a POSIX sh entry point that runs the complete Python stdlib evidence and claim
-  checker on every invocation. It never invokes Claude or any other model.
-- **The hook never rewrites a file.** `ctx-check` only compares evidence against the committed
-  stamp and prints a notice when they disagree. It never edits `AGENTS.md` or any other file.
-- **The hook never blocks a session.** It prints nothing when fresh, a short notice when
-  evidence moved, and it never exits 2. A hook that hangs or blocks the session is a bug.
-- **The hook has a 5 second timeout.** If it has not finished by then, it is killed and the
-  session continues.
-- **The stamp holds digests only.** `.contextify/stamp.json` stores content digests of the
-  evidence it checked, never file contents.
+- **Local deterministic scripts.** Discovery, writing and checking make no network requests. Your coding agent handles generation under its own data policy. Installation and optional CI fetch code from GitHub.
+- **Narrow output paths.** The writer produces `AGENTS.md`, selected editor pointers, optional `docs/context/architecture.md` and `docs/context/workflows.md`, `.contextify/` state and its draft-ignore entries in `.gitignore`. The hook installer separately writes the selected hook configurations and can activate repository-local Git hooks explicitly.
+- **Evidence can contain repository information.** Stamp and evidence files include paths, quoted commands, provenance locations and normalized values as well as digests. Review them before publishing. They are not anonymized telemetry or a secret scanner's output.
+- **Secret handling.** The environment-example normalizer records key names rather than values. Drafts and source mappings still require review: do not cite private credentials or copy secret values into context. A model-generated draft is not safe merely because a source file exists.
+- **Managed writes.** Contextify preserves human text outside managed blocks, refuses conflicts inside recorded blocks and checks destination containment. Each file is replaced atomically; the recovery journal handles interrupted multi-file updates. This is not a filesystem-wide transaction.
+- **Read-only checks.** Git and host-session checks do not update context, metadata or the Git index. The optional CI mode can append a job summary. Checks never execute quoted repository commands to validate them.
+- **Explicit hook policy.** Git hooks are advisory by default. Strict mode deliberately blocks drift, missing stamps and failures. No session hooks are registered by default; opt-in host adapters have host-specific timeout and error behavior.
+- **Existing hooks survive installation.** Safe activation refuses to mask custom/global hook paths or executable default hooks. It does not alter global configuration and refuses activation from linked worktrees where shared configuration could be affected.
 
-## What counts as a security issue in contextify
+## Report a vulnerability
 
-Report any of the following:
+Please do not open a public issue for a security problem. Use GitHub private vulnerability reporting for `Aboudjem/contextify`, or email **boudjemaa.adam@gmail.com** with the affected revision, impact and reproduction steps.
 
-- A path by which contextify **writes a secret's value** into `AGENTS.md`, a pointer file, the
-  stamp, or the evidence file, rather than a key name.
-- A way that **content contextify reads could steer it into running a command** it was not
-  asked to run.
-- A path by which contextify **writes outside the repo root**, including through a symlink.
-- A way the **hook blocks or hangs a session**, including exceeding its timeout without being
-  killed.
-- A way the **drift check could exfiltrate anything**: evidence, file contents, or repo
-  metadata, off the machine.
+Relevant reports include writes outside the selected scope, symlink escapes, command execution caused by repository text, check-time exfiltration, unintended overwrites of human content or hooks, and secret values being copied into generated evidence by a normalizer.
 
-## How to report a vulnerability
-
-**Please do not open a public issue for a security problem.**
-
-Report privately, either way:
-
-- GitHub private vulnerability reporting on the `Aboudjem/contextify` repo, or
-- Email **boudjemaa.adam@gmail.com** with a description of the issue, its impact, and steps to
-  reproduce.
-
-You will get an acknowledgement within 72 hours. There is no bounty programme.
+There is no bounty programme.
 
 ## Supported versions
 
-| Version | Supported |
-| ------- | --------- |
-| 0.1.x   | yes       |
+Security reports are welcome for the latest published release. The current development line is 0.2.x; consult [GitHub releases](https://github.com/Aboudjem/contextify/releases) for published versions rather than assuming a development branch has shipped.
 
-## What is not a contextify vulnerability
+## Expected limitations
 
-- **A wrong fact in a generated file that traces to a wrong fact in the repo.** contextify
-  writes what the evidence says. If the evidence itself is wrong or stale, that is a bug report
-  against the check that read it, not a security issue.
-- **A stale file when the hook was not installed.** `ctx-check` only runs, and only catches
-  drift, when the SessionStart hook is actually wired up. A file going stale with no hook
-  installed is expected, not a vulnerability.
+A false source can support a false explanation. A fresh check does not establish semantic correctness, successful tests or secure repository code. A repository with no active hook will not be checked automatically. Intentional strict-mode refusal to commit or push is expected behavior.
+
+See [limits](docs/limits.md) and [hook setup](docs/hooks.md).

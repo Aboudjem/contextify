@@ -18,6 +18,7 @@ Contents, in order:
   the check itself, the drift notice (D11) and the hook envelopes
 """
 
+import contextlib
 import hashlib
 import json
 import os
@@ -70,6 +71,9 @@ COPILOT_MD = os.path.join(".github", "copilot-instructions.md")
 # Files contextify generates. They never count as repository evidence, so writing them
 # can never look like a change to the repository they describe.
 GENERATED_FILES = (AGENTS_MD, CLAUDE_MD, GEMINI_MD, CURSOR_RULE, COPILOT_MD)
+SUPPORTING_DOCS = ("docs/context/architecture.md", "docs/context/workflows.md")
+SUPPORTING_LINE_CEILING = 120
+_planned_outputs = {}
 
 TARGET_IDS = ("claude", "codex", "gemini", "cursor", "cursor-rule", "copilot")
 
@@ -236,7 +240,7 @@ def tool_version():
                 return v
         except ValueError:
             pass
-    return "0.1.0"
+    return "0.2.0"
 
 
 def load_json_file(path):
@@ -304,6 +308,52 @@ def untracked_files(root):
     return [p.decode("utf-8", "replace") for p in raw.split(b"\0") if p]
 
 
+def supporting_scope(rel):
+    """Owning scope for an allowlisted supporting doc, or None for other files."""
+    norm = rel.replace(os.sep, "/")
+    for suffix in SUPPORTING_DOCS:
+        if norm == suffix:
+            return "."
+        if norm.endswith("/" + suffix):
+            return norm[:-len(suffix) - 1]
+    return None
+
+
+@contextlib.contextmanager
+def planned_outputs(root, paths):
+    """Read-only preflight view; scoped to one writer call, never saved on disk."""
+    previous = _planned_outputs.get(root)
+    _planned_outputs[root] = set(paths)
+    try:
+        yield
+    finally:
+        if previous is None:
+            _planned_outputs.pop(root, None)
+        else:
+            _planned_outputs[root] = previous
+
+
+def owned_supporting_files(root):
+    stored = load_json_file(safe_path(root, STAMP_REL)) or {}
+    owned = {rel for rel in stored.get("contextFiles", {}) if supporting_scope(rel) is not None}
+    owned.update(rel for rel in _planned_outputs.get(root, ()) if supporting_scope(rel) is not None)
+    for rel in tracked_files(root) + untracked_files(root):
+        if supporting_scope(rel) is None or is_excluded(rel) or any(part in (".goal", "eval", "evals", "snapshots") for part in rel.split("/")[:-1]):
+            continue
+        try:
+            path = safe_path(root, rel)
+        except CtxError:
+            continue  # unrelated human links do not become owned output
+        text = read_text(path)
+        if text is not None:
+            try:
+                if find_block(text):
+                    owned.add(rel)
+            except CtxError:
+                pass  # stamped malformed blocks remain owned and are reported by check
+    return owned
+
+
 def is_excluded(rel):
     norm = rel.replace(os.sep, "/")
     if norm.startswith(STATE_DIR + "/") or norm == STATE_DIR:
@@ -321,8 +371,9 @@ def is_excluded(rel):
 def eligible_files(root):
     """Tracked plus non-ignored untracked regular files, minus everything D2 excludes."""
     seen = set()
+    owned = owned_supporting_files(root)
     for rel in tracked_files(root) + untracked_files(root):
-        if is_excluded(rel):
+        if is_excluded(rel) or rel in owned:
             continue
         if os.path.isfile(os.path.join(root, rel)):
             seen.add(rel)
@@ -698,8 +749,9 @@ def normalize_tree(root, extra_paths=()):
     off. extra_paths lets a writer hash the tree it is about to produce.
     """
     entries = set()
+    owned = owned_supporting_files(root)
     for rel in list(eligible_files(root)) + list(extra_paths):
-        if is_excluded(rel):
+        if is_excluded(rel) or rel in owned:
             continue
         parts = rel.replace(os.sep, "/").split("/")
         if len(parts) == 1:
@@ -1057,6 +1109,9 @@ def _looks_like_path(token):
 def extract_claims(text, file_rel, scope="."):
     claims = []
     seen = set()
+    base = supporting_scope(file_rel)
+    if base is None:
+        base = os.path.dirname(file_rel) or scope
     for snippet, line, negated in _raw_snippets(text, file_rel):
         head = snippet.split()[0] if snippet.split() else ""
         if " " in snippet or head in COMMAND_HEADS:
@@ -1066,7 +1121,6 @@ def extract_claims(text, file_rel, scope="."):
                 if key in seen:
                     continue
                 seen.add(key)
-                base = os.path.dirname(file_rel) or scope
                 cwd = os.path.normpath(os.path.join(base, cwd))
                 claim = Claim(command, file_rel, line, cwd, "command")
                 claim.negated = negated
@@ -1076,9 +1130,23 @@ def extract_claims(text, file_rel, scope="."):
             if key in seen:
                 continue
             seen.add(key)
-            claim = Claim(snippet, file_rel, line, os.path.dirname(file_rel) or scope, "path")
+            claim = Claim(snippet, file_rel, line, base, "path")
             claim.negated = negated
             claims.append(claim)
+    # Markdown links use Markdown-relative paths, unlike scoped command/code spans.
+    for number, raw in enumerate(text.splitlines(), 1):
+        for match in re.finditer(r"(?<!!)\[[^\]\n]+\]\(([^\s)]+)\)", raw):
+            target = match.group(1)
+            if target.startswith(("#", "/", "~")) or re.match(r"[a-zA-Z][a-zA-Z0-9+.-]*:", target):
+                continue
+            target = target.split("#", 1)[0]
+            if not target:
+                continue
+            cwd = os.path.dirname(file_rel) or scope
+            key = (target, cwd, file_rel)
+            if key not in seen:
+                claims.append(Claim(target, file_rel, number, cwd, "path"))
+                seen.add(key)
     return claims
 
 
@@ -1172,10 +1240,15 @@ def _resolve_path(claim, root):
     claim.resolver = "tracked-file"
     base = root if claim.cwd in (".", "") else os.path.join(root, claim.cwd)
     candidate = os.path.join(base, claim.text)
+    relative = os.path.normpath(os.path.relpath(candidate, root)).replace(os.sep, "/")
+    planned = relative in _planned_outputs.get(root, ())
     inside = relpath_inside(root, candidate) if os.path.exists(candidate) else None
+    if planned:
+        safe_path(root, relative)
+        inside = relative
     claim.target = claim.text
     claim.evidence_refs.append("tree#depth2")
-    if os.path.exists(candidate):
+    if os.path.exists(candidate) or planned:
         if inside is None:
             claim.status = "stale"
             claim.reason = "%s resolves outside the scope" % claim.text
@@ -1601,6 +1674,9 @@ def budget_report(root, rel, text):
         problems.append(
             "%s is %d lines; the ceiling is %d (Claude Code guidance: keep context files "
             "under %d lines)" % (rel, len(lines), AGENTS_LINE_CEILING, CLAUDE_LINE_GUIDANCE))
+    if supporting_scope(rel) is not None and len(lines) > SUPPORTING_LINE_CEILING:
+        problems.append("%s is %d lines; the ceiling is %d"
+                        % (rel, len(lines), SUPPORTING_LINE_CEILING))
     if base == CLAUDE_MD and len(lines) > CLAUDE_LINE_CEILING:
         problems.append("%s is %d lines; the ceiling is %d"
                         % (rel, len(lines), CLAUDE_LINE_CEILING))
@@ -1685,13 +1761,27 @@ def generated_pointer_line(rel, line, texts):
     return False
 
 
+def generated_navigation_line(rel, line, texts):
+    """Exact navigation labels prove only a link, never surrounding prose."""
+    match = re.fullmatch(r"\s*(?:- )?\[(Architecture|Workflows)\]\(([^\s)]+)\)\s*", line)
+    if not match:
+        return False
+    target = os.path.normpath(os.path.join(os.path.dirname(rel), match.group(2))).replace(os.sep, "/")
+    expected = "docs/context/" + match.group(1).lower() + ".md"
+    scope = supporting_scope(target)
+    if scope is None or (target != expected and not target.endswith("/" + expected)):
+        return False
+    content = texts.get(target)
+    return content is not None and find_block(content) is not None
+
+
 def missing_provenance_lines(texts, entries):
     supported = {(item.get("file"), item.get("lineHash")) for item in entries if isinstance(item, dict)}
     missing = []
     for rel, text in sorted(texts.items()):
         for number, line in factual_lines(text):
             identity = digest_bytes(line)
-            if (rel, identity) in supported or generated_pointer_line(rel, line, texts):
+            if (rel, identity) in supported or generated_pointer_line(rel, line, texts) or generated_navigation_line(rel, line, texts):
                 continue
             missing.append({"file": rel, "line": number, "lineHash": identity,
                             "reason": "no supplied per-line provenance"})
@@ -1730,6 +1820,7 @@ def provenance_for(root, texts, draft_dir=None, scope=".", updated_files=None):
                     source_path = source_match.group(1)
                     if not source_path.startswith(scope + "/"):
                         source_path = scope + "/" + source_path
+                    source_path = os.path.normpath(source_path).replace(os.sep, "/")
                     source = source_path + ":" + source_match.group(2)
             mappings.setdefault(identity, []).append(source)
     identities = {digest_bytes(line) for text in texts.values() for line in text.splitlines()}
@@ -1753,7 +1844,7 @@ def provenance_for(root, texts, draft_dir=None, scope=".", updated_files=None):
                 sources = [source for (file, line_hash, source) in previous_entries
                            if file == rel and line_hash == identity]
             if not sources:
-                if generated_pointer_line(rel, line, texts):
+                if generated_pointer_line(rel, line, texts) or generated_navigation_line(rel, line, texts):
                     continue
                 missing.append({"file": rel, "line": number, "lineHash": identity,
                                 "reason": "no supplied per-line provenance"})
@@ -1877,7 +1968,7 @@ def present_context_files(root):
     """Every context file that exists right now, with its digests."""
     out = {}
     stored = load_json_file(safe_path(root, STAMP_REL)) or {}
-    candidates = list(GENERATED_FILES) + nested_agents_files(root) + list(stored.get("contextFiles", {}))
+    candidates = list(GENERATED_FILES) + nested_agents_files(root) + list(stored.get("contextFiles", {})) + sorted(owned_supporting_files(root))
     for rel in candidates:
         safe_path(root, rel)
         norm = rel.replace(os.sep, "/")

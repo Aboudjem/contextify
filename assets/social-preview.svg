@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img"
-     aria-label="contextify: tell every coding agent how your repo works, then prove it is still true. One AGENTS.md carries the facts, every other agent file points at it, and the session-start check costs nothing while the evidence still holds.">
+     aria-label="contextify: tell every coding agent how your repo works, then prove it is still true. One AGENTS.md carries the facts, every other agent file points at it, and the commit/push check costs nothing while the evidence still holds.">
   <title>contextify</title>
   <desc>Static social preview card. It gets rasterised, so nothing here animates. One source file
   carries the repository facts with a citation on every line, every other agent file is a thin

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" width="1200" height="360" role="img"
-     aria-label="One loop, four stations and a way back: init reads the repo and every line cites a file, files writes AGENTS.md plus thin pointers, stamp records digests of the evidence, the SessionStart hook runs ctx-check and stays silent while the evidence holds, and update rewrites only what moved.">
+     aria-label="One loop, four stations and a way back: init reads the repo and every line cites a file, files writes AGENTS.md plus thin pointers, stamp records digests of the evidence, a Git checkpoint runs ctx-check and stays silent while the evidence holds, and update rewrites only what moved.">
   <title>contextify: how it works</title>
   <desc>Dark-mode diagram. Four stations on one rail and a return path. The loop only turns when
-  the evidence behind a claim has moved, so a fresh repository costs nothing at session start.</desc>
+  the evidence behind a claim has moved, so a fresh repository stays silent at commit and push.</desc>
   <defs>
     <linearGradient id="cx-ground" x1="0" y1="0" x2="0.35" y2="1">
       <stop offset="0%" stop-color="#0E1524"/>
@@ -87,7 +87,7 @@
     <text class="sd" x="710"  y="130">.contextify/stamp.json</text>
     <text class="sd" x="710"  y="150">digests what was cited</text>
     <text class="st" x="980"  y="104">hook</text>
-    <text class="sd" x="980"  y="130">SessionStart ctx-check,</text>
+    <text class="sd" x="980"  y="130">commit / push ctx-check,</text>
     <text class="sd" x="980"  y="150">silent while it holds</text>
   </g>
 

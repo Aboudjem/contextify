@@ -23,6 +23,7 @@ contextify は、エージェントが読んだファイルを基に、短いリ
 - 共通の指示を一つの `AGENTS.md` にまとめ、ほかのエージェント向けには参照用ファイルを作ります。規模に応じて20、40、60行を目安とし、150行を超えるファイルは拒否します。
 - コマンドとパスをリポジトリ内の根拠に結び付けます。裏付けのない記述は `unverified` と明示するか省き、別のエージェントが草案を確認します。
 - モデルを呼び出さずに変更を検出します。最新なら何も表示せず、更新時は差分を提示します。管理対象ブロックの外にある人の記述は保持します。
+- 必要な場合だけアーキテクチャや作業手順の資料を追加し、`AGENTS.md` からリンクします。既存の正確な資料を優先して使います。
 
 ## インストール
 
@@ -45,11 +46,11 @@ npx skills add Aboudjem/contextify
 /contextify init
 ```
 
-提示された差分を確認してから、生成された指示ファイルと `.contextify/` のメタデータをコミットします。スクリプトには Git、POSIX シェルツール、Bash、Python 3 が必要です。追加の Python パッケージや MCP サーバーは不要です。インストーラーは `npx` 経由で Node.js を使います。[エディター別の設定](../docs/editors.md)。
+提示された差分を確認してから、生成された指示ファイルと `.contextify/` のメタデータをコミットします。スクリプトには Git、POSIX シェルツール、Bash、Python 3.11 以降が必要です。追加の Python パッケージや MCP サーバーは不要です。インストーラーは `npx` 経由で Node.js を使います。[エディター別の設定](../docs/editors.md)。
 
 ## 出力例
 
-2026年9月17日、Next.js アプリ HazeLab の隔離コピーで実行した実例の抜粋です。Codex が指示書の草案を作り、Contextify がファイルを書き込みました。[完全な出力と根拠](../examples/nextjs/README.md)。
+**v0.1.0** の過去の実例です。0.2.0 の追加機能を検証するものではありません。2026年9月17日、Next.js アプリ HazeLab の隔離コピーで実行した実例の抜粋です。Codex が指示書の草案を作り、Contextify がファイルを書き込みました。[完全な出力と根拠](../examples/nextjs/README.md)。
 
 ```markdown
 ## Commands
@@ -88,10 +89,12 @@ Accept   unavailable until the stale command is corrected
 | `GEMINI.md` | Gemini CLI。`@AGENTS.md` で参照 | 3 |
 | `.cursor/rules/contextify.mdc` | Cursor。`AGENTS.md` も直接読むため任意 | 9 |
 | `.github/copilot-instructions.md` | GitHub Copilot | 4 |
+| `docs/context/architecture.md` | 必要に応じて構成要素、境界、データフローを説明 | 最大120 |
+| `docs/context/workflows.md` | 必要に応じて開発、テスト、リリースの手順を説明 | 最大120 |
 | `.contextify/evidence.json` | Contextify の根拠記録 | リポジトリによる |
 | `.contextify/stamp.json` | Contextify の更新確認 | リポジトリによる |
 
-選択した対象にだけ参照用ファイルを作成します。[読み込み規則と注意点](../docs/editors.md)も確認してください。
+選択した対象にだけ参照用ファイルを作ります。補足資料は任意で、それぞれ最大120行です。必要なときにだけ読みます。[補足資料](../docs/supporting-docs.md)と[読み込み規則](../docs/editors.md)を参照してください。
 
 ## 仕組み
 
@@ -106,7 +109,14 @@ Accept   unavailable until the stale command is corrected
 
 `init --dry-run` は作成予定のファイルと行数・バイト数を表示します。`--yes` は通常の質問を省略しますが、管理対象ブロックの競合や上限は回避しません。
 
-Claude Code プラグインにはセッション開始時のフックが付属します。[Codex、Gemini、Cursor、Git、CI のフック](../docs/hooks.md)は任意で導入します。検査自体はモデルのトークンを消費しませんが、変更通知をエージェントが読むとコンテキストを使います。CI は標準では警告のみで、`--ci --strict` を使うと変更検出時に失敗します。
+プラグインはセッション開始フックを既定では登録しません。インストーラーは Git の `pre-commit` と `pre-push` チェックを提案します。ファイルの作成と有効化は明示的な操作です。Contextify のチェックアウトから対象リポジトリを指定します。
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
+```
+
+Git フックは現在の作業ツリーを確認します。ステージ済みの内容やプッシュするコミットの検査ではありません。既定では警告のみで、ファイルを書き換えません。厳格モードは任意です。既存のフックや独自・グローバルのフックパスを置き換える有効化は拒否します。[設定、移行、CI](../docs/hooks.md)を参照してください。
 
 ## ほかのツールとの比較
 
@@ -133,24 +143,15 @@ Claude Code プラグインにはセッション開始時のフックが付属�
 
 [貢献方法](../CONTRIBUTING.md) · [セキュリティ](../SECURITY.md) · [変更履歴](../CHANGELOG.md) · [MIT ライセンス](../LICENSE) · [10x プラグイン一覧](https://github.com/Aboudjem/10x)
 
-**2026年9月17日**のローカル検証では、以下の6コマンドがすべて終了コード0で完了しました。公開CIの成功を示す結果ではありません。検証範囲は[評価ガイド](../evals/README.md)を参照してください。
+確認するリビジョンで以下を実行してください。[v0.1.0 の評価記録](../evals/dogfood.md)は過去の結果であり、新しい変更の合格を示すものではありません。
 
 ```bash
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
 python3 tests/test_hooks.py
 python3 tests/test_regressions.py
+python3 tests/test_supporting_docs.py
 python3 tests/test_manifests.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 ```
-
-| 検査 | 成功 |
-| --- | ---: |
-| 変更検出と書き込み | 119/119 |
-| 主張の解決 | 30/30 |
-| フック | 6/6 |
-| 回帰テスト | 23/23 |
-| マニフェスト | 135/135 |
-| スキル仕様 | 110/110 |
-
 この翻訳はモデルの支援を受けて作成しました。[英語版](../README.md)より更新が遅れる場合があるため、英語版を正としてください。リンク先の資料は英語です。

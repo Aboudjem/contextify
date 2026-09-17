@@ -349,35 +349,14 @@ for lang in TRANSLATIONS:
           f"{rel} must carry the literal `<!-- may-lag -->` marker")
 
 # --- 8b. contextify-specific: the hook manifest and the scripts ---
-# hooks/hooks.json is what makes the drift check a rule rather than a suggestion. It has to parse,
-# live at the plugin root (never under .claude-plugin/), resolve its command through
-# ${CLAUDE_PLUGIN_ROOT}, and point at a script that exists and is executable.
+# Installation does not register automatic session events. Git checks require the installer.
 _hooks, _hooks_err = load_json("hooks/hooks.json")
 check("hooks/hooks.json parses as valid JSON", not _hooks_err, _hooks_err)
 check("no hooks/ directory under .claude-plugin/",
       not os.path.exists(os.path.join(ROOT, ".claude-plugin", "hooks")),
       "the docs say only plugin.json goes inside .claude-plugin/")
-_ss = (_hooks.get("hooks") or {}).get("SessionStart") or []
-check("hooks/hooks.json declares a SessionStart hook", bool(_ss), "no SessionStart entry")
-_cmds = [h.get("command", "") for grp in _ss for h in (grp.get("hooks") or [])]
-check("every SessionStart hook is a command hook with a 5 s timeout",
-      bool(_cmds) and all(h.get("type") == "command" and h.get("timeout") == 5
-                          for grp in _ss for h in (grp.get("hooks") or [])),
-      "type must be command and timeout must be 5 so a hung check can never stall a launch")
-for _c in _cmds:
-    _m = re.search(r"\$\{CLAUDE_PLUGIN_ROOT\}/([^\s\"]+)", _c)
-    check(f"hook command resolves through ${{CLAUDE_PLUGIN_ROOT}}: {_c[:60]}", bool(_m),
-          "the plugin's install dir is only known at run time")
-    if _m:
-        _rel = _m.group(1)
-        _abs = os.path.join(ROOT, _rel)
-        check(f"hook script exists and is executable: {_rel}",
-              os.path.isfile(_abs) and os.access(_abs, os.X_OK), f"{_rel} missing or not chmod +x")
-    check(f"hook command passes --hook claude: {_c[:60]}", "--hook claude" in _c,
-          "the envelope flag picks the Claude Code JSON shape")
-    check("hook matcher covers startup|resume|clear",
-          any(grp.get("matcher") == "startup|resume|clear" for grp in _ss),
-          "compact and fork are omitted on purpose: a compaction resume would re-inject the notice")
+check("packaged hooks register no automatic session events", _hooks.get("hooks") == {},
+      "Git checkpoints are explicitly installed; session hooks are opt-in")
 
 # Every script is zero-dependency: executable, correct shebang, and no import outside the
 # standard library. A dependency here would break `npx skills add` installs, which copy files
