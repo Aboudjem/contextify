@@ -8,8 +8,7 @@ description: >-
   Gemini CLI, Cursor and Copilot, so the same instructions are never copied into five files. Every
   line traces to a file the run read, or it is omitted, or it is labelled unverified. The drift check
   is a shell script: it spends zero tokens, calls no model, and never rewrites a file on its own.
-  Claude Code's own /init writes one file for one agent, with no evidence behind any line and no way
-  to tell later that the line went stale.
+  Use this when a one-off /init file needs a committed stamp for later deterministic drift checks.
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
@@ -22,9 +21,8 @@ metadata:
 
 In one line, for anyone: **Tell every coding agent how your repo works. Then prove it is still true.**
 
-Two halves, and the second one is what nobody ships. Writing a context file is a single afternoon.
-Knowing three months later whether it is still describing the same repository is the hard part, and
-every tool in this category stops before it. A context file that confidently names a deleted script
+Writing a context file is only the first step. Later, its commands and paths can drift away from
+the repository. A context file that confidently names a deleted script
 is worse than no file at all: it sends an agent somewhere the repo does not go, and it costs a turn
 before anyone notices.
 
@@ -55,8 +53,9 @@ is stale", "generate CLAUDE.md") or as `/contextify <mode> [path]`.
 | `accept` | the docs are still right and only the evidence moved: restamp, change no prose |
 | `[path]` | scope the run to that directory. It must sit inside the repository the run resolved |
 
-Flags reach the scripts unchanged: `--dry-run`, `--yes`, `--json`, `--strict`, `--targets LIST`,
-`--symlink`, `--hook AGENT`. The full table is in `references/agents-and-files.md`.
+Pass only the options supported by the selected script: `--dry-run`, `--yes`, `--json`, `--strict`,
+`--targets LIST` or `--hook AGENT`. Check its `--help`; unsupported combinations fail without writing.
+The current writer refuses the optional `--symlink` mode. Pointer files are regular files by default.
 
 ## When to use / when not
 
@@ -155,7 +154,7 @@ You write a draft. You never write a target file yourself.
 
 ### check
 
-1. Run `sh "${CLAUDE_SKILL_DIR}/scripts/ctx-check" --ci <path>`.
+1. Run `sh "${CLAUDE_SKILL_DIR}/scripts/ctx-check" <path>`.
 2. Relay its output exactly. Empty output means fresh: say so in one line and stop.
 3. Write nothing in this mode, not even a fix the notice makes obvious. Offer `/contextify update`
    and let the user decide.
@@ -166,7 +165,7 @@ You write a draft. You never write a target file yourself.
 2. Relay the metadata difference it prints, and state plainly that no prose changed and every context
    file is byte-identical.
 3. Relay the refusal and switch to `update` when it refuses, which it does on a dead claim, a budget
-   violation, or a missing stamp.
+   violation, a changed managed block, invalid provenance, or a missing stamp.
 
 ## Hard rules
 
@@ -356,7 +355,7 @@ Say these before a user infers the opposite.
   wrong. Evidence beats a guess. It does not beat reality.
 - **The category has a published negative result.** An ETH Zurich study (arXiv 2602.11988) found that
   context files "do not generally improve task success rates, while increasing inference cost by over
-  20% on average". It reports no success-rate figure, so none is quoted here. That finding is exactly
+  20% on average". Its abstract gives no success-rate percentage, so none is quoted here. That finding is exactly
   why the output is deliberately sparse, and it is a reason to doubt this skill too.
 - **The hook never rewrites anything.** It reports drift. Fixing is a separate, explicit run, and
   nothing gets corrected while you are not looking.

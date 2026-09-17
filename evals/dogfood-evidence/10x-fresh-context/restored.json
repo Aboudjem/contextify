@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "$SCRIPTS/ctx-check",
+    "$SCRATCH/10x-fresh-context"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

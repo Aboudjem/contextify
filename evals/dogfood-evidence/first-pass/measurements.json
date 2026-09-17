@@ -1,0 +1,83 @@
+{
+  "hazelab": {
+    "date": "2026-09-17T07:33:02.263276+00:00",
+    "AGENTS_lines": 15,
+    "AGENTS_bytes": 732,
+    "CLAUDE_lines": 4,
+    "evidence_records": 5,
+    "unverified": 0,
+    "dead_claims": 0,
+    "fresh_silent": true,
+    "script_sha256": {
+      "detect_repo.sh": "132890d156b84f0cc3c12395a689115498078ed66d8f4e02db225384bb4a6cf8",
+      "ctx_check.py": "42a1a2200c419ff353b759f5aace97fc892b3c40eb019ef6d7c622c4cc38f7de",
+      "ctxlib.py": "ad0f58e4f856d5293183837fbc59261f231e68ab21be583e031eb810c4160f0c",
+      "ctx_write.py": "a5e91a24e446ef99dd815b9e8e50aeb783a8b7c15cdd6265a5fae85d7f0594ca",
+      "verify_claims.py": "3516e8d6dfde561beb430f7d7c54e10314704e9348f4578f69be600409f01084",
+      "ctx-check": "b7bea556c8a0708014f06c52a0af84a574d3d062e3df8f3182069a7637928fd2",
+      "install_hooks.sh": "79fc103e548da3a716355d0d9093b589d1b1b4e51c76710ae7b756156b3fe262",
+      "ctx_stamp.py": "d12d45b901ec8abf466d194d94a092330a6ce78a449761bdac66d1701a3aaf46"
+    },
+    "AGENTS_tokens_approx_bytes_div_4": 183.0,
+    "idempotent_bytes_and_mtime": false,
+    "human_suffix_preserved_bytes": true,
+    "drift_mutation": "removed package.json script lint",
+    "drift_exit": 0,
+    "drift_notice": "contextify: drift\nScope    .\nStale    AGENTS.md:7 references pnpm run lint\nChanged  package.json#scripts\nRemoved  script lint\nFiles    0 written\nNext     /contextify update\nAccept   unavailable until the stale command is corrected\n",
+    "restored_fresh_silent": true
+  },
+  "10x-fresh-context": {
+    "date": "2026-09-17T07:33:04.478355+00:00",
+    "AGENTS_lines": 16,
+    "AGENTS_bytes": 769,
+    "CLAUDE_lines": 4,
+    "evidence_records": 3,
+    "unverified": 0,
+    "dead_claims": 0,
+    "fresh_silent": true,
+    "script_sha256": {
+      "detect_repo.sh": "132890d156b84f0cc3c12395a689115498078ed66d8f4e02db225384bb4a6cf8",
+      "ctx_check.py": "42a1a2200c419ff353b759f5aace97fc892b3c40eb019ef6d7c622c4cc38f7de",
+      "ctxlib.py": "ad0f58e4f856d5293183837fbc59261f231e68ab21be583e031eb810c4160f0c",
+      "ctx_write.py": "a5e91a24e446ef99dd815b9e8e50aeb783a8b7c15cdd6265a5fae85d7f0594ca",
+      "verify_claims.py": "3516e8d6dfde561beb430f7d7c54e10314704e9348f4578f69be600409f01084",
+      "ctx-check": "b7bea556c8a0708014f06c52a0af84a574d3d062e3df8f3182069a7637928fd2",
+      "install_hooks.sh": "79fc103e548da3a716355d0d9093b589d1b1b4e51c76710ae7b756156b3fe262",
+      "ctx_stamp.py": "d12d45b901ec8abf466d194d94a092330a6ce78a449761bdac66d1701a3aaf46"
+    },
+    "AGENTS_tokens_approx_bytes_div_4": 192.25,
+    "idempotent_bytes_and_mtime": false,
+    "human_suffix_preserved_bytes": true,
+    "drift_mutation": "removed package.json script validate",
+    "drift_exit": 0,
+    "drift_notice": "contextify: drift\nScope    .\nStale    AGENTS.md:6 references npm run validate\nChanged  package.json#scripts\nRemoved  script validate\nFiles    0 written\nNext     /contextify update\nAccept   unavailable until the stale command is corrected\n",
+    "restored_fresh_silent": true
+  },
+  "secure-my-app-fresh-context": {
+    "date": "2026-09-17T07:33:06.793795+00:00",
+    "AGENTS_lines": 13,
+    "AGENTS_bytes": 626,
+    "CLAUDE_lines": 4,
+    "evidence_records": 2,
+    "unverified": 0,
+    "dead_claims": 0,
+    "fresh_silent": true,
+    "script_sha256": {
+      "detect_repo.sh": "132890d156b84f0cc3c12395a689115498078ed66d8f4e02db225384bb4a6cf8",
+      "ctx_check.py": "42a1a2200c419ff353b759f5aace97fc892b3c40eb019ef6d7c622c4cc38f7de",
+      "ctxlib.py": "ad0f58e4f856d5293183837fbc59261f231e68ab21be583e031eb810c4160f0c",
+      "ctx_write.py": "a5e91a24e446ef99dd815b9e8e50aeb783a8b7c15cdd6265a5fae85d7f0594ca",
+      "verify_claims.py": "3516e8d6dfde561beb430f7d7c54e10314704e9348f4578f69be600409f01084",
+      "ctx-check": "b7bea556c8a0708014f06c52a0af84a574d3d062e3df8f3182069a7637928fd2",
+      "install_hooks.sh": "79fc103e548da3a716355d0d9093b589d1b1b4e51c76710ae7b756156b3fe262",
+      "ctx_stamp.py": "d12d45b901ec8abf466d194d94a092330a6ce78a449761bdac66d1701a3aaf46"
+    },
+    "AGENTS_tokens_approx_bytes_div_4": 156.5,
+    "idempotent_bytes_and_mtime": false,
+    "human_suffix_preserved_bytes": true,
+    "drift_mutation": "moved tests/test_manifests.py out of its declared path",
+    "drift_exit": 0,
+    "drift_notice": "contextify: drift\nScope    .\nStale    AGENTS.md:6 references python3 tests/test_manifests.py\nChanged  tree#depth2\nFiles    0 written\nNext     /contextify update\nAccept   unavailable until the stale command is corrected\n",
+    "restored_fresh_silent": true
+  }
+}

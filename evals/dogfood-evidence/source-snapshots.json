@@ -1,0 +1,17 @@
+{
+  "10x": {
+    "sourceHead": "451ddc695d899374431814cc646c70c2a929a07a",
+    "trackedFilesCopied": 49,
+    "skipped": []
+  },
+  "hazelab": {
+    "sourceHead": "852985b98dd80b0aceecc4b133ed3c9e74145277",
+    "trackedFilesCopied": 67,
+    "skipped": []
+  },
+  "secure-my-app": {
+    "sourceHead": "21cbf590166fc0f4faed9fce2a2d806dafea0436",
+    "trackedFilesCopied": 56,
+    "skipped": []
+  }
+}

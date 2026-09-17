@@ -32,8 +32,9 @@ Open an issue first if you want to discuss a larger change before writing it.
 - **No emoji in headings**, in this repo's Markdown or in anything the skill generates.
 - **Zero dependencies.** Scripts are POSIX sh safe on bash 3.2, or python3 using stdlib only.
   Nothing contextify ships requires `pip install` or `npm install` to run.
-- **The drift check stays fast and safe.** The sh fast path over `git ls-files -s` must stay
-  under 100 ms. `ctx-check` must never exit 2, and it must never block or hang a session.
+- **The drift check stays fast and safe.** Aim for a warm median below 100 ms and keep the
+  regression ceiling below 250 ms. No cache may skip a changed source, context file or evidence
+  record. `ctx-check` must never exit 2; hook input reads must be bounded.
 
 ## How to test locally
 
@@ -41,15 +42,17 @@ Open an issue first if you want to discuss a larger change before writing it.
 python3 tests/test_manifests.py
 python3 tests/test_ctx_check.py
 python3 tests/test_verify_claims.py
+python3 tests/test_regressions.py
+python3 tests/test_hooks.py
 python3 evals/check_skill.py skills/contextify/SKILL.md
 claude plugin validate . --strict
 ```
 
-All five must exit 0 before you open a PR.
+All seven must exit 0 before you open a PR.
 
 ## How to add a normalizer
 
-1. Add one function to `skills/contextify/scripts/ctx_check.py`.
+1. Add the normalizer to `skills/contextify/scripts/ctxlib.py`.
 2. Add one fixture case to `tests/test_ctx_check.py` that exercises it.
 3. Add one row to `skills/contextify/references/detection-signals.md` describing what it
    detects and why.
@@ -69,7 +72,7 @@ All five must exit 0 before you open a PR.
 
 ## PR checklist
 
-- [ ] All five local checks pass (see above).
+- [ ] All seven local checks pass (see above).
 - [ ] Every new or changed claim in `SKILL.md` or `references/` cites a primary source.
 - [ ] No em dash, no emoji in headings.
 - [ ] `AGENTS.md` stays within its 60-line target and 150-line ceiling; `CLAUDE.md` stays under

@@ -1,0 +1,121 @@
+{
+  "generatedAt": "2026-09-17T07:33:04Z",
+  "records": [
+    {
+      "claims": [],
+      "key": "ci#jobs",
+      "source": {
+        "file": ".github/workflows/deploy-pages.yml",
+        "line": 1
+      },
+      "value": {
+        ".github/workflows/deploy-pages.yml": {
+          "deploy": {
+            "name": null,
+            "runs": [
+              "set -euo pipefail\nmkdir -p _site/assets\ncp -r site/. _site/\n# Reuse the already-shipped demo assets; never rebuild them here.\nfor f in demo.gif logo-light.svg logo-dark.svg logo-mark.png social-preview.png \\\nhero-banner-dark.svg hero-banner-light.svg \\\nhero-diagram.svg editors-strip.svg; do\n[ -f \".github/assets/$f\" ] && cp \".github/assets/$f\" \"_site/assets/$f\" || true\ndone"
+            ],
+            "working-directory": []
+          }
+        },
+        ".github/workflows/sync-plugins.yml": {
+          "sync": {
+            "name": "Sync marketplace version pins",
+            "runs": [
+              "set -o pipefail\nnode scripts/sync-plugins.mjs --write | tee /tmp/sync.txt",
+              "{\necho '### sync-plugins'\necho ''\necho '```'\ncat /tmp/sync.txt 2>/dev/null || echo '(no output)'\necho '```'\n} >> \"$GITHUB_STEP_SUMMARY\"",
+              "node scripts/validate-marketplace.mjs",
+              "set -euo pipefail\ngit config user.name \"github-actions[bot]\"\ngit config user.email \"41898282+github-actions[bot]@users.noreply.github.com\"\ngit add .claude-plugin/marketplace.json\nif git diff --cached --quiet; then\necho \"No changes to commit.\"\nexit 0\nfi\n# One commit for the whole run: \"chore(sync): a 1.0.0 → 1.1.0, b 2.0.0 → 2.1.0\"\nbumps=$(awk '/^bump: /{ printf \"%s%s %s \\342\\206\\222 %s\", (n++ ? \", \" : \"\"), $2, $3, $5 }' /tmp/sync.txt)\nif [ -z \"$bumps\" ]; then\nbumps=\"marketplace version pins\"\nfi\ngit commit -m \"chore(sync): $bumps\"\ngit push"
+            ],
+            "working-directory": []
+          }
+        },
+        ".github/workflows/validate.yml": {
+          "drift": {
+            "name": "Marketplace pins match upstream",
+            "runs": [
+              "node --test \"tests/**/*.test.mjs",
+              "node scripts/sync-plugins.mjs --check"
+            ],
+            "working-directory": []
+          },
+          "validate": {
+            "name": "Validate marketplace",
+            "runs": [
+              "python3 - <<'PY'\nimport json, sys\npath = \".claude-plugin/marketplace.json\"\ntry:\nwith open(path, \"r\", encoding=\"utf-8\") as f:\ndata = json.load(f)\nexcept FileNotFoundError:\nprint(f\"FAIL: {path} not found\")\nsys.exit(1)\nexcept json.JSONDecodeError as e:\nprint(f\"FAIL: invalid JSON in {path}: {e}\")\nsys.exit(1)\nif \"plugins\" not in data or not isinstance(data[\"plugins\"], list) or not data[\"plugins\"]:\nprint(\"FAIL: marketplace.json has no non-empty 'plugins' array\")\nsys.exit(1)\nfor i, p in enumerate(data[\"plugins\"]):\nfor field in (\"name\", \"version\", \"source\"):\nif field not in p:\nprint(f\"FAIL: plugin #{i} is missing required field '{field}'\")\nsys.exit(1)\nprint(f\"PASS: valid JSON with {len(data['plugins'])} plugin(s) -> {path}\")\nPY",
+              "if command -v claude >/dev/null 2>&1; then\necho \"claude CLI found, validating marketplace manifest (strict)\"\nclaude plugin validate . --strict\nelse\necho \"SKIP: 'claude' CLI is not installed on this runner; skipping plugin validate.\"\necho \"JSON validity is already enforced by the previous step.\"\nfi",
+              "set -euo pipefail\nasset=\"gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz\"\nurl=\"https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${asset}\"\necho \"Downloading $url\"\ncurl -fsSL -o /tmp/gitleaks.tar.gz \"$url\"\ntar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks\nchmod +x /tmp/gitleaks\n/tmp/gitleaks version\n/tmp/gitleaks dir . --no-banner --redact --exit-code 1"
+            ],
+            "working-directory": []
+          }
+        }
+      }
+    },
+    {
+      "claims": [
+        "67f226413a3d",
+        "aa42a32d1566",
+        "fe2e26218133"
+      ],
+      "key": "package.json#scripts",
+      "source": {
+        "file": "package.json",
+        "line": 5
+      },
+      "value": {
+        "sync:check": "node scripts/sync-plugins.mjs --check",
+        "sync:write": "node scripts/sync-plugins.mjs --write",
+        "test": "node --test \"tests/**/*.test.mjs\"",
+        "validate": "node scripts/validate-marketplace.mjs"
+      }
+    },
+    {
+      "claims": [
+        "1ae4f8c54e17",
+        "55435af670d3",
+        "8dfa4a80384d",
+        "b958f728ba0a"
+      ],
+      "key": "tree#depth2",
+      "source": {
+        "file": ".",
+        "line": 1
+      },
+      "value": [
+        ".claude-plugin/marketplace.json",
+        ".github/FUNDING.yml",
+        ".github/ISSUE_TEMPLATE/",
+        ".github/assets/",
+        ".github/workflows/",
+        ".gitignore",
+        "CHANGELOG.md",
+        "CODE_OF_CONDUCT.md",
+        "CONTRIBUTING.md",
+        "ECOSYSTEM.md",
+        "LICENSE",
+        "QUALITY-BAR.md",
+        "README.md",
+        "READMEs/es.md",
+        "READMEs/fr.md",
+        "READMEs/ja.md",
+        "READMEs/zh-CN.md",
+        "SECURITY.md",
+        "docs/DISTRIBUTION.md",
+        "docs/LAUNCH-PLAN.md",
+        "docs/SYNC.md",
+        "docs/VIDEO-EMBED.md",
+        "docs/VIRAL-AUDIT.md",
+        "docs/command-surface.md",
+        "examples/README.md",
+        "llms.txt",
+        "package.json",
+        "scripts/sync-plugins.mjs",
+        "scripts/validate-marketplace.mjs",
+        "site/index.html",
+        "tests/sync-plugins.test.mjs",
+        "tests/validate.test.mjs"
+      ]
+    }
+  ],
+  "version": 1
+}

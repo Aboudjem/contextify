@@ -26,8 +26,8 @@ safe, and how to report a hole in contextify itself.
 - **Refuses to follow symlinks out of the repo.** A symlink that resolves outside the repo root
   is not followed for reads and is never a write target.
 - **The hook never runs a model.** `ctx-check`, the SessionStart hook, is a deterministic
-  script: a POSIX sh fast path over `git ls-files -s`, falling back to a python3 stdlib
-  normalizer on mismatch. It never invokes Claude or any other model.
+  script: a POSIX sh entry point that runs the complete Python stdlib evidence and claim
+  checker on every invocation. It never invokes Claude or any other model.
 - **The hook never rewrites a file.** `ctx-check` only compares evidence against the committed
   stamp and prints a notice when they disagree. It never edits `AGENTS.md` or any other file.
 - **The hook never blocks a session.** It prints nothing when fresh, a short notice when

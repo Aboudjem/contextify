@@ -1,5 +1,6 @@
 # contextify design decisions (locked)
 
+Historical design artifact (2026-09-16). For the implemented contract and corrections, read `SCRIPTS-SPEC.md`; for measured behavior, read the dogfood report. This design is not current test evidence.
 Date: 2026-09-16. Method: a four-CLI dream-team fanout answered one design prompt independently, then an anonymized cross-check graded every answer. Fanout dir: `/Users/adamboudj/projects/10x/.goal/audit/ctx-design/fanout` (A claude, B codex, C kimi, D agy). Verdict: `.../crosscheck/verdict-matrix.json`. **Answer B won**, graded CONFIRMED; A, C and D each took one CORRECTED; nothing was fact-contaminated. This document starts from B and grafts a runner-up element only where it is verifiably better and is not what a grader corrected.
 
 Corrections honoured, so they are not carried forward: A's exit-code changes and its claim that per-file renames give an atomic multi-file update (rejected, see D7 and D9); C's `--strict` drift exit 4, its `CLAUDE.md` missing the first-line import, its five-line `GEMINI.md`; D's accents at hue 284.82 and 282.99, outside the 290 to 315 band, actual ratios 5.96:1 and 7.30:1 (rejected, see D21).

@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "$SCRIPTS/ctx-check",
+    "$SCRATCH/secure-my-app-fresh-context"
+  ],
+  "exit": 0,
+  "stdout": "contextify: drift\nScope    .\nStale    AGENTS.md:6 references python3 tests/test_manifests.py\nChanged  tree#depth2\nFiles    0 written\nNext     /contextify update\nAccept   unavailable until the stale command is corrected\n",
+  "stderr": ""
+}

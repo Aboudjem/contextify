@@ -1,0 +1,290 @@
+{
+  "generatedAt": "2026-09-17T08:15:36Z",
+  "provenance": [
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:d993810bf1f1842d683b2a1660b1d1e5b6cfc6e44c2b373dae2c97b566a1f4bf",
+      "source": ".github/workflows/validate.yml:195",
+      "sourceDigest": "sha256:e579276a32e63a1b62b6f0a9129e7ff383e7d458657a1fce67bf8fc8a1c99e90"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 7,
+      "lineHash": "sha256:62d312384a10cdb2ef815d6d8654042b424e01ea7639f792374f071ebb57dd3a",
+      "source": ".github/workflows/validate.yml:199",
+      "sourceDigest": "sha256:7c77dda5a45da9f642eae5ae389bfb79698155933df96b0253830e0b7435eabb"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 8,
+      "lineHash": "sha256:7f6ee11da159bcf4854c25d9c7dcd7c5287eb65264a31c6f13c654881482542a",
+      "source": ".github/workflows/validate.yml:188",
+      "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 9,
+      "lineHash": "sha256:ff1aa39b0ae117a97df242ff6640f7db63baebc1643772e0e0a75795b524515f",
+      "source": ".github/workflows/validate.yml:181",
+      "sourceDigest": "sha256:d7d1a2c4c0efa868a552e0f334c58ee6752f3fee91385dba460f7a715bb0e9a9"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:5ebf5583bc7385dfc8976677757c68d9fe8fb663c0f59a617e3b4bdd45907035",
+      "source": ".github/workflows/validate.yml:213",
+      "sourceDigest": "sha256:ee95a9d7d7646cc7681c9866d07429a027493ffe4e98d70a8df652176cad6900"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 13,
+      "lineHash": "sha256:4529de96d1973a49940a4c30494f0d0658a133cf419edff9d59359f4ee739b70",
+      "source": "skills/contextify/SKILL.md:130",
+      "sourceDigest": "sha256:0ef5222c6b95d7b1f9dde6e60f9281bc539116766539903dbb38411ee06157f5"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 13,
+      "lineHash": "sha256:4529de96d1973a49940a4c30494f0d0658a133cf419edff9d59359f4ee739b70",
+      "source": "skills/contextify/SKILL.md:83",
+      "sourceDigest": "sha256:6613de40ceae8eb93bb0e29f2f81497e9e84adc487d1b6a60f562dc6cdaab01e"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctx_check.py:24",
+      "sourceDigest": "sha256:3c3d137f9ca2b84c3abbded89d3491800a948dd7b18ae193988282b2f39ac0bb"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctxlib.py:1189",
+      "sourceDigest": "sha256:59b399d762260abb1323ec6b896b8d6f1b275ad21e6e3afc5ca5d546c09e046a"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctxlib.py:906",
+      "sourceDigest": "sha256:3575b66bc49ebe45e2901d3e9a2cbebd1afa9e356611d4f6e12a8a7538e75b12"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctxlib.py:1506",
+      "sourceDigest": "sha256:985c49a84d358238a46baa36c94f866261190e2d3985337c4a2d4d16bd8713ce"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 15,
+      "lineHash": "sha256:b0093e2f7f3369a39ffb6f82d4633bfc4401185eb825b54197457913cc979da9",
+      "source": "hooks/hooks.json:10",
+      "sourceDigest": "sha256:6e1170fab26f026350392c334b585dab66dd64a1cb75585ed3f059553457c5fa"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 18,
+      "lineHash": "sha256:ae13143381dcba85a72c1c559aaf5b94ae8af93dbbd24caa2744935b5f8c7069",
+      "source": ".github/workflows/validate.yml:5",
+      "sourceDigest": "sha256:f733c68e4f5db039f493e8a8bf54cc60cf86d58e4d707349c6b1d59add3fff24"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 19,
+      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
+      "source": ".github/workflows/release.yml:37",
+      "sourceDigest": "sha256:b891fe6a6bd9b71a164e30e8b5e5ca7528a2b1d8f643a836af83340ea569eead"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 19,
+      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
+      "source": ".github/workflows/release.yml:6",
+      "sourceDigest": "sha256:5a3c7106d3427b41e78ab68ea06460823de1df2848a6e16ccf531401b26a08cf"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 19,
+      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
+      "source": ".github/workflows/release.yml:46",
+      "sourceDigest": "sha256:8ef6d45b9cde32ee44a7f335bd53f2919080cba6d0d875c263c4d062d880aa00"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 20,
+      "lineHash": "sha256:40f93380baefa9abd8ee4ec761369b73a563ef92f11df69c6c286014668ec190",
+      "source": "CONTRIBUTING.md:33",
+      "sourceDigest": "sha256:89f15be70b9fb2518adecb5663c967e2235305bec744eddce61013dca9102799"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 20,
+      "lineHash": "sha256:40f93380baefa9abd8ee4ec761369b73a563ef92f11df69c6c286014668ec190",
+      "source": "CONTRIBUTING.md:70",
+      "sourceDigest": "sha256:10d77ad7474f54f25dd20460c2efeb2d4812c10904f5580d40d21495829ab37a"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 23,
+      "lineHash": "sha256:5095d93bbc173f202bb8baf770f74070d5e4e7509acd28d5d4bf94e69809800e",
+      "source": "docs/design/SCRIPTS-SPEC.md:1",
+      "sourceDigest": "sha256:c3cfd1c3f964069cd300acbdf19c52764f12aeccd36e9050c81f879e5bb25e36"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 23,
+      "lineHash": "sha256:5095d93bbc173f202bb8baf770f74070d5e4e7509acd28d5d4bf94e69809800e",
+      "source": "docs/design/DECISIONS.md:1",
+      "sourceDigest": "sha256:61601497da5b461c06d895fa6246a58c0b2c766ac3f360e379b0e381a32ddd6f"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 24,
+      "lineHash": "sha256:c76d4946f2b37d5888f38abd77c031b7a45d3184534cdca776a393dadb025d7b",
+      "source": "skills/contextify/references/update-in-place.md:5",
+      "sourceDigest": "sha256:68b7082d3a3a265f5c965fc5d28748b2d59b6ea918d86773c86803f1957e8dcd"
+    }
+  ],
+  "records": [
+    {
+      "claims": [],
+      "key": "ci#jobs",
+      "source": {
+        "file": ".github/workflows/release.yml",
+        "line": 1
+      },
+      "value": {
+        ".github/workflows/release.yml": {
+          "release": {
+            "name": "Create GitHub Release",
+            "runs": [
+              "if [ \"$GITHUB_REF_TYPE\" = \"tag\" ]; then\nVERSION=\"${GITHUB_REF_NAME#v}\"\nelse\nVERSION=$(node -p \"require('./.claude-plugin/plugin.json').version\")\nfi\necho \"value=$VERSION\" >> \"$GITHUB_OUTPUT\"\necho \"Releasing v$VERSION\"",
+              "TAG_VERSION=\"${GITHUB_REF_NAME#v}\"\nPLUGIN_VERSION=$(node -p \"require('./.claude-plugin/plugin.json').version\")\nif [ \"$TAG_VERSION\" != \"$PLUGIN_VERSION\" ]; then\necho \"Tag $GITHUB_REF_NAME does not match .claude-plugin/plugin.json version $PLUGIN_VERSION.\"\necho \"Bump plugin.json to $TAG_VERSION, or retag as v$PLUGIN_VERSION, then release again.\"\nexit 1\nfi\necho \"Tag $GITHUB_REF_NAME matches plugin.json.\""
+            ],
+            "working-directory": []
+          },
+          "sync-10x": {
+            "name": "Sync 10x marketplace",
+            "runs": [
+              "if [ -z \"$DISPATCH_TOKEN\" ]; then\necho \"TEN_X_DISPATCH_TOKEN secret not set; skipping 10x sync.\"\nexit 0\nfi\nHTTP_CODE=$(curl -sS -o /tmp/dispatch.json -w \"%{http_code}\" -X POST \\\n-H \"Authorization: token $DISPATCH_TOKEN\" \\\n-H \"Accept: application/vnd.github+json\" \\\nhttps://api.github.com/repos/Aboudjem/10x/dispatches \\\n-d \"{\\\"event_type\\\":\\\"plugin-released\\\",\\\"client_payload\\\":{\\\"plugin\\\":\\\"contextify\\\",\\\"version\\\":\\\"$VERSION\\\"}}\")\nif [ \"$HTTP_CODE\" != \"204\" ]; then\necho \"10x dispatch failed with HTTP $HTTP_CODE:\"\ncat /tmp/dispatch.json\necho \"Rotate TEN_X_DISPATCH_TOKEN at https://github.com/Aboudjem/contextify/settings/secrets/actions\"\nexit 1\nfi\necho \"10x dispatch succeeded (HTTP 204).\""
+            ],
+            "working-directory": []
+          }
+        },
+        ".github/workflows/validate.yml": {
+          "validate": {
+            "name": "Validate skill",
+            "runs": [
+              "python3 - <<'PY'\nimport re, sys\n\npath = \"skills/contextify/SKILL.md\"\ntry:\nwith open(path, \"r\", encoding=\"utf-8\") as f:\ntext = f.read()\nexcept FileNotFoundError:\nprint(f\"FAIL: {path} not found\")\nsys.exit(1)\n\nm = re.match(r\"^---\\s*\\n(.*?)\\n---\\s*(?:\\n|$)\", text, re.DOTALL)\nif not m:\nprint(f\"FAIL: no YAML frontmatter block found in {path}\")\nsys.exit(1)\nblock = m.group(1)\n\n# Minimal YAML parse for top-level 'name' and 'description'.\n# Supports plain scalars and folded/literal block scalars (>- , | , etc.).\ndef parse_frontmatter(block):\ndata = {}\nlines = block.split(\"\\n\")\ni = 0\nkey_re = re.compile(r\"^([A-Za-z0-9_-]+):\\s*(.*)$\")\nwhile i < len(lines):\nline = lines[i]\nif not line.strip() or line.lstrip().startswith(\"#\"):\ni += 1\ncontinue\nif line[:1] in (\" \", \"\\t\"):\ni += 1\ncontinue\nkm = key_re.match(line)\nif not km:\ni += 1\ncontinue\nkey, rest = km.group(1), km.group(2).strip()\nif rest.startswith((\"|\", \">\")):\ncollected = []\ni += 1\nwhile i < len(lines):\nnxt = lines[i]\nif nxt.strip() == \"\":\ncollected.append(\"\")\ni += 1\ncontinue\nif nxt[:1] in (\" \", \"\\t\"):\ncollected.append(nxt.strip())\ni += 1\nelse:\nbreak\ndata[key] = \" \".join(c for c in collected if c != \"\").strip()\ncontinue\nval = rest\nif len(val) >= 2 and val[0] == val[-1] and val[0] in (\"'\", '\"'):\nval = val[1:-1]\ndata[key] = val\ni += 1\nreturn data\n\nfm = parse_frontmatter(block)\nok = True\n\nname = fm.get(\"name\", \"\")\n# The Agent Skills spec: 1-64 chars, [a-z0-9-], and no leading, trailing or\n# consecutive hyphens. The stricter pattern below rejects all three.\nif not re.fullmatch(r\"[a-z0-9]+(?:-[a-z0-9]+)*\", name or \"\"):\nprint(f\"FAIL: 'name' must match ^[a-z0-9]+(-[a-z0-9]+)*$ \"\nf\"(no leading, trailing or consecutive hyphens; got: {name!r})\")\nok = False\nelif len(name) > 64:\nprint(f\"FAIL: 'name' must be <= 64 chars (got {len(name)})\")\nok = False\nelif name != \"contextify\":\nprint(f\"FAIL: 'name' must be 'contextify' to match skills/contextify/ (got {name!r})\")\nok = False\nelse:\nprint(f\"PASS: 'name' is valid ({name!r})\")\n\ndesc = fm.get(\"description\", \"\")\nif not desc or not desc.strip():\nprint(\"FAIL: 'description' must be non-empty\")\nok = False\nelif len(desc) > 1024:\nprint(f\"FAIL: 'description' must be <= 1024 chars (got {len(desc)})\")\nok = False\nelse:\nprint(f\"PASS: 'description' is valid ({len(desc)} chars)\")\n\nif not ok:\nsys.exit(1)\nprint(\"PASS: frontmatter check passed\")\nPY",
+              "python3 - <<'PY'\nimport json, re, sys\n\nMANIFESTS = {\n\".claude-plugin/plugin.json\": lambda d: d.get(\"version\"),\n\".claude-plugin/marketplace.json\": lambda d: (d.get(\"plugins\") or [{}])[0].get(\"version\"),\n\".cursor-plugin/plugin.json\": lambda d: d.get(\"version\"),\n\".copilot-plugin/plugin.json\": lambda d: d.get(\"version\"),\n}\n\nok = True\nversions = {}\nfor path, get in MANIFESTS.items():\ntry:\nwith open(path, \"r\", encoding=\"utf-8\") as f:\ndata = json.load(f)\nexcept FileNotFoundError:\nprint(f\"FAIL: {path} not found\")\nok = False\ncontinue\nexcept json.JSONDecodeError as e:\nprint(f\"FAIL: invalid JSON in {path}: {e}\")\nok = False\ncontinue\nprint(f\"PASS: {path} parses as valid JSON\")\nversions[path] = get(data)\n\ntry:\nwith open(\"CHANGELOG.md\", \"r\", encoding=\"utf-8\") as f:\nchangelog = f.read()\nm = re.search(r\"^##\\s*\\[(\\d+\\.\\d+\\.\\d+)\\]\", changelog, re.MULTILINE)\nversions[\"CHANGELOG.md latest entry\"] = m.group(1) if m else None\nif not m:\nprint(\"FAIL: CHANGELOG.md has no `## [x.y.z]` release heading\")\nok = False\nexcept FileNotFoundError:\nprint(\"FAIL: CHANGELOG.md not found\")\nok = False\n\ndistinct = set(versions.values())\nif len(distinct) != 1 or None in distinct:\nprint(\"FAIL: the version must be identical everywhere it is declared:\")\nfor k, v in versions.items():\nprint(f\"  {k} = {v!r}\")\nok = False\nelse:\nprint(f\"PASS: every manifest and CHANGELOG.md name version {distinct.pop()}\")\n\nsys.exit(0 if ok else 1)\nPY",
+              "python3 evals/check_skill.py skills/contextify/SKILL.md",
+              "python3 tests/test_manifests.py",
+              "python3 tests/test_ctx_check.py",
+              "python3 tests/test_verify_claims.py",
+              "python3 tests/test_hooks.py",
+              "python3 tests/test_regressions.py",
+              "set -o pipefail\nout=$(sh skills/contextify/scripts/ctx-check); rc=$?\nif [ \"$rc\" -ne 0 ] || [ -n \"$out\" ]; then\necho \"FAIL: ctx-check exit=$rc output=[$out]\"; exit 1\nfi\necho \"PASS: ctx-check is fresh and silent\"\npython3 skills/contextify/scripts/verify_claims.py --budget AGENTS.md CLAUDE.md",
+              "python3 - <<'PY'\nimport json, os, re, sys\nh = json.load(open(\"hooks/hooks.json\"))\nok = True\nif os.path.exists(\".claude-plugin/hooks\"):\nprint(\"FAIL: hooks/ must not live under .claude-plugin/\"); ok = False\ncmds = [x[\"command\"] for grp in h[\"hooks\"].get(\"SessionStart\", []) for x in grp[\"hooks\"]]\nfor c in cmds:\nm = re.search(r\"\\$\\{CLAUDE_PLUGIN_ROOT\\}/([^\\s\\\"]+)\", c)\nif not m:\nprint(\"FAIL: hook command does not use the CLAUDE_PLUGIN_ROOT variable: \" + c); ok = False; continue\nrel = m.group(1)\nif not os.path.isfile(rel):\nprint(f\"FAIL: hook names a missing script: {rel}\"); ok = False\nelif not os.access(rel, os.X_OK):\nprint(f\"FAIL: hook script is not executable: {rel}\"); ok = False\nelse:\nprint(f\"PASS: hook runs {rel}\")\nsys.exit(0 if ok else 1)\nPY",
+              "python3 - <<'PY'\nimport re, subprocess, sys\n\nfiles = subprocess.run(\n[\"git\", \"ls-files\"],\ncapture_output=True, text=True, check=True,\n).stdout.splitlines()\n\n# Provider-specific, length-anchored patterns: broad enough to catch a real\n# leak, narrow enough not to fire on prose that merely mentions a prefix.\nPATTERNS = [\n(\"AWS access key id\", re.compile(r\"AKIA[0-9A-Z]{16}\")),\n(\"private key header\",\nre.compile(r\"-----BEGIN (?:RSA |EC |OPENSSH |DSA |PGP )?PRIVATE KEY-----\")),\n(\"GitHub personal access token\", re.compile(r\"ghp_[A-Za-z0-9]{36}\")),\n(\"GitHub fine-grained token\", re.compile(r\"github_pat_[A-Za-z0-9_]{22,}\")),\n(\"GitHub OAuth/app/refresh token\", re.compile(r\"gh[osur]_[A-Za-z0-9]{36}\")),\n(\"Anthropic API key\", re.compile(r\"sk-ant-[A-Za-z0-9_\\-]{24,}\")),\n(\"OpenAI-style API key\", re.compile(r\"sk-(?:proj-)?[A-Za-z0-9]{32,}\")),\n(\"Slack token\", re.compile(r\"xox[baprs]-[A-Za-z0-9-]{10,}\")),\n(\"Slack webhook\", re.compile(r\"https://hooks\\.slack\\.com/services/[A-Za-z0-9/+]{20,}\")),\n(\"Google API key\", re.compile(r\"AIza[0-9A-Za-z_\\-]{35}\")),\n(\"Stripe secret key\", re.compile(r\"sk_live_[0-9a-zA-Z]{24,}\")),\n(\"npm token\", re.compile(r\"npm_[A-Za-z0-9]{36}\")),\n(\"Supabase service-role JWT\", re.compile(r\"eyJ[A-Za-z0-9_\\-]{10,}\\.eyJ[A-Za-z0-9_\\-]{40,}\\.[A-Za-z0-9_\\-]{20,}\")),\n]\n\nfindings = []\nfor path in files:\nif path.startswith(\".git/\") or path == \".git\":\ncontinue\ntry:\nwith open(path, \"r\", encoding=\"utf-8\", errors=\"ignore\") as f:\ndata = f.read()\nexcept (IsADirectoryError, FileNotFoundError, OSError):\ncontinue\nfor ln, line in enumerate(data.splitlines(), 1):\nfor kind, rx in PATTERNS:\nif rx.search(line):\nfindings.append((path, ln, kind))\n\nif findings:\nprint(\"FAIL: potential secret(s) found:\")\nfor path, ln, kind in findings:\nprint(f\"  {path}:{ln}: {kind}\")\nsys.exit(1)\nprint(f\"PASS: no credentials matched {len(PATTERNS)} secret patterns in tracked files\")\nPY",
+              "set -o pipefail\nshopt -s nullglob\nfail=0\nfor f in assets/*.svg assets/*.html; do\nif grep -q '<script' \"$f\"; then\necho \"FAIL: <script> found in $f\"; fail=1\nfi\nif grep -Eq 'href=\"https?:|xlink:href=\"https?:|<image|@import|url\\(https?:|src=\"https?:' \"$f\"; then\necho \"FAIL: external reference found in $f\"; fail=1\nfi\ncase \"$f\" in\n*.svg)\npython3 -c \"import xml.dom.minidom,sys; xml.dom.minidom.parse('$f')\" \\\n&& echo \"PASS: $f is well-formed, script-free, self-contained\" \\\n|| { echo \"FAIL: $f is not well-formed XML\"; fail=1; }\nif ! grep -Eq '@keyframes|<animate|<set[ >]' \"$f\"; then\necho \"PASS: $f is static; no motion guard needed\"\nelif grep -q 'prefers-reduced-motion' \"$f\"; then\necho \"PASS: $f honours prefers-reduced-motion\"\nelse\necho \"FAIL: $f has no prefers-reduced-motion guard\"; fail=1\nfi\n;;\n*) echo \"PASS: $f is script-free and self-contained\" ;;\nesac\ndone\nexit $fail",
+              "python3 - <<'PY'\nimport os, re, subprocess, sys\nfrom urllib.parse import unquote\n\nmd_files = subprocess.run(\n[\"git\", \"ls-files\", \"*.md\"],\ncapture_output=True, text=True, check=True,\n).stdout.splitlines()\n\nlink_re = re.compile(r\"\\[[^\\]]*\\]\\(([^)]+)\\)\")\nfence_re = re.compile(r\"^\\s*(`{3,}|~{3,})\")\ninline_code_re = re.compile(r\"`[^`]*`\")\n\nbroken = []\nchecked = 0\nfor md in md_files:\ntry:\nwith open(md, \"r\", encoding=\"utf-8\", errors=\"ignore\") as f:\nlines = f.readlines()\nexcept (IsADirectoryError, FileNotFoundError, OSError):\ncontinue\n\nin_fence = False\nbase_dir = os.path.dirname(md)\nfor line in lines:\nif fence_re.match(line):\nin_fence = not in_fence\ncontinue\nif in_fence:\ncontinue\nline = inline_code_re.sub(\"\", line)\nfor raw in link_re.findall(line):\ntarget = raw.strip()\nif \" \" in target:\ntarget = target.split(\" \", 1)[0].strip()\ntarget = target.strip(\"<>\")\nif not target:\ncontinue\nlow = target.lower()\nif low.startswith((\"http://\", \"https://\", \"mailto:\", \"tel:\",\n\"#\", \"ftp://\", \"data:\")):\ncontinue\npath_part = target.split(\"#\", 1)[0].split(\"?\", 1)[0]\npath_part = unquote(path_part)\nif not path_part:\ncontinue\nif path_part.startswith(\"/\"):\nresolved = path_part.lstrip(\"/\")\nelse:\nresolved = os.path.normpath(os.path.join(base_dir, path_part))\nchecked += 1\nif not os.path.exists(resolved):\nbroken.append((md, target, resolved))\n\nif broken:\nprint(\"FAIL: broken relative markdown link(s):\")\nfor md, target, resolved in broken:\nprint(f\"  {md}: '{target}' -> '{resolved}' (missing)\")\nsys.exit(1)\nprint(f\"PASS: all {checked} relative markdown link(s) resolve\")\nPY",
+              "# Local hooks cannot cover every path: `git rebase` does not run commit-msg,\n# `--no-verify` skips it, and squash-merges done on github.com, the GitHub API\n# and Actions never touch a local hook at all. This is the backstop that does.\n#\n# It matches attribution TRAILERS only. Prose naming Claude Code is expected and\n# allowed here, because this repository is a Claude Code plugin.\nRANGE=\"${{ github.event.before }}..${{ github.sha }}\"\nif [ -z \"${{ github.event.before }}\" ] || ! git rev-parse -q --verify \"${{ github.event.before }}\" >/dev/null 2>&1; then\nRANGE=\"$(git rev-list --max-parents=0 HEAD | tail -1)..HEAD\"\nfi\necho \"Scanning $RANGE\"\nBAD=$(git log --format='%H%x09%B' \"$RANGE\" 2>/dev/null | grep -i -E \\\n-e '^[[:space:]]*Claude-Session:[[:space:]]' \\\n-e '^[[:space:]]*Co-?Authored-?By:[[:space:]]*Claude' \\\n-e '^[[:space:]]*Co-?Authored-?By:.*@anthropic\\.com' \\\n-e '^[[:space:]]*(Generated|Co-created) with .*Claude' || true)\nif [ -n \"$BAD\" ]; then\necho \"::error::AI attribution trailer found in a commit message.\"\necho \"$BAD\"\necho \"\"\necho \"Fix: git rebase -i and reword, or install the global hook:\"\necho \"  git config --global core.hooksPath ~/.config/git/hooks\"\nexit 1\nfi\necho \"No AI attribution trailers found.\"",
+              "set -euo pipefail\nasset=\"gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz\"\nurl=\"https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/${asset}\"\necho \"Downloading $url\"\ncurl -fsSL -o /tmp/gitleaks.tar.gz \"$url\"\ntar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks\nchmod +x /tmp/gitleaks\n/tmp/gitleaks version\n/tmp/gitleaks dir . --no-banner --redact --exit-code 1",
+              "if command -v claude >/dev/null; then\n# Root CLAUDE.md is contributor context, not distributed plugin context.\n# The plugin validator warns about that intentional self-dogfood file.\nclaude plugin validate . --strict && claude plugin validate ./.claude-plugin/plugin.json\nelse\necho \"claude CLI not on the runner; validate locally before tagging a release\"\nfi"
+            ],
+            "working-directory": []
+          }
+        }
+      }
+    },
+    {
+      "claims": [
+        "22224c23d556",
+        "294cf8d6cc82",
+        "3698b374815d",
+        "3ab6a98bfab8",
+        "5ab27fb2a642",
+        "72f7d37f4c93",
+        "8030f2315034",
+        "83894371288a",
+        "85a86cb82b4a",
+        "a0c51eee561f",
+        "a702caf9f72c",
+        "ade022fd77eb",
+        "d5228ee3491c",
+        "dcd7cd5aa7a6",
+        "f216daaed22b",
+        "f8383f239a11",
+        "fb45284c0adf"
+      ],
+      "key": "tree#depth2",
+      "source": {
+        "file": ".",
+        "line": 1
+      },
+      "value": [
+        ".claude-plugin/marketplace.json",
+        ".claude-plugin/plugin.json",
+        ".copilot-plugin/plugin.json",
+        ".cursor-plugin/plugin.json",
+        ".github/ISSUE_TEMPLATE/",
+        ".github/workflows/",
+        ".gitignore",
+        ".gitleaks.toml",
+        "CHANGELOG.md",
+        "CODE_OF_CONDUCT.md",
+        "CONTRIBUTING.md",
+        "LICENSE",
+        "README.md",
+        "READMEs/es.md",
+        "READMEs/fr.md",
+        "READMEs/ja.md",
+        "READMEs/zh-CN.md",
+        "SECURITY.md",
+        "assets/hero-dark.svg",
+        "assets/hero-light.svg",
+        "assets/hero.svg",
+        "assets/how-it-works.svg",
+        "assets/logo-mark-512.png",
+        "assets/logo-mark-animated-light.svg",
+        "assets/logo-mark-animated.svg",
+        "assets/logo-mark.png",
+        "assets/social-card.html",
+        "assets/social-preview.png",
+        "assets/social-preview.svg",
+        "docs/comparison.md",
+        "docs/design/",
+        "docs/editors.md",
+        "docs/faq.md",
+        "docs/hooks.md",
+        "docs/limits.md",
+        "docs/quickstart.md",
+        "evals/README.md",
+        "evals/RED-baseline.md",
+        "evals/check_skill.py",
+        "evals/dogfood-evidence/",
+        "evals/dogfood.md",
+        "evals/red-baseline/",
+        "evals/scenarios.md",
+        "examples/README.md",
+        "examples/nextjs/",
+        "examples/python-service/",
+        "examples/tiny/",
+        "hooks/hooks.json",
+        "llms.txt",
+        "skills/contextify/",
+        "tests/test_ctx_check.py",
+        "tests/test_hooks.py",
+        "tests/test_manifests.py",
+        "tests/test_regressions.py",
+        "tests/test_verify_claims.py"
+      ]
+    }
+  ],
+  "unverifiedLines": [],
+  "version": 1
+}

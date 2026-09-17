@@ -1,0 +1,118 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "eaed595ca4fb",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 5
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "evals/check_skill.py",
+        "text": "python3 evals/check_skill.py skills/secure-my-app/SKILL.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "72f7d37f4c93",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "tests/test_manifests.py",
+        "text": "python3 tests/test_manifests.py"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "30cdff372d74",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/secure-my-app/references/controls.md",
+        "text": "skills/secure-my-app/references/controls.md"
+      }
+    ]
+  },
+  "commit": null,
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:4fa8b1465bdf97632ac3d155688bff0c2205c55f61a83d6c30b47be1bb6ac9fa",
+      "kind": "file",
+      "managedBlockDigest": "sha256:3453148ae2027e977ff5692d1a2c2ddfc34d6d4212e736c34972af3422205394"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:e6591b340dc020d62cec59e6dd54060d5ef4d818e1bc4914c78e62325009ae6f",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    ".github/workflows/release.yml",
+    ".github/workflows/validate.yml"
+  ],
+  "evidence": {
+    "ci#jobs": "sha256:3f341b64e416d1f3c66e686a3b2cee86322807abf38a19554797083227850329",
+    "tree#depth2": "sha256:410f25ade8aa78b0558a09f240ba02caa44f1e83ece9107e1bd61d92e025b0cb"
+  },
+  "evidenceFileDigest": "sha256:b0215da5881cdde47efea0e980c6fd47ab6b0af3b7b1012a9a0464e91c69c13b",
+  "fastKey": "sha256:940aec7bc8b2d74625ed9b5cc4d5c960179cfacd52f5eb7a368a960c8f6b3f95",
+  "generatedAt": "2026-09-17T08:04:58Z",
+  "generatedBy": "codex",
+  "normalizerVersion": 1,
+  "provenance": [
+    {
+      "file": "AGENTS.md",
+      "line": 5,
+      "lineHash": "sha256:acf88cb10c3b04eb4e6b5d4d020747375b2cfc9fe27fe9124a9c350d7e186322",
+      "source": ".github/workflows/validate.yml:181",
+      "sourceDigest": "sha256:a1bf9a16e5a5f384c511ad3ec8c2ff1ea197b31e0a36891ccd7ab61c7fb30744"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:b5ce58a8f8bbeea3705983a7083c16860ec13f436c8854ca1603ce258e1cfa88",
+      "source": ".github/workflows/validate.yml:188",
+      "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 8,
+      "lineHash": "sha256:b80f9ba6b63206c347e1dad65810186faf814b0425d6178e74c66d3ef36495de",
+      "source": "skills/secure-my-app/SKILL.md:13",
+      "sourceDigest": "sha256:fc850f6945363348dfe94bb30355d459d08578cd7c0502554d2d004e66b04e95"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:d999f888052c6254f86d73c341bc928171038a215f3b08cc497df453cd802517",
+      "source": "skills/secure-my-app/SKILL.md:418",
+      "sourceDigest": "sha256:9f0820f2cb82bdada5d60f38b4e59e9d15e5180506b9c36bbdfa7840a0e64d4f"
+    }
+  ],
+  "scope": ".",
+  "targets": [
+    "claude",
+    "codex"
+  ],
+  "tool": "contextify",
+  "toolVersion": "0.1.0",
+  "unverifiedLines": [],
+  "version": 2
+}

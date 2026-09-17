@@ -1,0 +1,83 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "eaed595ca4fb",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 5
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "evals/check_skill.py",
+        "text": "python3 evals/check_skill.py skills/secure-my-app/SKILL.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "72f7d37f4c93",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "tests/test_manifests.py",
+        "text": "python3 tests/test_manifests.py"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "30cdff372d74",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/secure-my-app/references/controls.md",
+        "text": "skills/secure-my-app/references/controls.md"
+      }
+    ]
+  },
+  "commit": null,
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:359cb7754983b222f563ead59fb378b3309e89dece2e7af272e828359660aa15",
+      "kind": "file",
+      "managedBlockDigest": "sha256:3453148ae2027e977ff5692d1a2c2ddfc34d6d4212e736c34972af3422205394"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:e1cd41490199690ffa10458f4d79fd72a1de372bcb32c562e6e3032a56ee73ee",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    ".github/workflows/release.yml",
+    ".github/workflows/validate.yml"
+  ],
+  "evidence": {
+    "ci#jobs": "sha256:3f341b64e416d1f3c66e686a3b2cee86322807abf38a19554797083227850329",
+    "tree#depth2": "sha256:410f25ade8aa78b0558a09f240ba02caa44f1e83ece9107e1bd61d92e025b0cb"
+  },
+  "evidenceFileDigest": "sha256:cdd09737c094078017e818a561c805c5d275118afbe100e2068c51f227b42202",
+  "fastKey": "sha256:940aec7bc8b2d74625ed9b5cc4d5c960179cfacd52f5eb7a368a960c8f6b3f95",
+  "generatedAt": "2026-09-17T07:33:06Z",
+  "generatedBy": "codex",
+  "normalizerVersion": 1,
+  "scope": ".",
+  "tool": "contextify",
+  "toolVersion": "0.1.0",
+  "version": 2
+}

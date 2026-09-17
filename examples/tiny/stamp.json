@@ -1,0 +1,88 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "makefile#targets"
+        ],
+        "id": "6291b5d8a587",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "make-target",
+        "status": "verified",
+        "target": "run",
+        "text": "make run"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "72a0e4b3c14f",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 7
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "hello.py",
+        "text": "hello.py"
+      }
+    ]
+  },
+  "commit": null,
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:76f53226fd84ea9053ccb01edb73012a263d9c5a787c8654170db302152a7bed",
+      "kind": "file",
+      "managedBlockDigest": "sha256:49f318207d334e51681f9f95f852f0f8297b5862cf954879c063ddf834a19d5a"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:a5835940513042481ce33d3df92944c018fd59a1f69c688d66734327bcef89d4",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    "Makefile"
+  ],
+  "evidence": {
+    "makefile#targets": "sha256:e68a3acd56688cf34562597512d56578049bf2930d1dcd6ab2490101c7eba59b",
+    "tree#depth2": "sha256:3a1fef9a7e2fcf3908fce0cbe2dbafe1049d723df8850e125f7b9e6871b1cb16"
+  },
+  "evidenceFileDigest": "sha256:3d3545b27eaf55f7443f28432715507a3eb001912c74700ff19c5331ad49693a",
+  "fastKey": "sha256:da48726d6f184d21d9bd78c66bdc50f8bda9a97ccf40cfee52f62018737f9c25",
+  "generatedAt": "2026-09-17T08:01:43Z",
+  "generatedBy": "codex",
+  "normalizerVersion": 1,
+  "provenance": [
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:a126c15ce1ca7d10aa830f94274499e904323528571fd931369c0a27dc76aa1d",
+      "source": "Makefile:2",
+      "sourceDigest": "sha256:ea644888424fa09bcb7ed93829464c18566b469472fcfba9180cc8918585c88e"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 7,
+      "lineHash": "sha256:dae2a28673a5ad27b4b41e05f42a8a089a0c33ef6e045c089a05003d72c4306f",
+      "source": "Makefile:3",
+      "sourceDigest": "sha256:e2e10af3b5a9481b6d12663b17bc487c094396d22763ae5308779480cf7fd579"
+    }
+  ],
+  "scope": ".",
+  "targets": [
+    "claude",
+    "codex"
+  ],
+  "tool": "contextify",
+  "toolVersion": "0.1.0",
+  "unverifiedLines": [],
+  "version": 2
+}

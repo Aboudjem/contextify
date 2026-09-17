@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "$SCRIPTS/ctx-check",
+    "$SCRATCH/10x-fresh-context"
+  ],
+  "exit": 0,
+  "stdout": "contextify: drift\nScope    .\nStale    AGENTS.md:6 references npm run validate\nChanged  package.json#scripts\nChanged  provenance:package.json:9\nRemoved  script validate\nFiles    0 written\nNext     /contextify update\nAccept   unavailable until the stale command is corrected\n",
+  "stderr": ""
+}

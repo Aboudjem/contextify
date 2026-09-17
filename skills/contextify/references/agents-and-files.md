@@ -77,8 +77,8 @@ Source: `docs/design/DECISIONS.md` D6.
 
 ## What each pointer costs the reader
 
-A pointer file is a handful of physical lines: `CLAUDE.md` is 4, `GEMINI.md` is 3, the Cursor `.mdc` is 9, the Copilot pointer is 4. None of them duplicate `AGENTS.md` prose, so adding a target costs close to the pointer's own line count, not the size of `AGENTS.md` itself.
+A pointer file is a handful of physical lines: `CLAUDE.md` is 4, `GEMINI.md` is 3, the Cursor `.mdc` is 9, the Copilot pointer is 4. They avoid duplicated maintenance, not the cost of reading the shared instructions. An import loads AGENTS.md too; total context cost depends on the host's loading behavior.
 
-Copilot is the one confirmed exception. Its `copilot-instructions.md` supports plain markdown links to other files for modularization, but everything a link resolves to still counts toward the context window: splitting organizes content, it does not shrink what gets loaded. Source: `10x/.goal/research/ctx/06b-reddit-browser.md`, section (d), GitHub Copilot. This is a community-reported claim from Reddit threads, not vendor documentation.
+Copilot link-following behavior varies by feature and is not treated here as a guaranteed native import. Measure actual host loading rather than inferring token savings from file length.
 
 Whether Claude Code's `@AGENTS.md` import, once resolved, counts the same way against the importing file's own 200-line guidance is `uncertain`: the memory page documents the import mechanic and the size guidance separately, and neither 01 nor 07 states whether an imported file's lines count against the importing file's own budget.

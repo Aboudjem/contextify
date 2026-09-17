@@ -1,7 +1,7 @@
 # Install contextify in your editor
 
 One Agent Skill: a `SKILL.md` with frontmatter, Markdown underneath, and `references/` and `scripts/`
-directories beside it. No server, no binary, no dependency beyond POSIX `sh` and python3. Claude Code
+directories beside it. No server or compiled binary. The scripts use Git, POSIX tools, Bash and Python 3.11 or newer. Claude Code
 has a first-party path; every other agent installs the same directory through the skills CLI.
 
 ## Claude Code
@@ -23,22 +23,20 @@ notice only when something actually moved. A fresh repository gets no notice and
 npx skills add Aboudjem/contextify -a <agent>
 ```
 
-Replace `<agent>` with a code from this table. Only `claude-code`, `codex`, `cursor` and `opencode`
-are confirmed `-a` codes for this plugin; for the rest, run `npx skills add --help` rather than
-guessing one.
+Replace `<agent>` with a code below. Codes and default installation paths were checked against the [skills CLI agent registry](https://github.com/vercel-labs/skills/blob/main/src/agents.ts) on 2026-09-17. Environment overrides can change global paths; these are installation destinations, not proof that every host loads context files the same way.
 
 | Agent | `-a` code | Project path | Global path | Context file it reads |
 | --- | --- | --- | --- | --- |
 | Claude Code | `claude-code` | `.claude/skills/` | `~/.claude/skills/` | `CLAUDE.md` |
 | Cursor | `cursor` | `.agents/skills/` | `~/.cursor/skills/` | `AGENTS.md` natively, plus optional `.mdc` |
 | Codex | `codex` | `.agents/skills/` | `~/.codex/skills/` | `AGENTS.md` |
-| GitHub Copilot | see `npx skills add --help` | `.agents/skills/` | `~/.copilot/skills/` | `AGENTS.md`, nearest-wins |
-| Gemini CLI | see `npx skills add --help` | `.agents/skills/` | `~/.gemini/skills/` | `GEMINI.md`, or the `context.fileName` array |
+| GitHub Copilot | `github-copilot` | `.agents/skills/` | `~/.copilot/skills/` | `AGENTS.md`, nearest-wins |
+| Gemini CLI | `gemini-cli` | `.agents/skills/` | `~/.gemini/skills/` | `GEMINI.md`, or the `context.fileName` array |
 | OpenCode | `opencode` | `.agents/skills/` | `~/.config/opencode/skills/` | uncertain |
-| Windsurf | see `npx skills add --help` | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` | uncertain |
-| Zed | see `npx skills add --help` | `.agents/skills/` | `~/.agents/skills/` | uncertain |
-| Continue.dev | see `npx skills add --help` | `.agents/skills/` | `~/.continue/skills/` | uncertain |
-| Kimi Code CLI | see `npx skills add --help` | `.agents/skills/` | `~/.agents/skills/` | uncertain |
+| Windsurf | `windsurf` | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` | uncertain |
+| Zed | `zed` | `.agents/skills/` | `~/.agents/skills/` | uncertain |
+| Continue.dev | `continue` | `.continue/skills/` | `~/.continue/skills/` | uncertain |
+| Kimi Code CLI | `kimi-code-cli` | `.agents/skills/` | `~/.agents/skills/` | uncertain |
 
 So for Cursor, and for Codex:
 
@@ -69,8 +67,7 @@ plus whatever the repository's own configuration evidences, and no human-supplie
 file already supports.
 
 The scripts still run anywhere. `ctx-check`, `ctx_write.py`, `ctx_stamp.py` and `verify_claims.py`
-need only POSIX `sh` and a python3 on the machine's `PATH`. No model call, no network call, no runtime
-dependency.
+need Git, shell tools and Python on the machine's `PATH`. They use no model, network request or third-party Python package. The installer CLI itself needs Node.js.
 
 ## Next
 

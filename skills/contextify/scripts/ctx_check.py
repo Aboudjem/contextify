@@ -15,6 +15,8 @@ Never 2. --ci --strict is the one opt-in that turns drift into exit 1.
 
 import json
 import os
+import select
+import time
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,6 +36,8 @@ def parse_args(argv):
     i = 0
     while i < len(argv):
         arg = argv[i]
+        if arg in ("--root", "--draft", "--targets", "--generated-by", "--tool-version", "--scope", "--hook") and (i + 1 >= len(argv) or argv[i + 1].startswith("--")):
+            raise ctxlib.CtxError("missing value for %s" % arg, 4)
         if arg in ("--help", "-h"):
             sys.stdout.write(USAGE)
             raise SystemExit(0)
@@ -56,7 +60,7 @@ def parse_args(argv):
         elif arg == "--quiet-if-fresh":
             opts["quiet"] = True
         elif arg.startswith("-"):
-            pass
+            raise ctxlib.CtxError("unsupported argument: %s" % arg, 1)
         elif opts["path"] is None:
             opts["path"] = arg
         i += 1
@@ -68,8 +72,26 @@ def read_hook_cwd():
     if sys.stdin is None or sys.stdin.isatty():
         return None
     try:
-        raw = sys.stdin.read(8192)
-    except (OSError, ValueError):
+        fd = sys.stdin.fileno()
+        raw_bytes = b""
+        deadline = time.monotonic() + 0.05
+        while len(raw_bytes) < 8192:
+            ready, _, _ = select.select([fd], [], [], max(0, deadline - time.monotonic()))
+            if not ready:
+                break
+            chunk = os.read(fd, 8192 - len(raw_bytes))
+            if not chunk:
+                break
+            raw_bytes += chunk
+            try:
+                json.loads(raw_bytes)
+                break
+            except (ValueError, UnicodeDecodeError):
+                pass
+            if time.monotonic() >= deadline:
+                break
+        raw = raw_bytes.decode("utf-8")
+    except (OSError, ValueError, UnicodeDecodeError):
         return None
     if not raw.strip():
         return None
@@ -167,4 +189,8 @@ def append_summary(text):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except ctxlib.CtxError as exc:
+        sys.stderr.write("contextify: " + exc.message + "\n")
+        sys.exit(1)

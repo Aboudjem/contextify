@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "$SCRIPTS/ctx_write.py",
+    "--root",
+    "$SCRATCH/10x-fresh-context",
+    "--draft",
+    "$SCRATCH/10x-fresh-context/.contextify/draft",
+    "--targets",
+    "codex,claude",
+    "--generated-by",
+    "codex",
+    "--strict",
+    "--yes"
+  ],
+  "exit": 0,
+  "stdout": "contextify update\n\nResult   unchanged\nScope    .\nSize     medium\nTargets  claude, codex\n\nFiles written                               Lines\n(nothing changed)                               -\n\nEvidence      3 records\nUnverified    0 claims\nNext         /contextify check\n",
+  "stderr": ""
+}

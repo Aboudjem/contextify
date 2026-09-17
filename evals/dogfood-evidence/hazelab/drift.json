@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "$SCRIPTS/ctx-check",
+    "$SCRATCH/hazelab"
+  ],
+  "exit": 0,
+  "stdout": "contextify: drift\nScope    .\nStale    AGENTS.md:7 references pnpm run lint\nChanged  package.json#scripts\nChanged  provenance:package.json:10\nRemoved  script lint\nFiles    0 written\nNext     /contextify update\nAccept   unavailable until the stale command is corrected\n",
+  "stderr": ""
+}

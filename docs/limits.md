@@ -20,7 +20,7 @@ read; it does not audit whether that file was telling the truth.
 
 The ETH Zurich paper (arXiv 2602.11988) reports that context files "do not generally improve task
 success rates, while increasing inference cost by over 20% on average." No success-rate percentage is
-quoted anywhere in contextify's own docs, because none was measured. This finding is why `init` output
+quoted here: the [paper's abstract](https://arxiv.org/abs/2602.11988) gives no such percentage. This finding is why `init` output
 is deliberately sparse and why the line budgets exist at all.
 
 ## The hook never rewrites
@@ -30,9 +30,7 @@ every session start, until a human or an agent runs `/contextify update`.
 
 ## Bounded parsers leave some evidence unverified
 
-YAML is read with a bounded line-based reader, not a full YAML library; Makefile and justfile includes
-are resolved only when they are statically local; a computed build target is not evaluated. Anything
-the bounded reader cannot follow is labelled `unverified`, never guessed. See
+YAML is read with a bounded line-based reader, not a full YAML library. Makefile/justfile includes and computed build targets are outside the current parser. A target supplied only by an include may be reported missing; review that result against the real build tool instead of treating it as proof of a dead command. See
 [D15](design/DECISIONS.md).
 
 ## Some runner forms are unverified in 0.1.0
@@ -47,11 +45,10 @@ Whether Copilot loads a Markdown pointer as a native import across every feature
 CLI deduplicates `AGENTS.md` when both combined discovery and an explicit import point at it, are both
 `uncertain`. See [D6](design/DECISIONS.md).
 
-## The fast path reads the git index
+## A check belongs to one working tree
 
-`ctx-check`'s fast path digests `git ls-files -s`, which reflects the index, not the working tree of
-every worktree. In a repository with more than one worktree, a change staged in another worktree can
-read as drift, or mask drift, in this one. See [D14, open risk 3](design/DECISIONS.md).
+Run `ctx-check` in the checkout you want to inspect. Git worktrees have separate indexes; a passing
+check in one worktree says nothing about another. Hook input selects the working directory.
 
 ## Cursor's .mdc rule is optional
 
@@ -67,10 +64,13 @@ detected, so the preflight check may still assume the default. See [D12](design/
 
 ## No Windows testing in 0.1.0
 
-The scripts are POSIX `sh` (bash 3.2 safe) and python3 standard library, tested on macOS and Linux CI
-only. Windows behaviour, including under WSL, has not been verified for this release.
+The scripts use POSIX shell tools, Bash and Python 3.11 or newer. Local checks run on macOS; the GitHub workflow runs on Linux. Consult the current CI result for that revision. Windows behavior, including WSL, has not been verified for this release.
 
 ## Related
 
 - [The design decisions](design/DECISIONS.md) · [The scripts spec](design/SCRIPTS-SPEC.md)
 - [FAQ](faq.md) · [Quickstart](quickstart.md) · [Comparison](comparison.md)
+
+## Plugin validation and contributor context
+
+The root `CLAUDE.md` imports this repository's contributor instructions. Claude's plugin validator warns that a plugin-root `CLAUDE.md` is not loaded as distributed project context. The installed skill lives in `skills/contextify/SKILL.md`. Marketplace validation passes with `--strict`; plugin manifest validation passes with this warning, and therefore does not pass `--strict`.

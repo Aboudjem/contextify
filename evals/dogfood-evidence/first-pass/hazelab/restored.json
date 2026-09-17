@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "$SCRIPTS/ctx-check",
+    "$SCRATCH/hazelab"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

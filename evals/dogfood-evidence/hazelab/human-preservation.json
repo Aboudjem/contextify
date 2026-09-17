@@ -1,0 +1,19 @@
+{
+  "argv": [
+    "python3",
+    "$SCRIPTS/ctx_write.py",
+    "--root",
+    "$SCRATCH/hazelab",
+    "--draft",
+    "$SCRATCH/hazelab/.contextify/draft",
+    "--targets",
+    "codex,claude",
+    "--generated-by",
+    "codex",
+    "--strict",
+    "--yes"
+  ],
+  "exit": 0,
+  "stdout": "contextify init\n\nResult   written\nScope    .\nSize     medium\nTargets  claude, codex\n\nFiles written                               Lines\n.contextify/evidence.json                     184\n.contextify/stamp.json                        180\n\nEvidence      5 records\nUnverified    0 claims\nNext         /contextify check\nNote     Codex root-to-leaf chains fit 32,768 bytes (.codex/config.toml project_doc_max_bytes not set)\n",
+  "stderr": ""
+}

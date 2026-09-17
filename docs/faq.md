@@ -19,7 +19,7 @@ No. Claude Code reads `CLAUDE.md`. contextify's `CLAUDE.md` is four lines, and i
 
 ## Why 60 lines
 
-60 is the target for a medium-sized repository, scaled down to 20 for a tiny one and up to 60 for a
+The targets are 20 lines for a tiny repository, 40 for a medium one and 60 for a
 monorepo, with a hard ceiling of 150. The budget exists because of a specific finding: the ETH Zurich
 paper (arXiv 2602.11988) reports that context files "do not generally improve task success rates,
 while increasing inference cost by over 20% on average." Claude Code's own `/init` guidance is to keep
@@ -29,7 +29,7 @@ a context file "target under 200 lines". contextify's ceiling sits well under th
 ## Why no code blocks
 
 Because a pasted snippet rots silently the moment the code it describes changes, and an agent greps a
-one-line fact faster than it reads a fenced block. `verify_claims.py` lints for exactly this. See
+one-line fact faster than it reads a fenced block. The writer rejects fenced code blocks in generated drafts. See
 [D3](design/DECISIONS.md).
 
 ## Does the hook rewrite my files
@@ -55,7 +55,7 @@ instead of every teammate separately hitting and re-fixing the same drift. See
 
 Outside the managed block, marked by `<!-- contextify:begin v1 -->` and `<!-- contextify:end -->`,
 your bytes are preserved exactly. Inside the block, a hand edit is reported as `edited`, not silently
-overwritten and not silently kept; `/contextify accept` re-digests it as the new baseline. See
+overwritten. `accept` refuses a changed managed block: review the edit and use the writer's explicit conflict-resolution path with a matching draft. See
 [D5 and D7](design/DECISIONS.md).
 
 ## What is accept for
@@ -79,14 +79,11 @@ lines and can carry nested `<package>/AGENTS.md` bodies. See [D2](design/DECISIO
 
 ## Does it run a model at session start
 
-No. `ctx-check` is POSIX `sh` with a python3 fallback on a cache miss. No model call, ever, in the
-freshness check itself. `/contextify init`, `update` and `accept` are the model-driven steps, and they
-run only when you invoke them.
+No. `ctx-check` runs local shell and Python code. Generation and revision use your coding agent when you invoke `init` or `update`. The `accept` script revalidates and refreshes metadata without a model call; deciding whether prose remains correct still requires a review.
 
 ## Does it send anything anywhere
 
-No network calls of any kind. Discovery, normalizing, claim resolution and the drift check all read
-the working tree and the git index locally.
+The deterministic discovery, writer and checker scripts do not make network requests. Your coding agent handles generation under its own data policy. Installation and the optional CI setup fetch the released code from GitHub.
 
 ## What is .contextify/mistakes.md
 
@@ -97,10 +94,7 @@ evidence a promoted rule can point back to, not context an agent loads by defaul
 
 ## Why not symlink CLAUDE.md to AGENTS.md
 
-`--symlink` exists as an explicit alternative, but it is not the default, and it is only eligible when
-there is no human content, no Claude-only addendum, and `AGENTS.md` is under 30 lines. A symlinked
-`CLAUDE.md` cannot carry Claude-specific notes that do not belong in the shared source. See
-[D6](design/DECISIONS.md) and [comparison.md](comparison.md).
+The supported default is a regular `CLAUDE.md` containing `@AGENTS.md`. It can carry a Claude-only addendum without copying repository instructions. The current writer refuses `--symlink` rather than silently ignoring it.
 
 ## Can I turn the hook off
 

@@ -1,0 +1,18 @@
+{
+  "argv": [
+    "python3",
+    "$SCRIPTS/ctx_write.py",
+    "--root",
+    "$SCRATCH/secure-my-app-fresh-context",
+    "--draft",
+    "$SCRATCH/secure-my-app-fresh-context/.contextify/draft",
+    "--targets",
+    "codex,claude",
+    "--generated-by",
+    "codex",
+    "--yes"
+  ],
+  "exit": 0,
+  "stdout": "contextify init\n\nResult   written\nScope    .\nSize     medium\nTargets  codex, claude\n\nFiles written                               Lines\nAGENTS.md                                      13\nCLAUDE.md                                       4\n.gitignore                                     36\n.contextify/evidence.json                     110\n.contextify/stamp.json                        133\n\nEvidence      2 records\nUnverified    0 claims\nNext         /contextify check\nNote     Codex instruction chain 628 bytes against 32,768 bytes (.codex/config.toml project_doc_max_bytes not set)\n",
+  "stderr": ""
+}

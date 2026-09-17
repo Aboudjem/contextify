@@ -34,6 +34,8 @@ def parse_args(argv):
             sys.stdout.write(USAGE)
             raise SystemExit(0)
         if arg == "--root":
+            if i + 1 >= len(argv) or argv[i + 1].startswith("--"):
+                raise ctxlib.CtxError("missing value for --root", 2)
             i += 1
             opts["root"] = argv[i] if i < len(argv) else None
         elif arg.startswith("--root="):
@@ -45,7 +47,7 @@ def parse_args(argv):
         elif arg == "--strict":
             opts["strict"] = True
         elif arg.startswith("-"):
-            pass
+            raise ctxlib.CtxError("unsupported argument: %s" % arg, 2)
         else:
             opts["files"].append(arg)
         i += 1
@@ -122,4 +124,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except ctxlib.CtxError as exc:
+        sys.stderr.write("contextify: " + exc.message + "\n")
+        sys.exit(2 if exc.code == 2 else 1)

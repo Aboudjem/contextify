@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "python3",
+    "$SCRIPTS/verify_claims.py",
+    "--root",
+    "$SCRATCH/hazelab",
+    "--budget",
+    "$SCRATCH/hazelab/AGENTS.md",
+    "$SCRATCH/hazelab/CLAUDE.md"
+  ],
+  "exit": 0,
+  "stdout": "OK          AGENTS.md:5  pnpm run dev\nOK          AGENTS.md:6  pnpm run build\nOK          AGENTS.md:7  pnpm run lint\nOK          AGENTS.md:9  package.json\nOK          AGENTS.md:10  vitest.config.ts\nOK          AGENTS.md:12  prisma.config.ts\n6 claims, 0 stale, 0 unverified\n",
+  "stderr": ""
+}

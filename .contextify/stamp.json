@@ -1,0 +1,450 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "3ab6a98bfab8",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "tests/test_ctx_check.py",
+        "text": "python3 tests/test_ctx_check.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "d5228ee3491c",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 7
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "tests/test_verify_claims.py",
+        "text": "python3 tests/test_verify_claims.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "72f7d37f4c93",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 8
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "tests/test_manifests.py",
+        "text": "python3 tests/test_manifests.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "294cf8d6cc82",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 9
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "evals/check_skill.py",
+        "text": "python3 evals/check_skill.py skills/contextify/SKILL.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "85a86cb82b4a",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "skills/contextify/scripts/ctx-check",
+        "text": "sh skills/contextify/scripts/ctx-check"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "f216daaed22b",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 13
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/contextify/SKILL.md",
+        "text": "skills/contextify/SKILL.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "a702caf9f72c",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 13
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/contextify/scripts/ctx_write.py",
+        "text": "skills/contextify/scripts/ctx_write.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "a0c51eee561f",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 14
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/contextify/scripts/ctxlib.py",
+        "text": "skills/contextify/scripts/ctxlib.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "3698b374815d",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 14
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/contextify/scripts/ctx_check.py",
+        "text": "skills/contextify/scripts/ctx_check.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "ade022fd77eb",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 15
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "hooks/hooks.json",
+        "text": "hooks/hooks.json"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "fb45284c0adf",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 18
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": ".github/workflows/validate.yml",
+        "text": ".github/workflows/validate.yml"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "8030f2315034",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 19
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": ".github/workflows/release.yml",
+        "text": ".github/workflows/release.yml"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "f8383f239a11",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 19
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": ".claude-plugin/plugin.json",
+        "text": ".claude-plugin/plugin.json"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "5ab27fb2a642",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 20
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "CONTRIBUTING.md",
+        "text": "CONTRIBUTING.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "22224c23d556",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 23
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "docs/design/SCRIPTS-SPEC.md",
+        "text": "docs/design/SCRIPTS-SPEC.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "83894371288a",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 23
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "docs/design/DECISIONS.md",
+        "text": "docs/design/DECISIONS.md"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "dcd7cd5aa7a6",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 24
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "skills/contextify/references/update-in-place.md",
+        "text": "skills/contextify/references/update-in-place.md"
+      }
+    ]
+  },
+  "commit": "f8e516f9d05508b67ee488112e78c76dab92b18f",
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:a0db9e76b21d5da6ff594bc52a11535e8305261a9aa746860b2ce3b52471e360",
+      "kind": "file",
+      "managedBlockDigest": "sha256:6830eca3941d6882a7049732ca91721d845602dd4e922789f4035ba9ae90f53d"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:1c58e6817ebbf9ee9b63e85c24200d70ffdcf8e35b9490630c30ca7890d025fd",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    ".github/workflows/release.yml",
+    ".github/workflows/validate.yml",
+    "examples/python-service/source/Makefile",
+    "examples/python-service/source/pyproject.toml",
+    "examples/tiny/source/Makefile"
+  ],
+  "evidence": {
+    "ci#jobs": "sha256:5457db3b5dfaca7e0b15b896a981b45b432057aa4ed3690a63bbe87324f086df",
+    "tree#depth2": "sha256:aef62fc5d87957ed525f287f11498264d8d44fd4ff9739ecf9e93cf82cc6cce3"
+  },
+  "evidenceFileDigest": "sha256:7de2f0778288c3667b3e44964649ca4a1f363841193b43704f3a6d39af62030b",
+  "fastKey": "sha256:eb2cedc34a2f920c514fe735cd8cdea73e3313b577c830577c60aeb3a36e8def",
+  "generatedAt": "2026-09-17T08:15:36Z",
+  "generatedBy": "codex",
+  "normalizerVersion": 1,
+  "provenance": [
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:d993810bf1f1842d683b2a1660b1d1e5b6cfc6e44c2b373dae2c97b566a1f4bf",
+      "source": ".github/workflows/validate.yml:195",
+      "sourceDigest": "sha256:e579276a32e63a1b62b6f0a9129e7ff383e7d458657a1fce67bf8fc8a1c99e90"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 7,
+      "lineHash": "sha256:62d312384a10cdb2ef815d6d8654042b424e01ea7639f792374f071ebb57dd3a",
+      "source": ".github/workflows/validate.yml:199",
+      "sourceDigest": "sha256:7c77dda5a45da9f642eae5ae389bfb79698155933df96b0253830e0b7435eabb"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 8,
+      "lineHash": "sha256:7f6ee11da159bcf4854c25d9c7dcd7c5287eb65264a31c6f13c654881482542a",
+      "source": ".github/workflows/validate.yml:188",
+      "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 9,
+      "lineHash": "sha256:ff1aa39b0ae117a97df242ff6640f7db63baebc1643772e0e0a75795b524515f",
+      "source": ".github/workflows/validate.yml:181",
+      "sourceDigest": "sha256:d7d1a2c4c0efa868a552e0f334c58ee6752f3fee91385dba460f7a715bb0e9a9"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:5ebf5583bc7385dfc8976677757c68d9fe8fb663c0f59a617e3b4bdd45907035",
+      "source": ".github/workflows/validate.yml:213",
+      "sourceDigest": "sha256:ee95a9d7d7646cc7681c9866d07429a027493ffe4e98d70a8df652176cad6900"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 13,
+      "lineHash": "sha256:4529de96d1973a49940a4c30494f0d0658a133cf419edff9d59359f4ee739b70",
+      "source": "skills/contextify/SKILL.md:130",
+      "sourceDigest": "sha256:0ef5222c6b95d7b1f9dde6e60f9281bc539116766539903dbb38411ee06157f5"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 13,
+      "lineHash": "sha256:4529de96d1973a49940a4c30494f0d0658a133cf419edff9d59359f4ee739b70",
+      "source": "skills/contextify/SKILL.md:83",
+      "sourceDigest": "sha256:6613de40ceae8eb93bb0e29f2f81497e9e84adc487d1b6a60f562dc6cdaab01e"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctx_check.py:24",
+      "sourceDigest": "sha256:3c3d137f9ca2b84c3abbded89d3491800a948dd7b18ae193988282b2f39ac0bb"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctxlib.py:1189",
+      "sourceDigest": "sha256:59b399d762260abb1323ec6b896b8d6f1b275ad21e6e3afc5ca5d546c09e046a"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctxlib.py:906",
+      "sourceDigest": "sha256:3575b66bc49ebe45e2901d3e9a2cbebd1afa9e356611d4f6e12a8a7538e75b12"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:f5c921543af0cfec6190d50c9fc78cba648844b67a1a4d05224a06d0639a8bb3",
+      "source": "skills/contextify/scripts/ctxlib.py:1506",
+      "sourceDigest": "sha256:985c49a84d358238a46baa36c94f866261190e2d3985337c4a2d4d16bd8713ce"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 15,
+      "lineHash": "sha256:b0093e2f7f3369a39ffb6f82d4633bfc4401185eb825b54197457913cc979da9",
+      "source": "hooks/hooks.json:10",
+      "sourceDigest": "sha256:6e1170fab26f026350392c334b585dab66dd64a1cb75585ed3f059553457c5fa"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 18,
+      "lineHash": "sha256:ae13143381dcba85a72c1c559aaf5b94ae8af93dbbd24caa2744935b5f8c7069",
+      "source": ".github/workflows/validate.yml:5",
+      "sourceDigest": "sha256:f733c68e4f5db039f493e8a8bf54cc60cf86d58e4d707349c6b1d59add3fff24"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 19,
+      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
+      "source": ".github/workflows/release.yml:37",
+      "sourceDigest": "sha256:b891fe6a6bd9b71a164e30e8b5e5ca7528a2b1d8f643a836af83340ea569eead"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 19,
+      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
+      "source": ".github/workflows/release.yml:6",
+      "sourceDigest": "sha256:5a3c7106d3427b41e78ab68ea06460823de1df2848a6e16ccf531401b26a08cf"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 19,
+      "lineHash": "sha256:f5ab487b3338512548bfe52117f49d400ebb85452ae9caac04b0ddc88e920fe7",
+      "source": ".github/workflows/release.yml:46",
+      "sourceDigest": "sha256:8ef6d45b9cde32ee44a7f335bd53f2919080cba6d0d875c263c4d062d880aa00"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 20,
+      "lineHash": "sha256:40f93380baefa9abd8ee4ec761369b73a563ef92f11df69c6c286014668ec190",
+      "source": "CONTRIBUTING.md:33",
+      "sourceDigest": "sha256:89f15be70b9fb2518adecb5663c967e2235305bec744eddce61013dca9102799"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 20,
+      "lineHash": "sha256:40f93380baefa9abd8ee4ec761369b73a563ef92f11df69c6c286014668ec190",
+      "source": "CONTRIBUTING.md:70",
+      "sourceDigest": "sha256:10d77ad7474f54f25dd20460c2efeb2d4812c10904f5580d40d21495829ab37a"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 23,
+      "lineHash": "sha256:5095d93bbc173f202bb8baf770f74070d5e4e7509acd28d5d4bf94e69809800e",
+      "source": "docs/design/SCRIPTS-SPEC.md:1",
+      "sourceDigest": "sha256:c3cfd1c3f964069cd300acbdf19c52764f12aeccd36e9050c81f879e5bb25e36"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 23,
+      "lineHash": "sha256:5095d93bbc173f202bb8baf770f74070d5e4e7509acd28d5d4bf94e69809800e",
+      "source": "docs/design/DECISIONS.md:1",
+      "sourceDigest": "sha256:61601497da5b461c06d895fa6246a58c0b2c766ac3f360e379b0e381a32ddd6f"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 24,
+      "lineHash": "sha256:c76d4946f2b37d5888f38abd77c031b7a45d3184534cdca776a393dadb025d7b",
+      "source": "skills/contextify/references/update-in-place.md:5",
+      "sourceDigest": "sha256:68b7082d3a3a265f5c965fc5d28748b2d59b6ea918d86773c86803f1957e8dcd"
+    }
+  ],
+  "scope": ".",
+  "targets": [
+    "claude",
+    "codex"
+  ],
+  "tool": "contextify",
+  "toolVersion": "0.1.0",
+  "unverifiedLines": [],
+  "version": 2
+}

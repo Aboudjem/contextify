@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "python3",
+    "$SCRIPTS/verify_claims.py",
+    "--root",
+    "$SCRATCH/secure-my-app-fresh-context",
+    "--budget",
+    "$SCRATCH/secure-my-app-fresh-context/AGENTS.md",
+    "$SCRATCH/secure-my-app-fresh-context/CLAUDE.md"
+  ],
+  "exit": 0,
+  "stdout": "OK          AGENTS.md:5  python3 evals/check_skill.py skills/secure-my-app/SKILL.md\nOK          AGENTS.md:6  python3 tests/test_manifests.py\nOK          AGENTS.md:10  skills/secure-my-app/references/controls.md\n3 claims, 0 stale, 0 unverified\n",
+  "stderr": ""
+}

@@ -1,32 +1,14 @@
-# Comparison
+# Comparison reference
 
-Purpose: a trimmed copy of `docs/design/comparison.md`, dated 2026-09-16, kept in the skill directory so a running skill can cite the matrix without leaving it.
+Use the [public comparison](../../../docs/comparison.md) for the dated source observations and trade-offs. The original 2026-09-16 design matrix is retained in [design/comparison.md](../../../docs/design/comparison.md) as a historical design artifact, not a current verification report.
 
-Every non-contextify cell is scoped to the implementation paths actually read in `08-steal-list.md`, not to a claim about every current release. Star counts, install methods and target counts that do not appear there come from `03-comparables-and-skills-cli.md` Part A and are marked `(03)`. contextify cells name the beat-them-here test number from `DECISIONS.md` that proves them; contextify is a design, so its cells describe what the design commits to and what will prove it, not a shipped measurement.
+When explaining the difference:
 
-Column meanings. **Evidence-cited claims**: a generated line traces to the file and line that justifies it. **Single source plus pointers**: one instruction file, every other agent file a thin pointer to it. **Line budget enforced**: a ceiling that refuses, not a sentence that asks. **Deterministic drift check**: staleness detected without a model call. **Update in place with diff**: a re-run preserves human bytes and shows what changes before writing. **Per-target ceiling preflight**: the target tool's own documented ceiling is checked before the write. **Size-scaled output**: output length changes with repository size. **Zero-dependency**: no package manager or runtime install beyond POSIX tooling.
+- Contextify drafts one AGENTS.md with selected pointer files, then checks recorded evidence and command/path liveness without a model call.
+- A resolved command is not a passing command. A fresh stamp is not proof of correct prose or a healthy repository.
+- Managed updates preserve human content outside the markers. Existing oversized instructions may require an explicitly reviewed reduction before they can fit.
+- Configuration-distribution tools cover a broader job; Contextify does not import their full configuration.
+- Quote measured outputs only from the [dogfood report](../../../evals/dogfood.md). The [RED baseline](../../../evals/RED-baseline.md) is historical, including its failed Gemini run.
+- No measured task-success advantage exists for Contextify. The [ETH study](https://arxiv.org/abs/2602.11988) is a reason to keep instructions sparse and evaluate them.
 
-| Tool | Evidence-cited claims | Single source plus pointers | Line budget enforced | Deterministic drift check | Update in place with diff | Per-target ceiling preflight | Size-scaled output | Zero-dependency | Targets |
-|---|---|---|---|---|---|---|---|---|---|
-| ruler | no: attributes a whole source file, never a claim | partial: concatenated and copied per agent, no pointers (03) | no | no: manual apply, no watch or CI mode (03) | no: overwrites the body, `.bak` copy only | no | no | no: npm install (03) | 30+ adapter classes |
-| rulesync | no | partial: fan-out per target, no symlinks (03) | no | no | no: full regeneration per run | no | no | no: npm install (03) | 47 target files |
-| ClaudeForge | no: scans and detects, shows no file or line behind a claim | partial: a nav-hub `CLAUDE.md` within one agent family | partial: 150 lines, hook-wired but advisory when the validator is disabled locally | no: an LLM agent, not deterministic | partial: fail-closed abort, no diff surface | no | partial: three hand-picked worked examples | no: curl-to-shell install plus a python3 hook (03) | 1, Claude Code (03) |
-| agentrules-architect | no | no: one pipeline output, not a pointer model | no: its own AGENTS.md is 372 lines | no: six LLM phases | partial: comment-preserving sync for one file only | no: token estimate only | no: always verbose | no: pip install (03) | AGENTS.md convention broadly (03) |
-| agents-md-generator | no | yes: `CLAUDE.md` is a filesystem symlink to `AGENTS.md` (03) | partial: 20 to 30 lines stated, unenforced | no | no: only seeds a near-empty clone | no | no: one fixed template | yes: shell only | 2, AGENTS.md plus the symlink (03) |
-| airul | no: sources are docs already written, not code evidence | no: one content blob written to several filenames | no: grows unbounded | no | no: full regeneration each run | no | no | no: npm install (03) | 4 output filenames |
-| Claude Code `/init` | partial: nothing records which file justified a line | partial: docs recommend an import or symlink | no: "target under 200 lines" is guidance, not a refusal | no | partial: suggests improvements to an existing file | no | no | yes: built in | 1, `CLAUDE.md` |
-| Codex `/init` | no: one generative sentence | partial: deterministic root-to-leaf discovery, `AGENTS.override.md` first | no: stops concatenating at 32 KiB, silently | no | no | no: truncation happens on read, no warning | no | yes: built in | 1, `AGENTS.md` |
-| Gemini `/init` | no: writes a TODO placeholder when it cannot infer a command | no | no | no | no: refuses outright when a file already exists | no | partial: branches on code vs non-code project | yes: built in | 1, `GEMINI.md` |
-| **contextify** | **yes**: every fact resolves to a selector and source line, or is `unverified`, or is cut. Test 5 | **yes**: AGENTS.md is the source, pointers are 3 to 9 lines, symlink exists but is not the default. Test 7 | **yes**: target 20/40/60 by size, hard ceiling 150, enforced at generation and by an opt-in CI gate. Tests 2 and 8 | **yes**: `ctx-check`, sh fast path, python3 stdlib on mismatch, no model, no network, bounded to 12 lines. Tests 3, 4, 6 | **yes**: managed comment block, full diff, human bytes preserved, no-op re-run byte-identical, interrupted run recoverable. Tests 1 and 11 | **yes**: `--dry-run` prints lines and bytes per target against real ceilings, labelled as two different kinds of number. Test 9 | **yes**: tiny, medium, monorepo classified by file count and build units. Test 8 | **yes**: Markdown plus POSIX sh and python3 stdlib only | about 10, one data table row per agent |
-
-## What the comparables do better
-
-**ruler has the breadth.** Thirty-plus agent adapters, each a small class declaring capability flags, plus a clean selection precedence chain and genuinely good path-traversal, symlink, and hardlink guards. contextify caps itself at about ten agents on purpose, so on day one ruler reaches roughly three times as many tools. If a reader's editor is not in the table, ruler is the better answer today.
-
-**rulesync has import, and contextify has none.** It can ingest an existing tool's configuration and normalize it before re-exporting, and it hardens frontmatter parsing against YAML alias bombs. contextify only migrates an existing file into AGENTS.md behind explicit approval; it cannot read a foreign tool's structured config at all.
-
-**agentrules-architect has the deeper pipeline.** Six separated phases with prompts kept apart from orchestration, content-hash-cached token accounting, and a comment-preserving tree sync will surface relationships on a large unfamiliar codebase that a single-pass evidence scan will miss. contextify's bet is that the cheap deterministic path is right most of the time, not that the expensive path is worthless.
-
-**Two more worth naming.** ClaudeForge ships three worked examples sized to the project instead of one generic template, better teaching material than anything contextify plans. agents-md-generator is the only tool in the survey with a true filesystem single source, and it seeds at clone time; contextify makes the symlink opt-in because a symlinked `CLAUDE.md` cannot carry a Claude-only addendum, a real trade, not a clear win.
-
-**And the honest caveat about the whole category.** The ETH Zurich paper (arXiv 2602.11988) reports that context files "do not generally improve task success rates, while increasing inference cost by over 20% on average." It gives no success-rate figure, so none is quoted here. That finding is the reason contextify's `init` output is deliberately sparse, and it is also a reason to doubt every row of the matrix above, including contextify's.
+Do not claim that no other tool has a feature, that a design test number proves implementation, or that the historical survey covers every current release.

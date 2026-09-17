@@ -1,0 +1,14 @@
+{
+  "--dry-run": {
+    "exit": 4,
+    "stdout": "",
+    "stderr": "contextify: refused: CLAUDE.md is 120 lines; the ceiling is 30\n"
+  },
+  "--yes": {
+    "exit": 4,
+    "stdout": "",
+    "stderr": "contextify: refused: CLAUDE.md is 120 lines; the ceiling is 30\n"
+  },
+  "all_copy_files_byte_identical": true,
+  "stamp_absent": true
+}

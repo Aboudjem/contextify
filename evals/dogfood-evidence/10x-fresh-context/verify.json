@@ -1,0 +1,14 @@
+{
+  "argv": [
+    "python3",
+    "$SCRIPTS/verify_claims.py",
+    "--root",
+    "$SCRATCH/10x-fresh-context",
+    "--budget",
+    "$SCRATCH/10x-fresh-context/AGENTS.md",
+    "$SCRATCH/10x-fresh-context/CLAUDE.md"
+  ],
+  "exit": 0,
+  "stdout": "OK          AGENTS.md:5  npm test\nOK          AGENTS.md:6  npm run validate\nOK          AGENTS.md:7  npm run sync:check\nOK          AGENTS.md:9  scripts/sync-plugins.mjs\nOK          AGENTS.md:9  .claude-plugin/marketplace.json\nOK          AGENTS.md:11  scripts/validate-marketplace.mjs\nOK          AGENTS.md:13  docs/SYNC.md\n7 claims, 0 stale, 0 unverified\n",
+  "stderr": ""
+}

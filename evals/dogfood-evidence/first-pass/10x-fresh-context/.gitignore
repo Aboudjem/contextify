@@ -1,0 +1,19 @@
+node_modules/
+.DS_Store
+*.log
+.env
+.env.*
+.vscode/
+.idea/
+*.swp
+.omc/
+.drafts/
+demo-output/
+
+# goalify briefs + conditions (local)
+.goal/
+
+# START contextify
+.contextify/draft/
+.contextify/journal.json
+# END contextify

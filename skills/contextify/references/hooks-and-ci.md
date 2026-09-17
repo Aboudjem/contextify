@@ -90,7 +90,7 @@ Hooks block:
 
 - Fires on: `SessionStart`, sources `startup`, `resume`, `clear`.
 - Envelope: `{"hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": "<notice>"}}`. Gemini documents the field as added as the first turn in interactive mode, or prepended to the user prompt in non-interactive mode, which is why the same hook also works unattended in CI.
-- Timeout: default 60,000 ms; the snippet above sets 5,000 ms because `ctx-check`'s fast path finishes in well under 100 ms on a warm cache.
+- Timeout: default 60,000 ms; the snippet above sets 5,000 ms to bound startup work independently of local check timings.
 - Exit codes: same contract as Codex, never blocks; `--hook` only picks the envelope.
 - Source: https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/reference.md, via `04-auto-update-mechanics.md` and `07-skeptic.md` claim 5d.
 
@@ -110,6 +110,7 @@ The `context.fileName` switch is a separate, one-time settings change, not a hoo
 
 ```json
 {
+  "version": 1,
   "hooks": {
     "sessionStart": [
       {
@@ -120,7 +121,7 @@ The `context.fileName` switch is a separate, one-time settings change, not a hoo
 }
 ```
 
-The exact top-level schema, whether Cursor expects a `version` key alongside `hooks`, is not confirmed by 01, 04 or 07, so it is `uncertain`; only the event name and output field below are confirmed.
+The [Cursor hooks reference](https://cursor.com/docs/hooks), checked 2026-09-17, requires a positive `version` (use 1) and direct command entries in the event list.
 
 - Fires on: `sessionStart`, camelCase with a lowercase first letter, unlike Claude Code and Codex's `SessionStart`. Fires when a new composer conversation is created.
 - Envelope: `{"additional_context": "<notice>"}`, snake_case, unlike Claude Code and Gemini's camelCase `additionalContext`.
@@ -144,7 +145,7 @@ git config core.hooksPath .githooks
 
 - Fires on: every `git commit`, before the commit object is created.
 - Output: `--ci` prints the drift notice, or `contextify: fresh` when clean, to stdout. Adding `--strict` makes the same command exit 1 on drift or a missing stamp instead of 0, which is what actually blocks a commit; without `--strict` the hook is informational only.
-- Timeout: none stated; it runs the same sub-100 ms fast path used everywhere else.
+- Timeout: none stated; measure the checker on the target repository; do not assume a fixed runtime.
 - Bypass caveats: `--no-verify` skips the hook entirely; `git commit` from some GUI clients does not run `core.hooksPath` hooks; a `rebase` replays commits without re-running `pre-commit` for each one. A fresh clone does not get this hook unless `core.hooksPath` itself is committed and someone runs the `git config` line once.
 - Source: `10x/.goal/research/ctx/04-auto-update-mechanics.md`, "Portable, agent-agnostic options" table.
 
@@ -159,12 +160,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch contextify
-        run: git clone --depth 1 https://github.com/Aboudjem/contextify /tmp/contextify
+        run: git clone --depth 1 --branch v0.1.0 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
       - name: ctx-check --ci
-        run: /tmp/contextify/skills/contextify/scripts/ctx-check --ci --strict
+        run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" --ci
 ```
 
-`--strict` is optional; drop it from the last step to keep the check informational, exit 0 always, drift still printed, rather than failing the workflow.
+The default is advisory. Add `--strict` to fail the job on drift or a missing stamp. Internal checker errors remain errors in both modes.
 
 - Fires on: whatever the workflow's `on:` block triggers, here every push and pull request.
 - Output: `--ci` prints the notice, or `contextify: fresh`, to stdout, and also appends the same text to `$GITHUB_STEP_SUMMARY` when that variable is set, which GitHub Actions runners set automatically. No extra step is needed to populate the summary.
@@ -177,4 +178,4 @@ jobs:
 Every snippet above writes the path as `<path-to-plugin>/skills/contextify/scripts/ctx-check`.
 
 - Installed via the Claude Code plugin marketplace: the exact install directory is not confirmed by 01, 04 or 07, so `<path-to-plugin>` for a marketplace install is `uncertain`. `install_hooks.sh` resolves and writes the absolute path itself at install time rather than requiring the user to know it in advance. Source: `docs/design/SCRIPTS-SPEC.md`, `install_hooks.sh` section.
-- Installed via `npx skills add`: the skill lands at `.claude/skills/contextify/` (project scope, the default) or `~/.claude/skills/contextify/` (global scope, `-g`), as a symlink to a canonical copy by default, or a full copy with `--copy`. So `<path-to-plugin>` is `.claude/skills/contextify` or `~/.claude/skills/contextify`. Source: `07-skeptic.md` claim 8b, `10x/.goal/research/ctx/03-comparables-and-skills-cli.md` Part B.
+- Installed via `npx skills add`: the skill lands at `.claude/skills/contextify/` (project scope, the default) or `~/.claude/skills/contextify/` (global scope, `-g`), as a symlink to a canonical copy by default, or a full copy with `--copy`. For this install layout the runner is `<installed-skill>/scripts/ctx-check`, without another `skills/contextify` segment. Source: `07-skeptic.md` claim 8b, `10x/.goal/research/ctx/03-comparables-and-skills-cli.md` Part B.

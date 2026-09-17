@@ -1,0 +1,57 @@
+{
+  "generatedAt": "2026-09-17T08:01:43Z",
+  "provenance": [
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:a126c15ce1ca7d10aa830f94274499e904323528571fd931369c0a27dc76aa1d",
+      "source": "Makefile:2",
+      "sourceDigest": "sha256:ea644888424fa09bcb7ed93829464c18566b469472fcfba9180cc8918585c88e"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 7,
+      "lineHash": "sha256:dae2a28673a5ad27b4b41e05f42a8a089a0c33ef6e045c089a05003d72c4306f",
+      "source": "Makefile:3",
+      "sourceDigest": "sha256:e2e10af3b5a9481b6d12663b17bc487c094396d22763ae5308779480cf7fd579"
+    }
+  ],
+  "records": [
+    {
+      "claims": [
+        "6291b5d8a587"
+      ],
+      "key": "makefile#targets",
+      "source": {
+        "file": "Makefile",
+        "line": 1
+      },
+      "value": {
+        "run": {
+          "prereqs": [],
+          "recipe": [
+            "python3 hello.py"
+          ]
+        }
+      }
+    },
+    {
+      "claims": [
+        "72a0e4b3c14f"
+      ],
+      "key": "tree#depth2",
+      "source": {
+        "file": ".",
+        "line": 1
+      },
+      "value": [
+        ".gitignore",
+        "Makefile",
+        "README.md",
+        "hello.py"
+      ]
+    }
+  ],
+  "unverifiedLines": [],
+  "version": 1
+}

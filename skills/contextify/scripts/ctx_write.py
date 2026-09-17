@@ -15,6 +15,7 @@ Exit codes:
 """
 
 import difflib
+import json
 import os
 import sys
 
@@ -40,6 +41,8 @@ def parse_args(argv):
     i = 0
     while i < len(argv):
         arg = argv[i]
+        if arg in ("--root", "--draft", "--targets", "--generated-by", "--tool-version", "--scope", "--hook") and (i + 1 >= len(argv) or argv[i + 1].startswith("--")):
+            raise ctxlib.CtxError("missing value for %s" % arg, 4)
         if arg in ("--help", "-h"):
             sys.stdout.write(USAGE)
             raise SystemExit(0)
@@ -80,6 +83,8 @@ def parse_args(argv):
             opts["force"] = True
         elif arg == "--recover":
             opts["recover"] = True
+        else:
+            raise ctxlib.CtxError("unsupported argument: %s" % arg, 4)
         i += 1
     return opts
 
@@ -175,15 +180,11 @@ def codex_chain(outputs):
 def check_preflight(root, targets, outputs):
     notes = []
     ceiling, source = ctxlib.codex_ceiling(root)
-    chain = codex_chain(outputs)
     if "codex" in targets:
-        notes.append("Codex instruction chain %s bytes against %s bytes (%s)"
-                     % (fmt(chain), fmt(ceiling), source))
-        if chain > ceiling:
-            raise ctxlib.CtxError(
-                "refused: the Codex instruction chain would be %s bytes; the ceiling is "
-                "%s bytes (%s). Codex truncates silently, so nothing is written."
-                % (fmt(chain), fmt(ceiling), source), 4)
+        problems = ctxlib.codex_chain_problems(root, outputs)
+        if problems:
+            raise ctxlib.CtxError("refused: " + problems[0], 4)
+        notes.append("Codex root-to-leaf chains fit %s bytes (%s)" % (fmt(ceiling), source))
     shadows = ctxlib.override_shadows(root)
     for shadow in shadows:
         notes.append("%s shadows the generated AGENTS.md at that level" % shadow)
@@ -200,7 +201,9 @@ def check_claims(root, outputs, scope, strict):
     for rel, text in outputs:
         if os.path.basename(rel) != ctxlib.AGENTS_MD:
             continue
-        for claim in ctxlib.extract_claims(text, rel, scope):
+        for claim in ctxlib.extract_claims(text, rel, "."):
+            if scope != ".":
+                ctxlib.safe_path(ctxlib.safe_path(root, scope), os.path.relpath(os.path.join(root, claim.cwd), os.path.join(root, scope)))
             ctxlib.resolve_claim(claim, root)
             if claim.status == "stale":
                 stale.append(claim)
@@ -222,24 +225,9 @@ def check_claims(root, outputs, scope, strict):
 
 
 def check_paths(root, outputs):
-    real_root = os.path.realpath(root)
+    ctxlib.validate_state_paths(root)
     for rel, _text in outputs:
-        path = os.path.join(root, rel)
-        parent = os.path.dirname(path) or root
-        probe = path if os.path.lexists(path) else parent
-        while not os.path.lexists(probe) and os.path.dirname(probe) != probe:
-            probe = os.path.dirname(probe)
-        real = os.path.realpath(probe)
-        if real != real_root and not real.startswith(real_root + os.sep):
-            raise ctxlib.CtxError(
-                "refused: target %s resolves to %s, outside the scope %s; no file is "
-                "written" % (rel, real, real_root), 5)
-        if os.path.islink(path):
-            link_real = os.path.realpath(path)
-            if not link_real.startswith(real_root + os.sep):
-                raise ctxlib.CtxError(
-                    "refused: target %s is a symlink to %s, outside the scope %s; no file "
-                    "is written" % (rel, link_real, real_root), 5)
+        ctxlib.safe_path(root, rel)
 
 
 def merge_all(root, outputs, stamp, yes, force):
@@ -247,7 +235,7 @@ def merge_all(root, outputs, stamp, yes, force):
     merged = []
     context_files = (stamp or {}).get("contextFiles") or {}
     for rel, rendered in outputs:
-        path = os.path.join(root, rel)
+        path = ctxlib.safe_path(root, rel)
         existing = ctxlib.read_text(path) if os.path.exists(path) else None
         if existing is not None:
             recorded = (context_files.get(rel) or {}).get("managedBlockDigest")
@@ -256,13 +244,13 @@ def merge_all(root, outputs, stamp, yes, force):
                     body = ctxlib.managed_body_of(existing)
                 except ctxlib.CtxError:
                     body = None
-                if body is not None and ctxlib.block_digest(body) != recorded:
+                if body is None or ctxlib.block_digest(body) != recorded:
                     if not (yes and force):
                         raise ctxlib.CtxError(
                             "conflict: the managed block in %s was edited since it was "
                             "stamped; rerun with --yes --force-managed to overwrite it, or "
                             "run /contextify accept to adopt the edit" % rel, 2)
-        keep = "@AGENTS.md" if rel == ctxlib.CLAUDE_MD else None
+        keep = "@AGENTS.md" if os.path.basename(rel) == ctxlib.CLAUDE_MD else None
         new_text, note = ctxlib.merge_block(existing, rendered, None, keep_first_line=keep)
         merged.append((rel, new_text, existing, note))
     return merged
@@ -320,16 +308,16 @@ def summary_block(verb, scope, size_class, targets, written, evidence_count,
 
 
 def do_recover(root):
-    journal_path = os.path.join(root, ctxlib.JOURNAL_REL)
+    journal_path = ctxlib.safe_path(root, ctxlib.JOURNAL_REL)
     journal = ctxlib.load_json_file(journal_path)
     if journal is None:
         sys.stdout.write("contextify: nothing to recover; there is no "
                          ".contextify/journal.json\n")
         return 0
-    entries = journal.get("targets") or []
+    entries = validate_journal(root, journal)
     for entry in entries:
         rel = entry.get("path")
-        path = os.path.join(root, rel)
+        path = ctxlib.safe_path(root, rel)
         current = ctxlib.read_text(path) if os.path.exists(path) else None
         current_digest = ctxlib.digest_bytes(current) if current is not None else None
         if current_digest not in (entry.get("previousDigest"), entry.get("newDigest")):
@@ -338,14 +326,15 @@ def do_recover(root):
     restored = []
     for entry in entries:
         rel = entry.get("path")
-        path = os.path.join(root, rel)
+        path = ctxlib.safe_path(root, rel)
         previous = entry.get("previous")
         if previous is None:
             if os.path.exists(path):
                 os.unlink(path)
                 restored.append(rel)
             continue
-        if ctxlib.write_if_changed(path, previous):
+        if ctxlib.read_text(path) != previous:
+            ctxlib.safe_write(root, rel, previous)
             restored.append(rel)
     os.unlink(journal_path)
     lines = ["contextify recover", "",
@@ -363,7 +352,13 @@ def main(argv):
     if root is None:
         return fail("%s is not inside a git repository" % start, 1)
 
+    ctxlib.validate_state_paths(root)
+    opts["scope"] = ctxlib.selected_scope(root, start, opts["scope"])
+    if opts["symlink"]:
+        return fail("--symlink is not implemented; no files changed", 4)
     if opts["recover"]:
+        if opts["dry_run"] or opts["json"]:
+            return fail("recovery does not support --dry-run or --json", 4)
         return do_recover(root)
 
     if not opts["draft"]:
@@ -384,7 +379,8 @@ def main(argv):
 def run(root, opts):
     scope = opts["scope"]
     size_class, file_count, unit_count = ctxlib.classify(root)
-    targets = resolve_targets(opts["targets"])
+    previous_stamp = ctxlib.load_json_file(ctxlib.safe_path(root, ctxlib.STAMP_REL)) or {}
+    targets = sorted(set(resolve_targets(opts["targets"])) | set(previous_stamp.get("targets", [])))
     agents_body, claude_body, nested = read_draft(opts["draft"])
 
     check_content_rules(agents_body, ctxlib.AGENTS_MD)
@@ -394,18 +390,38 @@ def run(root, opts):
     meta = ctxlib.Meta(ctxlib.tool_version(), opts["generated_by"] or "unknown",
                        ctxlib.now_rfc3339(), ctxlib.head_commit(root))
     outputs = build_outputs(root, targets, agents_body, claude_body, nested, meta)
+    if scope != ".":
+        outputs = [(scope + "/" + rel, text) for rel, text in outputs]
 
-    warnings = check_budgets(outputs, size_class)
-    notes = check_preflight(root, targets, outputs)
-    unverified = check_claims(root, outputs, scope, opts["strict"])
     check_paths(root, outputs)
+    if scope != ".":
+        for rel, _text in outputs:
+            ctxlib.safe_path(ctxlib.safe_path(root, scope), os.path.relpath(os.path.join(root, rel), os.path.join(root, scope)))
 
     stamp = ctxlib.load_json_file(os.path.join(root, ctxlib.STAMP_REL))
     merged = merge_all(root, outputs, stamp, opts["yes"], opts["force"])
     merged.append((".gitignore", ctxlib.gitignore_merged_text(root),
                    ctxlib.read_text(os.path.join(root, ".gitignore")), ""))
 
-    if opts["dry_run"]:
+    final_outputs = [(rel, text) for rel, text, _old, _note in merged if rel != ".gitignore"]
+    warnings = check_budgets(final_outputs, size_class)
+    notes = check_preflight(root, targets, final_outputs)
+    notes.extend(note for _, _, _, note in merged if note)
+    unverified = check_claims(root, final_outputs, scope, opts["strict"])
+    all_context_texts = {rel: ctxlib.read_text(ctxlib.safe_path(root, rel)) or ""
+                         for rel in ctxlib.present_context_files(root)}
+    all_context_texts.update(dict(final_outputs))
+    provenance, missing_provenance = ctxlib.provenance_for(root, all_context_texts, opts["draft"], scope,
+                                                         updated_files=set(dict(final_outputs)))
+    if opts["strict"] and missing_provenance:
+        raise ctxlib.CtxError("refused under --strict: %d managed lines lack provenance" % len(missing_provenance), 4)
+    unverified.extend(missing_provenance)
+    patches = [diff_text(rel, old, new_text) for rel, new_text, old, _note in merged if new_text != old]
+    if opts["dry_run"] or not opts["yes"]:
+        if opts["json"]:
+            sys.stdout.write(json.dumps({"result": "proposed", "scope": scope, "diff": patches, "notes": notes,
+                                        "unverified": len(unverified), "warnings": warnings}) + "\n")
+            return 0
         out = []
         for rel, new_text, old, _note in merged:
             patch = diff_text(rel, old, new_text)
@@ -427,6 +443,8 @@ def run(root, opts):
 
     written_texts = {rel: new_text for rel, new_text, _old, _n in merged}
     new_stamp, new_evidence = stamp_for(root, written_texts, meta, scope)
+    ctxlib.attach_provenance(new_stamp, new_evidence, provenance, missing_provenance)
+    new_stamp["targets"] = targets
 
     stamp_path = os.path.join(root, ctxlib.STAMP_REL)
     evidence_path = os.path.join(root, ctxlib.EVIDENCE_REL)
@@ -438,6 +456,9 @@ def run(root, opts):
         stamp is not None
         and ctxlib.stamp_signature(stamp) == ctxlib.stamp_signature(new_stamp))
     if not changed and stamp_is_current:
+        if opts["json"]:
+            sys.stdout.write(json.dumps({"result": "unchanged", "scope": scope, "diff": [], "unverified": len(unverified)}) + "\n")
+            return 0
         sys.stdout.write("\n".join(summary_block(
             "update", scope, size_class, targets, [], len(new_stamp["evidence"]),
             len(unverified), "/contextify check")) + "\n")
@@ -463,26 +484,28 @@ def run(root, opts):
                      "newDigest": ctxlib.digest_bytes(new_text)}
                     for rel, new_text, old in to_write],
     }
-    os.makedirs(os.path.join(root, ctxlib.STATE_DIR), exist_ok=True)
+    if not opts["json"]:
+        sys.stdout.write("".join(patches))
+        sys.stdout.flush()
+    check_paths(root, [(rel, text) for rel, text, _old in to_write])
+    os.makedirs(ctxlib.safe_path(root, ctxlib.STATE_DIR), exist_ok=True)
     journal_path = os.path.join(root, ctxlib.JOURNAL_REL)
-    ctxlib.atomic_write(journal_path, ctxlib.dump_json(ctxlib.JOURNAL_REL, journal))
+    ctxlib.safe_write(root, ctxlib.JOURNAL_REL, ctxlib.dump_json(ctxlib.JOURNAL_REL, journal))
 
     crash_after = os.environ.get("CONTEXTIFY_TEST_CRASH_AFTER")
     crash_after = int(crash_after) if crash_after and crash_after.isdigit() else 0
 
     written = []
     for index, (rel, new_text, _old) in enumerate(to_write, 1):
-        path = os.path.join(root, rel)
+        path = ctxlib.safe_path(root, rel)
         parent = os.path.dirname(path)
         if parent and not os.path.isdir(parent):
             os.makedirs(parent, exist_ok=True)
-        ctxlib.atomic_write(path, new_text)
+        ctxlib.safe_write(root, rel, new_text)
         written.append((rel, len(new_text.splitlines())))
         if crash_after and index >= crash_after:
             raise RuntimeError(
                 "CONTEXTIFY_TEST_CRASH_AFTER=%d: interrupted after %s" % (crash_after, rel))
-
-    os.unlink(journal_path)
 
     result = ctxlib.run_check(root, strict=False)
     if result.status != "fresh":
@@ -490,6 +513,8 @@ def run(root, opts):
         sys.stderr.write(ctxlib.notice_text(result) + "\n")
         return fail("the generated files did not pass their own check; the previous "
                     "generation was restored", 6)
+
+    os.unlink(ctxlib.safe_path(root, ctxlib.JOURNAL_REL))
 
     lines = summary_block("init", scope, size_class, targets, written,
                           len(new_stamp["evidence"]), len(unverified),
@@ -499,9 +524,10 @@ def run(root, opts):
     for note in notes:
         lines.append(ctxlib.label("Note") + note)
     if opts["json"]:
-        import json
         sys.stdout.write(json.dumps({
             "result": "written",
+            "diff": patches,
+            "notes": notes,
             "scope": scope,
             "size": size_class,
             "files": [{"path": rel, "lines": n} for rel, n in written],
@@ -513,26 +539,50 @@ def run(root, opts):
     return 0
 
 
+def validate_journal(root, journal):
+    if not isinstance(journal, dict) or journal.get("version") != 1 or (not isinstance(journal.get("root"), str) or os.path.realpath(journal["root"]) != os.path.realpath(root)) or not isinstance(journal.get("targets"), list):
+        raise ctxlib.CtxError("refused: malformed recovery journal", 6)
+    entries = journal["targets"]
+    seen = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            raise ctxlib.CtxError("refused: malformed recovery target", 6)
+        rel = entry.get("path")
+        ctxlib.safe_path(root, rel)
+        allowed = rel in (".gitignore", ctxlib.STAMP_REL, ctxlib.EVIDENCE_REL) or rel in ctxlib.GENERATED_FILES or any(rel.endswith("/" + target) for target in ctxlib.GENERATED_FILES)
+        previous = entry.get("previous")
+        if not allowed or rel in seen or (previous is not None and not isinstance(previous, str)):
+            raise ctxlib.CtxError("refused: invalid recovery target", 6)
+        seen.add(rel)
+        expected = ctxlib.digest_bytes(previous) if previous is not None else None
+        if expected != entry.get("previousDigest") or not isinstance(entry.get("newDigest"), str) or not __import__("re").fullmatch(r"sha256:[a-f0-9]{64}", entry["newDigest"]):
+            raise ctxlib.CtxError("refused: invalid recovery digest", 6)
+    return entries
+
+
 def rollback(root, journal):
-    for entry in journal.get("targets") or []:
-        path = os.path.join(root, entry["path"])
+    for entry in validate_journal(root, journal):
+        path = ctxlib.safe_path(root, entry["path"])
         if entry["previous"] is None:
             if os.path.exists(path):
                 os.unlink(path)
         else:
-            ctxlib.atomic_write(path, entry["previous"])
+            ctxlib.safe_write(root, entry["path"], entry["previous"])
+    journal_path = ctxlib.safe_path(root, ctxlib.JOURNAL_REL)
+    if os.path.exists(journal_path):
+        os.unlink(journal_path)
 
 
 def stamp_for(root, written_texts, meta, scope):
     """The stamp and evidence for a tree where written_texts are already on disk."""
     context_files = {}
-    candidates = list(ctxlib.GENERATED_FILES) + ctxlib.nested_agents_files(root)
+    candidates = list(ctxlib.present_context_files(root))
     for rel in sorted(set(list(written_texts) + candidates)):
         if rel == ".gitignore":
             continue
         text = written_texts.get(rel)
         if text is None:
-            path = os.path.join(root, rel)
+            path = ctxlib.safe_path(root, rel)
             if not os.path.exists(path):
                 continue
             text = ctxlib.read_text(path)
@@ -543,11 +593,14 @@ def stamp_for(root, written_texts, meta, scope):
     claims = []
     for rel in sorted(context_files):
         text = written_texts.get(rel) or ctxlib.read_text(os.path.join(root, rel)) or ""
-        for claim in ctxlib.extract_claims(text, rel, scope):
+        for claim in ctxlib.extract_claims(text, rel, "."):
             ctxlib.resolve_claim(claim, root)
             claims.append(claim)
     return ctxlib.build_stamp(root, records, claims, context_files, meta, scope)
 
 
 if __name__ == "__main__":
-    sys.exit(main(sys.argv[1:]))
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except ctxlib.CtxError as exc:
+        sys.exit(fail(exc.message, exc.code))

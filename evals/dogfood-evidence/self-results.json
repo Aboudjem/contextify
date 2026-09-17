@@ -1,0 +1,42 @@
+{
+  "date": "2026-09-17T08:15:38.014472+00:00",
+  "method": "Codex author and independent Codex source review; no Claude model session",
+  "generated_lines": {
+    "AGENTS.md": 27,
+    "CLAUDE.md": 4
+  },
+  "no_op_byte_identical": true,
+  "sha256": {
+    "AGENTS.md": "a0db9e76b21d5da6ff594bc52a11535e8305261a9aa746860b2ce3b52471e360",
+    "CLAUDE.md": "1c58e6817ebbf9ee9b63e85c24200d70ffdcf8e35b9490630c30ca7890d025fd",
+    ".contextify/evidence.json": "d43f12cdc4df2e70e74448923e0cc8a9e6873dbe759ae6c6097de1dc32d90987",
+    ".contextify/stamp.json": "907d669c35a0188b95d5d48c7d59169a84f8b965430b477e3942058bee8c2bdc",
+    ".gitignore": "ec25a520ea8cb8a31e5cc3a2449c56c229a580417680948971838941c1923076"
+  },
+  "records": [
+    {
+      "argv": [
+        "sh",
+        "skills/contextify/scripts/ctx-check"
+      ],
+      "exit": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "argv": [
+        "python3",
+        "skills/contextify/scripts/verify_claims.py",
+        "--root",
+        ".",
+        "--strict",
+        "--budget",
+        "AGENTS.md",
+        "CLAUDE.md"
+      ],
+      "exit": 0,
+      "stdout": "OK          AGENTS.md:6  python3 tests/test_ctx_check.py\nOK          AGENTS.md:7  python3 tests/test_verify_claims.py\nOK          AGENTS.md:8  python3 tests/test_manifests.py\nOK          AGENTS.md:9  python3 evals/check_skill.py skills/contextify/SKILL.md\nOK          AGENTS.md:10  sh skills/contextify/scripts/ctx-check\nOK          AGENTS.md:13  skills/contextify/SKILL.md\nOK          AGENTS.md:13  skills/contextify/scripts/ctx_write.py\nOK          AGENTS.md:14  skills/contextify/scripts/ctxlib.py\nOK          AGENTS.md:14  skills/contextify/scripts/ctx_check.py\nOK          AGENTS.md:15  hooks/hooks.json\nOK          AGENTS.md:18  .github/workflows/validate.yml\nOK          AGENTS.md:19  .github/workflows/release.yml\nOK          AGENTS.md:19  .claude-plugin/plugin.json\nOK          AGENTS.md:20  CONTRIBUTING.md\nOK          AGENTS.md:23  docs/design/SCRIPTS-SPEC.md\nOK          AGENTS.md:23  docs/design/DECISIONS.md\nOK          AGENTS.md:24  skills/contextify/references/update-in-place.md\n17 claims, 0 stale, 0 unverified\n",
+      "stderr": ""
+    }
+  ]
+}

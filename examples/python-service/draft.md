@@ -1,0 +1,14 @@
+# Repository instructions
+
+## Commands
+- Start the local service: `make serve`. <!-- src: Makefile:2 -->
+- Run all tests: `make test`. <!-- src: Makefile:4 -->
+- Run the health test alone: `make test-health`. <!-- src: Makefile:6 -->
+
+## Architecture
+- `service/__main__.py` calls the HTTP server in `service/server.py`. <!-- src: service/__main__.py:1 -->
+- `service/server.py` loads the bind settings from `service/config.py` and the handler from `service/handler.py`. <!-- src: service/server.py:2 -->
+- `service/handler.py` serializes the result from `service/health.py` as JSON for the health endpoint. <!-- src: service/handler.py:10 -->
+
+## Testing
+- `tests/test_health.py` checks the response payload; `tests/test_config.py` checks local binding. <!-- src: tests/test_health.py:6 -->

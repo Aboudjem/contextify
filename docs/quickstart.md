@@ -11,15 +11,15 @@ claude plugin marketplace add Aboudjem/contextify
 claude plugin install contextify@contextify-marketplace
 ```
 
-Any other agent, same skill directory:
+For Codex, the same skill directory:
 
 ```bash
-npx skills add Aboudjem/contextify -a claude-code
+npx skills add Aboudjem/contextify -a codex
 ```
 
 ## 2. Run it
 
-Run `/contextify init` in your project.
+Run `/contextify init` in Claude Code. In Codex, ask the installed Contextify skill to initialize the current repository.
 
 ## 3. What you see
 
@@ -88,8 +88,7 @@ Accept   unavailable until the stale command is corrected
 
 If the notice names a real change, run `/contextify update` to re-read the evidence and revise the
 affected content. If `AGENTS.md` is still right and only the evidence moved, a claim's source line
-shifted, a file it depended on was renamed, run `/contextify accept` instead: it re-digests the
-evidence and the stamp and leaves every context file byte-identical.
+shifted, run `/contextify accept` after reviewing the evidence: it re-digests metadata and leaves context files byte-identical. A removed or renamed source needs its provenance mapping updated first; accepting cannot invent the replacement source.
 
 ## Next
 

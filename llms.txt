@@ -36,7 +36,7 @@
 
 ## Examples
 
-- `examples/`: two worked examples, a Next.js app and a Python service, each showing a real `AGENTS.md`, its pointer files, and a drift notice after a deliberate change.
+- `examples/`: a real Next.js dogfood snapshot and explicitly labelled tiny/Python teaching fixtures, with full generated instructions, pointers and evidence.
 
 ## Optional
 

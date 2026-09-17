@@ -1,0 +1,10 @@
+{
+  "argv": [
+    "sh",
+    "$SCRIPTS/ctx-check",
+    "$SCRATCH/secure-my-app-fresh-context"
+  ],
+  "exit": 0,
+  "stdout": "",
+  "stderr": ""
+}

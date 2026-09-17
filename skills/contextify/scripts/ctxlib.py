@@ -164,10 +164,43 @@ def short_commit(commit):
 
 def read_text(path):
     try:
-        with open(path, "r", encoding="utf-8", errors="replace") as fh:
+        with open(path, "r", encoding="utf-8", errors="strict", newline="") as fh:
             return fh.read()
-    except (OSError, UnicodeDecodeError):
+    except UnicodeDecodeError:
+        raise CtxError("refused: file is not valid UTF-8: %s" % path, 4)
+    except OSError:
         return None
+
+
+def safe_path(root, rel):
+    """Validate every destination, including state, before touching its contents."""
+    if (not isinstance(rel, str) or not rel or os.path.isabs(rel)
+            or "\\" in rel or "\x00" in rel or ".." in rel.split("/")):
+        raise CtxError("refused: target %r is outside the scope" % rel, 5)
+    base = os.path.realpath(root)
+    path = os.path.join(base, rel)
+    if os.path.commonpath((base, os.path.realpath(path))) != base:
+        raise CtxError("refused: target %s resolves outside the scope" % rel, 5)
+    return path
+
+
+def selected_scope(root, start, requested="."):
+    inferred = os.path.relpath(os.path.realpath(start), os.path.realpath(root)).replace(os.sep, "/")
+    scope = requested if requested != "." else inferred
+    path = safe_path(root, scope)
+    if not os.path.isdir(path):
+        raise CtxError("refused: scope %s is not an existing directory" % scope, 4)
+    return os.path.relpath(path, os.path.realpath(root)).replace(os.sep, "/")
+
+
+def validate_state_paths(root):
+    for rel in (STAMP_REL, EVIDENCE_REL, JOURNAL_REL, ".gitignore"):
+        safe_path(root, rel)
+
+
+def safe_write(root, rel, text):
+    path = safe_path(root, rel)
+    atomic_write(path, text, root=root)
 
 
 def read_lines(path):
@@ -246,15 +279,26 @@ def fast_key(root):
     return "sha256:" + hashlib.sha256(raw).hexdigest()
 
 
+_check_file_cache = None
+
+def file_listing(root, *args):
+    key = (root,) + args
+    if _check_file_cache is not None and key in _check_file_cache:
+        return _check_file_cache[key]
+    raw = git(root, *args, binary=True)
+    if _check_file_cache is not None:
+        _check_file_cache[key] = raw
+    return raw
+
 def tracked_files(root):
-    raw = git(root, "ls-files", "-z", binary=True)
+    raw = file_listing(root, "ls-files", "-z")
     if not raw:
         return []
     return [p.decode("utf-8", "replace") for p in raw.split(b"\0") if p]
 
 
 def untracked_files(root):
-    raw = git(root, "ls-files", "--others", "--exclude-standard", "-z", binary=True)
+    raw = file_listing(root, "ls-files", "--others", "--exclude-standard", "-z")
     if not raw:
         return []
     return [p.decode("utf-8", "replace") for p in raw.split(b"\0") if p]
@@ -630,7 +674,7 @@ def normalize_env_example(root):
             continue
         keys = []
         try:
-            with open(path, "r", encoding="utf-8", errors="replace") as fh:
+            with open(path, "r", encoding="utf-8", errors="strict", newline="") as fh:
                 for raw in fh:
                     m = ENV_KEY_RE.match(raw)
                     if m:
@@ -889,7 +933,7 @@ SHELL_LANGS = ("", "sh", "bash", "shell", "console", "zsh")
 
 COMMAND_HEADS = ("npm", "pnpm", "yarn", "bun", "npx", "make", "just", "python", "python3",
                  "cargo", "go", "uv", "poetry", "node", "deno", "pytest", "docker", "git",
-                 "gradle", "mvn", "bundle", "rake", "task", "mise")
+                 "gradle", "mvn", "bundle", "rake", "task", "mise", "sh", "bash", "zsh")
 
 PM_BUILTINS = ("install", "i", "add", "remove", "rm", "update", "up", "run", "exec", "dlx",
                "create", "init", "publish", "pack", "why", "audit", "outdated", "link",
@@ -963,9 +1007,12 @@ def _raw_snippets(text, file_rel):
                 if body and not body.startswith("#"):
                     out.append((body.lstrip("$ ").strip(), idx, False))
             continue
-        negated = bool(NEGATION_RE.search(raw))
-        for span in INLINE_RE.findall(raw):
-            span = span.strip()
+        previous_end = 0
+        for match in INLINE_RE.finditer(raw):
+            prefix = raw[previous_end:match.start()]
+            negated = bool(NEGATION_RE.search(prefix))
+            previous_end = match.end()
+            span = match.group(1).strip()
             if span:
                 out.append((span, idx, negated))
     return out
@@ -1015,12 +1062,12 @@ def extract_claims(text, file_rel, scope="."):
         if " " in snippet or head in COMMAND_HEADS:
             for cwd, command in _split_command(snippet):
                 token = command.split()[0] if command.split() else ""
-                if token not in COMMAND_HEADS:
-                    continue
                 key = (command, cwd, file_rel)
                 if key in seen:
                     continue
                 seen.add(key)
+                base = os.path.dirname(file_rel) or scope
+                cwd = os.path.normpath(os.path.join(base, cwd))
                 claim = Claim(command, file_rel, line, cwd, "command")
                 claim.negated = negated
                 claims.append(claim)
@@ -1029,7 +1076,7 @@ def extract_claims(text, file_rel, scope="."):
             if key in seen:
                 continue
             seen.add(key)
-            claim = Claim(snippet, file_rel, line, scope, "path")
+            claim = Claim(snippet, file_rel, line, os.path.dirname(file_rel) or scope, "path")
             claim.negated = negated
             claims.append(claim)
     return claims
@@ -1077,6 +1124,9 @@ def _resolve_make(claim, root, target):
     targets = _makefile_targets(path)
     if target in targets:
         claim.status = "verified"
+    elif any(re.match(r"\s*-?include\s", line) for line in read_lines(path)):
+        claim.status = "unverified"
+        claim.reason = "Makefile includes are not resolved"
     else:
         claim.status = "stale"
         claim.reason = "%s declares no target %s" % (os.path.basename(path), target)
@@ -1137,6 +1187,7 @@ def _resolve_path(claim, root):
 
 
 def resolve_claim(claim, root):
+    safe_path(root, claim.cwd)
     tokens = claim.text.split()
     if not tokens:
         claim.status = "unverified"
@@ -1154,6 +1205,9 @@ def resolve_claim(claim, root):
             claim.resolver = "npm-builtin"
             claim.status = "unverified"
             claim.reason = "not a script invocation"
+    elif head in ("pnpm", "yarn", "bun") and len(tokens) > 1 and tokens[1].startswith("-"):
+        claim.status = "unverified"
+        claim.reason = "package manager flags and workspace selectors are not resolved"
     elif head in ("pnpm", "yarn", "bun"):
         if len(tokens) >= 3 and tokens[1] == "run":
             _resolve_script(claim, root, tokens[2], head)
@@ -1202,6 +1256,9 @@ def resolve_claim(claim, root):
         else:
             claim.status = "unverified"
             claim.reason = "npx downloads on demand; nothing in the repository proves it"
+    elif head == "make" and any(t.startswith("-") for t in tokens[1:]):
+        claim.status = "unverified"
+        claim.reason = "make flags and alternate working directories are not resolved"
     elif head == "make":
         args = [t for t in tokens[1:] if not t.startswith("-")]
         if args:
@@ -1209,6 +1266,9 @@ def resolve_claim(claim, root):
         else:
             claim.resolver = "make-default"
             claim.status = "unverified"
+    elif head == "just" and any(t.startswith("-") for t in tokens[1:]):
+        claim.status = "unverified"
+        claim.reason = "just flags are not resolved"
     elif head == "just":
         args = [t for t in tokens[1:] if not t.startswith("-")]
         if args:
@@ -1216,8 +1276,8 @@ def resolve_claim(claim, root):
         else:
             claim.resolver = "just-default"
             claim.status = "unverified"
-    elif head in ("python", "python3"):
-        if len(tokens) >= 3 and tokens[1] == "-m":
+    elif head in ("python", "python3", "sh", "bash", "zsh"):
+        if head in ("python", "python3") and len(tokens) >= 3 and tokens[1] == "-m":
             _resolve_python_module(claim, root, tokens[2])
         elif len(tokens) >= 2 and not tokens[1].startswith("-"):
             sub = Claim(tokens[1], claim.file, claim.line, claim.cwd, "path")
@@ -1244,12 +1304,37 @@ def resolve_claim(claim, root):
             claim.reason = "%s is not a known cargo verb" % verb
     elif head == "go":
         claim.resolver = "go-module"
-        claim.target = " ".join(tokens[1:2])
-        if not os.path.isfile(os.path.join(root, "go.mod")):
-            claim.status = "unverified"
-            claim.reason = "no go.mod in scope"
+        verb = tokens[1] if len(tokens) > 1 else ""
+        claim.target = verb
+        cwd = safe_path(root, claim.cwd)
+        module = cwd
+        while module != os.path.realpath(root) and not os.path.isfile(os.path.join(module, "go.mod")):
+            module = os.path.dirname(module)
+        if verb not in ("test", "build", "vet", "fmt"):
+            claim.reason = "unsupported Go verb"
+        elif not os.path.isfile(os.path.join(module, "go.mod")):
+            claim.reason = "no evidenced Go module in scope"
+        elif any(t.startswith("-") for t in tokens[2:]):
+            claim.reason = "Go flags require repository-specific evidence"
         else:
-            claim.status = "verified"
+            targets = tokens[2:] or ["."]
+            found = True
+            for target in targets:
+                if not target.startswith("."):
+                    found = False
+                    break
+                rel = os.path.normpath(os.path.join(claim.cwd, target.removesuffix("/...")))
+                target_path = safe_path(root, rel)
+                if target.endswith("/..."):
+                    has_source = any(any(f.endswith(".go") for f in files)
+                                     for _, _, files in os.walk(target_path))
+                else:
+                    has_source = os.path.isdir(target_path) and any(f.endswith(".go") for f in os.listdir(target_path))
+                if not has_source:
+                    found = False
+                    break
+            claim.status = "verified" if found else "stale"
+            claim.reason = "" if found else "Go target has no source files"
             claim.evidence_refs.append("go.mod#module+go")
     elif head in ("uv", "poetry"):
         claim.resolver = head + "-run"
@@ -1419,42 +1504,35 @@ def managed_body_of(text):
 
 
 def merge_block(existing, rendered, meta, keep_first_line=None):
-    """Replace only the managed block inside existing, preserving every other byte.
-
-    Returns (new_text, note). note is '' , 'created' or 'migration pending'.
-    """
+    """Splice owned character ranges; preserve all surrounding human bytes."""
     if existing is None:
         return rendered, "created"
-    old = find_block(existing)
-    new_block = find_block(rendered)
-    if new_block is None:
+    old, new = find_block(existing), find_block(rendered)
+    if new is None:
         raise CtxError("internal: rendered target carries no managed block", 1)
-    new_lines = rendered.splitlines()
-    new_chunk = new_lines[new_block.begin:new_block.end + 1]
-    old_lines = existing.splitlines()
-    if old is not None and old.body == new_block.body:
-        # D5: the header and the footer are rewritten only when the bytes between them
-        # change, so a re-run over unchanged evidence leaves the file alone, mtime
-        # included. Keeping the old chunk verbatim is what makes that true.
-        new_chunk = old_lines[old.begin:old.end + 1]
-    if old is None:
-        # A human file with no markers: insert after the first H1, or at the top.
-        insert_at = 0
-        for i, line in enumerate(old_lines):
-            if line.startswith("# "):
-                insert_at = i + 1
-                break
-        merged = old_lines[:insert_at] + [""] + new_chunk + old_lines[insert_at:]
-        text = "\n".join(merged).rstrip("\n") + "\n"
-        return text, "migration pending"
-    merged = old_lines[:old.begin] + new_chunk + old_lines[old.end + 1:]
-    if keep_first_line is not None:
-        if not merged or merged[0] != keep_first_line:
-            merged = [keep_first_line] + [l for l in merged if l != keep_first_line]
-    text = "\n".join(merged)
-    if existing.endswith("\n") or True:
-        text = text.rstrip("\n") + "\n"
-    return text, ""
+    new_lines = rendered.splitlines(keepends=True)
+    chunk = "".join(new_lines[new.begin:new.end + 1])
+    lines = existing.splitlines(keepends=True)
+    note = ""
+    if old is not None:
+        if old.body == new.body:
+            text = existing
+        else:
+            # The end marker's line terminator belongs to the existing boundary.
+            old_end = lines[old.end]
+            ending = "\r\n" if old_end.endswith("\r\n") else ("\n" if old_end.endswith("\n") else "")
+            chunk = chunk.rstrip("\r\n") + ending
+            text = "".join(lines[:old.begin]) + chunk + "".join(lines[old.end + 1:])
+    else:
+        # Insert after the first H1 while preserving each human character.
+        insert_at = next((i + 1 for i, line in enumerate(lines) if line.startswith("# ")), 0)
+        prefix, suffix = "".join(lines[:insert_at]), "".join(lines[insert_at:])
+        separator = "\n" if prefix and not prefix.endswith(("\n", "\r")) else ""
+        text = prefix + separator + chunk + suffix
+        note = "migration pending: human content retained outside the managed block"
+    if keep_first_line and (not text.splitlines() or text.splitlines()[0] != keep_first_line):
+        text = keep_first_line + "\n" + text
+    return text, note
 
 
 # --------------------------------------------------------------------------------------
@@ -1529,6 +1607,30 @@ def budget_report(root, rel, text):
     return problems
 
 
+def codex_chain_problems(root, outputs=()):
+    proposed = dict(outputs)
+    names = set(present_context_files(root)) | set(proposed) | set(override_shadows(root))
+    directories = {os.path.dirname(rel) for rel in names if os.path.basename(rel) in (AGENTS_MD, "AGENTS.override.md")}
+    ceiling, source = codex_ceiling(root)
+    problems = []
+    for directory in sorted(directories):
+        parts = directory.split("/") if directory else []
+        size = 0
+        for depth in range(len(parts) + 1):
+            parent = "/".join(parts[:depth])
+            regular = os.path.join(parent, AGENTS_MD)
+            override = os.path.join(parent, "AGENTS.override.md")
+            rel = override if os.path.isfile(safe_path(root, override)) else regular
+            text = proposed.get(rel)
+            if text is None:
+                text = read_text(safe_path(root, rel))
+            if text:
+                size += len(text.encode("utf-8")) + 2
+        if size > ceiling:
+            problems.append("Codex instruction chain %s is %s bytes; ceiling %s bytes (%s)" % (directory or ".", format(size, ","), format(ceiling, ","), source))
+    return problems
+
+
 def codex_ceiling(root):
     """project_doc_max_bytes from .codex/config.toml when it is set, else the default."""
     path = os.path.join(root, ".codex", "config.toml")
@@ -1552,6 +1654,147 @@ def override_shadows(root):
 # --------------------------------------------------------------------------------------
 # evidence and stamp IO (D14)
 # --------------------------------------------------------------------------------------
+
+def factual_lines(text):
+    block = find_block(text)
+    if not block:
+        return []
+    out = []
+    for number, line in enumerate(text.splitlines(), 1):
+        stripped = line.strip()
+        if number <= block.begin + 1 or number > block.end:
+            continue
+        if not stripped or stripped.startswith(("#", "<!--", "@")) or FOOTER_RE.match(stripped):
+            continue
+        out.append((number, line))
+    return out
+
+
+def generated_pointer_line(rel, line, texts):
+    """Only an exact owned pointer body may derive its support mechanically."""
+    for suffix, renderer in ((CURSOR_RULE, render_cursor_rule), (COPILOT_MD, render_copilot)):
+        if rel != suffix and not rel.endswith("/" + suffix):
+            continue
+        prefix = rel[:-len(suffix)]
+        target = prefix + AGENTS_MD
+        if target not in texts:
+            return False
+        expected = managed_body_of(renderer(Meta("", "", "", None)))
+        actual = managed_body_of(texts[rel])
+        return actual == expected and line in expected
+    return False
+
+
+def missing_provenance_lines(texts, entries):
+    supported = {(item.get("file"), item.get("lineHash")) for item in entries if isinstance(item, dict)}
+    missing = []
+    for rel, text in sorted(texts.items()):
+        for number, line in factual_lines(text):
+            identity = digest_bytes(line)
+            if (rel, identity) in supported or generated_pointer_line(rel, line, texts):
+                continue
+            missing.append({"file": rel, "line": number, "lineHash": identity,
+                            "reason": "no supplied per-line provenance"})
+    return missing
+
+
+def provenance_for(root, texts, draft_dir=None, scope=".", updated_files=None):
+    """Validate explicit line-hash<TAB>source:line mappings, retaining old identities."""
+    old = load_json_file(safe_path(root, EVIDENCE_REL)) or {}
+    mappings = {}
+    previous_entries = {(item.get("file"), item.get("lineHash"), item.get("source")): item
+                        for item in old.get("provenance", []) if isinstance(item, dict)}
+    for item in old.get("provenance", []):
+        if isinstance(item, dict):
+            mappings.setdefault(item.get("lineHash"), []).append(item.get("source"))
+    tsv = os.path.join(draft_dir, "evidence.tsv") if draft_dir else None
+    supplied = set()
+    if tsv and os.path.exists(tsv):
+        updated_identities = {digest_bytes(line) for rel, text in texts.items()
+                              if updated_files is None or rel in updated_files
+                              for line in text.splitlines()}
+        mappings = {key: value for key, value in mappings.items() if key not in updated_identities}
+        text = read_text(tsv)
+        if text is None:
+            raise CtxError("refused: evidence.tsv is not valid UTF-8", 4)
+        for n, row in enumerate(text.splitlines(), 1):
+            columns = row.split("\t")
+            if len(columns) != 2 or not re.fullmatch(r"(?:sha256:)?[a-f0-9]{64}", columns[0]):
+                raise CtxError("refused: malformed evidence.tsv row %d" % n, 4)
+            identity = columns[0] if columns[0].startswith("sha256:") else "sha256:" + columns[0]
+            supplied.add(identity)
+            source = columns[1]
+            if scope != ".":
+                source_match = re.fullmatch(r"(.+):([1-9][0-9]*)", source)
+                if source_match:
+                    source_path = source_match.group(1)
+                    if not source_path.startswith(scope + "/"):
+                        source_path = scope + "/" + source_path
+                    source = source_path + ":" + source_match.group(2)
+            mappings.setdefault(identity, []).append(source)
+    identities = {digest_bytes(line) for text in texts.values() for line in text.splitlines()}
+    if supplied - identities:
+        raise CtxError("refused: evidence.tsv contains an unknown draft line hash", 4)
+    mappings = {key: sources for key, sources in mappings.items() if key in identities}
+    for sources in mappings.values():
+        for source in sources:
+            match = re.fullmatch(r"(.+):([1-9][0-9]*)", source or "")
+            if not match:
+                raise CtxError("refused: invalid provenance source %r" % source, 4)
+            content = read_text(safe_path(root, match.group(1)))
+            if content is None or int(match.group(2)) > len(content.splitlines()):
+                raise CtxError("refused: provenance source %s does not exist" % source, 4)
+    provenance, missing = [], []
+    for rel, text in sorted(texts.items()):
+        for number, line in factual_lines(text):
+            identity = digest_bytes(line)
+            sources = mappings.get(identity, [])
+            if not (tsv and os.path.exists(tsv)) or (updated_files is not None and rel not in updated_files):
+                sources = [source for (file, line_hash, source) in previous_entries
+                           if file == rel and line_hash == identity]
+            if not sources:
+                if generated_pointer_line(rel, line, texts):
+                    continue
+                missing.append({"file": rel, "line": number, "lineHash": identity,
+                                "reason": "no supplied per-line provenance"})
+                continue
+            for source in sources:
+                match = re.fullmatch(r"(.+):([1-9][0-9]*)", source or "")
+                if not match:
+                    raise CtxError("refused: invalid provenance source %r" % source, 4)
+                path, source_line = match.group(1), int(match.group(2))
+                content = read_text(safe_path(root, path))
+                lines = content.splitlines() if content is not None else []
+                if source_line > len(lines):
+                    raise CtxError("refused: provenance source %s does not exist" % source, 4)
+                previous = previous_entries.get((rel, identity, source), {})
+                source_digest = (previous.get("sourceDigest") if updated_files is not None and rel not in updated_files else None)
+                provenance.append({"file": rel, "line": number, "lineHash": identity,
+                                   "source": source, "sourceDigest": source_digest or digest_bytes(lines[source_line - 1])})
+    return provenance, missing
+
+
+def attach_provenance(stamp, evidence, provenance, missing):
+    evidence["provenance"] = provenance
+    evidence["unverifiedLines"] = missing
+    stamp["provenance"] = provenance
+    stamp["unverifiedLines"] = missing
+    stamp["evidenceFileDigest"] = digest(evidence)
+
+
+def check_provenance(root, entries, result):
+    for item in entries:
+        if not isinstance(item, dict):
+            raise CtxError("invalid stored provenance", 1)
+        match = re.fullmatch(r"(.+):([1-9][0-9]*)", item.get("source", ""))
+        if not match:
+            raise CtxError("invalid stored provenance source", 1)
+        source = read_text(safe_path(root, match.group(1)))
+        lines = source.splitlines() if source is not None else []
+        n = int(match.group(2))
+        if n > len(lines) or digest_bytes(lines[n - 1]) != item.get("sourceDigest"):
+            result.changed.append("provenance:" + item["source"])
+
 
 def build_evidence(root, records, claims, generated_at):
     by_key = {}
@@ -1620,6 +1863,8 @@ def nested_agents_files(root):
     out = []
     for rel in tracked_files(root) + untracked_files(root):
         norm = rel.replace(os.sep, "/")
+        if any(part in (".contextify", ".goal", "eval", "evals", "snapshots") for part in norm.split("/")[:-1]):
+            continue
         if norm == AGENTS_MD or os.path.basename(norm) != AGENTS_MD:
             continue
         if any(norm.startswith(v) or ("/" + v) in norm for v in VENDOR_DIRS):
@@ -1631,7 +1876,10 @@ def nested_agents_files(root):
 def present_context_files(root):
     """Every context file that exists right now, with its digests."""
     out = {}
-    for rel in list(GENERATED_FILES) + nested_agents_files(root):
+    stored = load_json_file(safe_path(root, STAMP_REL)) or {}
+    candidates = list(GENERATED_FILES) + nested_agents_files(root) + list(stored.get("contextFiles", {}))
+    for rel in candidates:
+        safe_path(root, rel)
         norm = rel.replace(os.sep, "/")
         if not os.path.exists(os.path.join(root, norm)):
             continue
@@ -1649,8 +1897,13 @@ def stamp_now(root, generated_by, scope=".", meta=None):
     records = collect_evidence(root)
     claims = []
     for rel in sorted(context_files):
-        claims.extend(claims_for_file(root, rel, scope))
+        claims.extend(claims_for_file(root, rel, "."))
     stamp, evidence = build_stamp(root, records, claims, context_files, meta, scope)
+    texts = {rel: read_text(safe_path(root, rel)) or "" for rel in context_files}
+    provenance, missing = provenance_for(root, texts)
+    attach_provenance(stamp, evidence, provenance, missing)
+    existing = load_json_file(safe_path(root, STAMP_REL)) or {}
+    stamp["targets"] = existing.get("targets", [])
     return stamp, evidence, claims
 
 
@@ -1663,13 +1916,16 @@ def stamp_signature(stamp):
 
 
 def persist_stamp(root, stamp, evidence):
+    validate_state_paths(root)
     state = os.path.join(root, STATE_DIR)
     os.makedirs(state, exist_ok=True)
     wrote = []
-    if write_if_changed(os.path.join(root, EVIDENCE_REL), dump_json(EVIDENCE_REL, evidence)):
-        wrote.append(EVIDENCE_REL)
-    if write_if_changed(os.path.join(root, STAMP_REL), dump_json(STAMP_REL, stamp)):
-        wrote.append(STAMP_REL)
+    for rel, obj in ((EVIDENCE_REL, evidence), (STAMP_REL, stamp)):
+        path = safe_path(root, rel)
+        text = dump_json(rel, obj)
+        if read_text(path) != text:
+            safe_write(root, rel, text)
+            wrote.append(rel)
     return wrote
 
 
@@ -1677,7 +1933,7 @@ def persist_stamp(root, stamp, evidence):
 # journal and atomic writes (D7)
 # --------------------------------------------------------------------------------------
 
-def atomic_write(path, text):
+def atomic_write(path, text, root=None):
     directory = os.path.dirname(os.path.abspath(path)) or "."
     if not os.path.isdir(directory):
         os.makedirs(directory, exist_ok=True)
@@ -1685,6 +1941,8 @@ def atomic_write(path, text):
     try:
         with os.fdopen(fd, "w", encoding="utf-8", newline="") as fh:
             fh.write(text)
+        if root is not None:
+            safe_path(root, os.path.relpath(path, root))
         os.replace(tmp, path)
     except BaseException:
         try:
@@ -1714,16 +1972,19 @@ def gitignore_merged_text(root):
     block = "\n".join(GITIGNORE_BLOCK)
     if existing is None:
         return block + "\n"
-    if "# START contextify" in existing:
-        lines = existing.splitlines()
-        start = lines.index("# START contextify")
-        try:
-            end = lines.index("# END contextify", start)
-        except ValueError:
-            end = start
-        merged = lines[:start] + GITIGNORE_BLOCK + lines[end + 1:]
-        return "\n".join(merged).rstrip("\n") + "\n"
-    return existing.rstrip("\n") + "\n\n" + block + "\n"
+    lines = existing.splitlines(keepends=True)
+    starts = [i for i, line in enumerate(lines) if line.rstrip("\r\n") == "# START contextify"]
+    if starts:
+        start = starts[0]
+        ends = [i for i in range(start + 1, len(lines)) if lines[i].rstrip("\r\n") == "# END contextify"]
+        if not ends:
+            raise CtxError("refused: incomplete contextify gitignore block", 4)
+        end = ends[0]
+        if [l.rstrip("\r\n") for l in lines[start:end + 1]] == GITIGNORE_BLOCK:
+            return existing
+        return "".join(lines[:start]) + block + "\n" + "".join(lines[end + 1:])
+    separator = "" if existing.endswith("\n") else "\n"
+    return existing + separator + "\n" + block + "\n"
 
 
 # --------------------------------------------------------------------------------------
@@ -1801,7 +2062,17 @@ class CheckResult(object):
 
 
 def run_check(root, strict=False):
+    global _check_file_cache
+    _check_file_cache = {}
+    try:
+        return _run_check(root, strict)
+    finally:
+        _check_file_cache = None
+
+
+def _run_check(root, strict=False):
     """The slow path. Returns a CheckResult; raises CtxError for a broken check."""
+    validate_state_paths(root)
     result = CheckResult()
     stamp = load_json_file(os.path.join(root, STAMP_REL))
     if stamp is None:
@@ -1813,6 +2084,8 @@ def run_check(root, strict=False):
     result.scope = stamp.get("scope") or "."
 
     evidence = load_json_file(os.path.join(root, EVIDENCE_REL)) or {}
+    if stamp.get("evidenceFileDigest") != digest(evidence):
+        raise CtxError("evidence.json integrity mismatch; regenerate reviewed evidence", 1)
     old_values = {r.get("key"): r.get("value")
                   for r in (evidence.get("records") or []) if isinstance(r, dict)}
 
@@ -1833,7 +2106,7 @@ def run_check(root, strict=False):
 
     context_files = stamp.get("contextFiles") or {}
     for rel in sorted(context_files):
-        path = os.path.join(root, rel)
+        path = safe_path(root, rel)
         if not os.path.exists(path):
             result.missing.append(rel)
             continue
@@ -1842,15 +2115,16 @@ def run_check(root, strict=False):
         if text is None:
             result.missing.append(rel)
             continue
+        result.pointer.extend(budget_report(root, rel, text))
         try:
             body = managed_body_of(text)
         except CtxError as exc:
             result.edited.append("%s %s" % (rel, exc.message))
             continue
         recorded = entry.get("managedBlockDigest")
-        if recorded and body is not None and block_digest(body) != recorded:
+        if recorded and (body is None or block_digest(body) != recorded):
             result.edited.append(rel)
-        if rel == CLAUDE_MD:
+        if os.path.basename(rel) == CLAUDE_MD:
             first = text.splitlines()[0] if text.splitlines() else ""
             if first.strip() != "@AGENTS.md":
                 result.pointer.append("%s:1 no longer imports AGENTS.md" % rel)
@@ -1858,7 +2132,7 @@ def run_check(root, strict=False):
     for rel in sorted(context_files):
         if not os.path.exists(os.path.join(root, rel)):
             continue
-        for claim in claims_for_file(root, rel, result.scope):
+        for claim in claims_for_file(root, rel, "."):
             if claim.status == "stale":
                 result.stale.append({"file": claim.file, "line": claim.line,
                                      "text": claim.text, "reason": claim.reason})
@@ -1866,6 +2140,15 @@ def run_check(root, strict=False):
                 result.unverified.append({"file": claim.file, "line": claim.line,
                                           "text": claim.text, "reason": claim.reason})
 
+    if "codex" in stamp.get("targets", []):
+        result.pointer.extend(codex_chain_problems(root))
+    check_provenance(root, evidence.get("provenance", []), result)
+    current_texts = {rel: read_text(safe_path(root, rel)) or "" for rel in context_files
+                     if os.path.exists(safe_path(root, rel))}
+    try:
+        result.unverified.extend(missing_provenance_lines(current_texts, evidence.get("provenance", [])))
+    except CtxError:
+        pass  # malformed managed blocks were already reported above
     if result.has_findings:
         result.status = "drift"
     elif strict and result.unverified:
@@ -1882,6 +2165,8 @@ def notice_lines(result):
         findings.append((label("Stale"),
                          "%s:%s references %s" % (item["file"], item["line"],
                                                   _sanitize(item["text"]))))
+    for item in result.unverified:
+        findings.append((label("Unverified"), "%s:%s %s" % (item.get("file", "?"), item.get("line", "?"), _sanitize(item.get("text") or item.get("reason", "no provenance")))))
     for rel in result.missing:
         findings.append((label("Missing"), "%s no longer exists" % rel))
     for item in result.pointer:
@@ -1953,6 +2238,10 @@ def json_report(result):
         "stale": result.stale,
         "next": "/contextify update" if result.status == "drift" else "",
     }
+    if result.unverified:
+        payload["unverified"] = result.unverified
+    if result.pointer:
+        payload["pointer"] = result.pointer
     if result.edited:
         payload["edited"] = result.edited
     if result.missing:

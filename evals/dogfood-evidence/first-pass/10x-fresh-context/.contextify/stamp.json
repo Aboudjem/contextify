@@ -1,0 +1,146 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "package.json#scripts"
+        ],
+        "id": "fe2e26218133",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 5
+        },
+        "resolver": "npm-run",
+        "status": "verified",
+        "target": "scripts.test",
+        "text": "npm test"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "package.json#scripts"
+        ],
+        "id": "aa42a32d1566",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "npm-run",
+        "status": "verified",
+        "target": "scripts.validate",
+        "text": "npm run validate"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "package.json#scripts"
+        ],
+        "id": "67f226413a3d",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 7
+        },
+        "resolver": "npm-run",
+        "status": "verified",
+        "target": "scripts.sync:check",
+        "text": "npm run sync:check"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "8dfa4a80384d",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 9
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "scripts/sync-plugins.mjs",
+        "text": "scripts/sync-plugins.mjs"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "55435af670d3",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 9
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": ".claude-plugin/marketplace.json",
+        "text": ".claude-plugin/marketplace.json"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "b958f728ba0a",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 11
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "scripts/validate-marketplace.mjs",
+        "text": "scripts/validate-marketplace.mjs"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "1ae4f8c54e17",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 13
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "docs/SYNC.md",
+        "text": "docs/SYNC.md"
+      }
+    ]
+  },
+  "commit": null,
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:4c4f713faf0aee8d0fd678e8a8b964e2bad6d25d5b86f85a7f5f23f5f43e5927",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4a14114aae5fe3bf2c4c36c4472c7abab8fa7c92baf0bd998ebcfcdb9becfcd3"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:24abdf4c07513781d52a6c4341e2572d0d384a3bacbeb6c2cc2a50f628bd2dbb",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    ".github/workflows/deploy-pages.yml",
+    ".github/workflows/sync-plugins.yml",
+    ".github/workflows/validate.yml",
+    "package.json"
+  ],
+  "evidence": {
+    "ci#jobs": "sha256:798011f6386cd5cf38014744edbefb5a33439d0f1539a8d038c598c7f9a01eb5",
+    "package.json#scripts": "sha256:ee4e4cf412e7b55f9c1431137f5e34a1f66761dfbc464e8119db7bd75392c830",
+    "tree#depth2": "sha256:9e398d01933db37d6e3d7d486be87700666ada983eb7f01ebaf4e1c2347c27bc"
+  },
+  "evidenceFileDigest": "sha256:a47f174b47940aeed716bd2359d996df1d2588ccee5b3e0e222719ed20fb6cc6",
+  "fastKey": "sha256:4f044a396775b45b8ac04115e3ec6f54b1f9a78805de4578f9996611476e3679",
+  "generatedAt": "2026-09-17T07:33:04Z",
+  "generatedBy": "codex",
+  "normalizerVersion": 1,
+  "scope": ".",
+  "tool": "contextify",
+  "toolVersion": "0.1.0",
+  "version": 2
+}

@@ -1,0 +1,131 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "package.json#scripts"
+        ],
+        "id": "b9f25f57addb",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 5
+        },
+        "resolver": "pnpm-run",
+        "status": "verified",
+        "target": "scripts.dev",
+        "text": "pnpm run dev"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "package.json#scripts"
+        ],
+        "id": "6a3e9c3cd587",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "pnpm-run",
+        "status": "verified",
+        "target": "scripts.build",
+        "text": "pnpm run build"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "package.json#scripts"
+        ],
+        "id": "a722db970e74",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 7
+        },
+        "resolver": "pnpm-run",
+        "status": "verified",
+        "target": "scripts.lint",
+        "text": "pnpm run lint"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "dff706e3fc3b",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 9
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "package.json",
+        "text": "package.json"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "e16209f36ab9",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "vitest.config.ts",
+        "text": "vitest.config.ts"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "4de705e03ed8",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 12
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "prisma.config.ts",
+        "text": "prisma.config.ts"
+      }
+    ]
+  },
+  "commit": null,
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:01b9e8da424311f073789093b440c8fbe635d14e2cc266da1eca92d3ffd8e6cf",
+      "kind": "file",
+      "managedBlockDigest": "sha256:ee0b37fbc92cb98219e31405fcba3171660ea5d0853c6a26a2566c06298a9682"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:dda3f3f81654de19ece918ef4ef55d7032a8a864ac739578d944c6ff27c2d725",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    "package.json",
+    "tsconfig.json"
+  ],
+  "evidence": {
+    "lockfile#present": "sha256:46deb745b6c19126da3b08be84936d5e701c5076251ea774b6236d4beba9a943",
+    "package.json#deps": "sha256:c6115ba2b5405ce023ee6e0c75cebaf7451e4aacdbbfa7c50abb108e88a693fd",
+    "package.json#scripts": "sha256:999249d7d157bf19ec98264865702180de6c34eef21b3a41b4305ce390397759",
+    "tree#depth2": "sha256:842d5bc90797c2fbd2c8ebe9ec76e5ad5dd99351a3ecfea52df15f306315ff18",
+    "tsconfig#paths+strict+target+module": "sha256:e9f69bb9e95e952aee0f44087595446891c645b7eaaaa25f08688125c242778d"
+  },
+  "evidenceFileDigest": "sha256:20845d5a489891b03b2f923cb1f4894454163ee11674446c1f5c3ba4c887314b",
+  "fastKey": "sha256:72fb0b2f09ee70f9997eef0ae3af67fe2cc39c58a93a6cd879b854e04938e307",
+  "generatedAt": "2026-09-17T07:33:02Z",
+  "generatedBy": "codex",
+  "normalizerVersion": 1,
+  "scope": ".",
+  "tool": "contextify",
+  "toolVersion": "0.1.0",
+  "version": 2
+}

@@ -18,8 +18,8 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
   a hard ceiling of 150, enforced at generation and again by the opt-in CI gate.
 - **`.contextify/evidence.json` and `.contextify/stamp.json`**, so every generated claim traces to a
   file and a line, and a second run can diff against the first instead of starting over.
-- **`ctx-check`**, a two-tier, zero-token drift check: a POSIX `sh` fast path over `git ls-files -s`,
-  falling through to a python3 normalizer only on a mismatch, with a locked exit contract (`0` and
+- **`ctx-check`**, a zero-token drift check: a POSIX `sh` entry point runs the complete Python
+  evidence and claim checker on every invocation, with a locked exit contract (`0` and
   empty stdout for fresh, `0` with a bounded notice for drift, `3` for no stamp, `1` for a broken
   check, never `2`, never a model call, never a write).
 - **A `SessionStart` hook in the plugin** (`hooks/hooks.json`), matcher `startup|resume|clear`,
@@ -29,7 +29,7 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 - **`verify_claims.py`**, a lint over a context file's quoted commands and paths, with `--budget`
   enforcing the line ceilings.
 - **`install_hooks.sh`**, the one-command writer for all five opt-in snippets, idempotent, diff first,
-  `--yes` to skip the prompts.
+  `--yes` to apply the displayed proposal.
 - **Ten reference files** under `skills/contextify/references/`, loaded only when the run reaches the
   area they cover, so the skill body stays short.
 - **Tests and evals** covering the deterministic scripts and the skill's behavioral scenarios.

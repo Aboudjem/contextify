@@ -89,3 +89,15 @@ Quoted verbatim from the abstract of arXiv 2602.11988, "Evaluating AGENTS.md: Ar
 > "does not generally improve task success rates, while increasing inference cost by over 20% on average"
 
 No success-rate percentage may be quoted alongside this finding: the abstract states exactly one number, the cost increase, and gives no success-rate figure in either direction. Source: `10x/.goal/research/ctx/07-skeptic.md` claim 9 and correction 2.
+
+## The three questions contextify's own `init` asks
+
+At most three, each asked only when its trigger fires, each skippable. `update`, `check` and `accept` never ask. Nothing is asked about language, framework, package manager or ports when repository evidence answers it (source: `docs/design/DECISIONS.md` D13).
+
+| # | Trigger | Literal question | Default when skipped |
+|---|---|---|---|
+| 1 | More than one agent is evidenced by existing configuration, or none is | `Which agents should get pointer files?` | Claude Code plus any agent evidenced by existing repository configuration (`.cursor/`, `.github/`, `.gemini/`, `.codex/`). `AGENTS.md` is unconditional; the Cursor rule file is off |
+| 2 | No single-test invocation was evidenced, or a deploy or migration path exists with no recorded approval rule | `What must an agent know that the repository does not show, especially a single-test command or an action that needs approval?` | Skip. A human-supplied technical fact stays `unverified` until a file read during the run supports it |
+| 3 | The dry-run diff touches an existing file | `Apply the displayed changes?` | Apply safe additions and managed-block replacements, with conflicts excluded and visibly reported |
+
+`init` asks nothing at all when `--yes` supplies the decisions, when `--dry-run` asks only for a proposal, when every choice is explicit and only new non-conflicting files are created, or when input is not interactive (non-interactive without `--yes` produces a dry-run proposal, not a write). Outside Claude Code, where `AskUserQuestion` may not exist, ask each as plain text, wait once, and apply the default when no answer comes.

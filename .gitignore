@@ -27,3 +27,8 @@ venv/
 .cache/
 .omc/
 .claude/
+
+# START contextify
+.contextify/draft/
+.contextify/journal.json
+# END contextify

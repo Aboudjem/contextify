@@ -8,8 +8,8 @@ stderr bytes, wall time and the bytes left on disk. Nothing here asserts that a 
 exists and stops there.
 
 Numbered cases, in order:
-   1  a fresh stamped repo is silent through both the sh fast path and ctx_check.py
-   2  a dependency bump plus a key reorder falls through the fast path and is still fresh
+   1  a fresh stamped repo is silent through both the shell entry and ctx_check.py
+   2  a dependency bump plus a key reorder is evaluated by the complete checker and is still fresh
    3  a removed script drifts, names the key and the script, and stays inside the bounds
    4  an added dependency drifts on package.json#deps
    5  a quoted command whose script was deleted is Stale, and dead claims come first
@@ -17,7 +17,7 @@ Numbered cases, in order:
    7  a directory that is not a git repository is silent at exit 0
    8  --hook claude, --hook cursor and the stdin cwd field
    9  --ci, --ci --strict and --ci when fresh
-  10  the fast path's wall time
+  10  the checker's wall time
   11  a second write is byte-identical, and a human sentinel survives the third
   12  the line ceiling, in the linter and in the writer
   13  the Codex byte ceiling refuses before any write
@@ -63,6 +63,7 @@ DEVIATIONS
 """
 
 import json
+import hashlib
 import os
 import re
 import shutil
@@ -217,9 +218,12 @@ def pkg_json(data):
 
 BASIC_FILES = {
     "package.json": pkg_json(PKG),
-    "src/index.ts": "export const main = () => 0;\n",
+    "src/index.ts": "import './styles.css';\nexport const main = () => 0;\n",
     "src/styles.css": "body { margin: 0; }\n",
-    "README.md": "# fixture\n\nA throwaway repository.\n",
+    "README.md": "# fixture\n\nA throwaway repository.\n"
+                 "- Build the bundle: `npm run build`\n"
+                 "- Run the suite: `npm run test`\n"
+                 "- Lint the stylesheets: `npm run lint:css`\n",
 }
 
 DRAFT_BODY = """# fixture
@@ -230,13 +234,27 @@ DRAFT_BODY = """# fixture
 - Lint the stylesheets: `npm run lint:css`
 
 ## Architecture
-- `src/index.ts` is the single entry point and it imports `src/styles.css`.
+- `src/index.ts` imports `src/styles.css`.
 """
 
 
 def basic_repo():
     repo = new_repo(dict(BASIC_FILES))
     draft = new_draft(DRAFT_BODY)
+    evidence_rows = []
+    for line in DRAFT_BODY.splitlines():
+        if line.startswith("- Build"):
+            source = "README.md:4"
+        elif line.startswith("- Run"):
+            source = "README.md:5"
+        elif line.startswith("- Lint"):
+            source = "README.md:6"
+        elif line.startswith("- `src/index.ts`"):
+            source = "src/index.ts:1"
+        else:
+            continue
+        evidence_rows.append(hashlib.sha256(line.encode()).hexdigest() + "\t" + source)
+    write(draft, "evidence.tsv", "\n".join(evidence_rows) + "\n")
     result = ctx_write(repo, draft, targets="claude,gemini")
     if result.returncode != 0:
         raise AssertionError("fixture write failed: %s%s" % (result.stdout, result.stderr))
@@ -248,16 +266,16 @@ print("--- 1. a fresh stamped repo is silent, through both paths ---")
 repo1, draft1 = basic_repo()
 
 r = ctx_check(repo1)
-check("1a sh fast path on a fresh repo exits 0", r.returncode == 0,
+check("1a shell entry on a fresh repo exits 0", r.returncode == 0,
       "exit %d stderr=%r" % (r.returncode, r.stderr))
-check("1b sh fast path on a fresh repo prints nothing on stdout", r.stdout == "",
+check("1b shell entry on a fresh repo prints nothing on stdout", r.stdout == "",
       "stdout=%r" % r.stdout)
-check("1c sh fast path on a fresh repo prints nothing on stderr", r.stderr == "",
+check("1c shell entry on a fresh repo prints nothing on stderr", r.stderr == "",
       "stderr=%r" % r.stderr)
 
 r = ctx_check(repo1, env={"CONTEXTIFY_TRACE": "1"})
-check("1d the fast path really is the fast path (ctx_check.py never ran)",
-      "contextify-trace" not in r.stderr, "stderr=%r" % r.stderr)
+check("1d the shell delegates to the authoritative checker until a complete cache exists",
+      "contextify-trace" in r.stderr, "stderr=%r" % r.stderr)
 
 r = run([sys.executable, CTX_CHECK_PY, "--root", repo1], cwd=repo1)
 check("1e ctx_check.py on a fresh repo exits 0 with empty stdout",
@@ -284,7 +302,7 @@ git(repo2, "add", "-A")
 git(repo2, "commit", "-q", "-m", "bump left-pad and reorder scripts")
 
 r = ctx_check(repo2, env={"CONTEXTIFY_TRACE": "1"})
-check("2a the bump moves the index blob, so the fast path falls through to ctx_check.py",
+check("2a the bump moves the index blob; complete checker still resolves freshness",
       "contextify-trace" in r.stderr, "stderr=%r" % r.stderr)
 check("2b the normalizer suppresses the noise: exit 0", r.returncode == 0,
       "exit %d" % r.returncode)
@@ -486,7 +504,7 @@ check("9g --ci --strict when fresh exits 0", r.returncode == 0, "exit %d" % r.re
 
 
 # ======================================================================================
-print("--- 10. the fast path's wall time ---")
+print("--- 10. the checker's wall time ---")
 for _ in range(2):
     ctx_check(repo1)  # the spec's budget is a warm cache, so warm it before measuring
 samples = []
@@ -495,9 +513,9 @@ for _ in range(5):
     r = ctx_check(repo1)
     samples.append((time.perf_counter() - start) * 1000.0)
 median_ms = statistics.median(samples)
-print("       fast-path samples (ms): %s" % ", ".join("%.1f" % s for s in samples))
-print("       fast-path median (ms):  %.1f" % median_ms)
-check("10a the fast path's median is under 250 ms (target is 100 ms)", median_ms < 250.0,
+print("       checker samples (ms): %s" % ", ".join("%.1f" % s for s in samples))
+print("       checker median (ms):  %.1f" % median_ms)
+check("10a the checker's median is under 250 ms (target is 100 ms)", median_ms < 250.0,
       "median %.1f ms" % median_ms)
 
 
@@ -714,6 +732,20 @@ API_TOKEN=SECRET_VALUE_XYZ123
 def rich_repo():
     repo = new_repo(dict(RICH_FILES))
     draft = new_draft(DRAFT_BODY)
+    evidence_rows = []
+    for line in DRAFT_BODY.splitlines():
+        if line.startswith("- Build"):
+            source = "README.md:4"
+        elif line.startswith("- Run"):
+            source = "README.md:5"
+        elif line.startswith("- Lint"):
+            source = "README.md:6"
+        elif line.startswith("- `src/index.ts`"):
+            source = "src/index.ts:1"
+        else:
+            continue
+        evidence_rows.append(hashlib.sha256(line.encode()).hexdigest() + "\t" + source)
+    write(draft, "evidence.tsv", "\n".join(evidence_rows) + "\n")
     result = ctx_write(repo, draft, targets="claude")
     if result.returncode != 0:
         raise AssertionError("rich fixture failed: %s%s" % (result.stdout, result.stderr))
@@ -966,9 +998,12 @@ for rel in expected22[:3]:
         bad_json.append("%s (%s)" % (rel, exc))
 check("22c every JSON snippet parses as JSON", not bad_json, "; ".join(bad_json))
 
-no_path = [rel for rel in expected22 if CTX_CHECK not in read(repo22, rel)]
-check("22d every snippet calls this installation's ctx-check by absolute path",
-      not no_path, "missing the path: %s" % ", ".join(no_path))
+no_path = [rel for rel in expected22[:-1] if CTX_CHECK not in read(repo22, rel)]
+workflow22 = read(repo22, expected22[-1])
+portable22 = (CTX_CHECK not in workflow22 and '--branch v0.1.0' in workflow22
+              and '$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check' in workflow22)
+check("22d local hooks use this installation and CI fetches a portable release",
+      not no_path and portable22, "local missing: %s; portable CI=%s" % (no_path, portable22))
 
 first22 = snapshot(repo22)
 r = run(["bash", INSTALL_HOOKS, "--yes", "--targets", "codex,gemini,cursor,git,github",

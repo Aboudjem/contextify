@@ -1,192 +1,156 @@
 #!/usr/bin/env bash
-# install_hooks.sh - write the opt-in Codex / Gemini / Cursor / git / GitHub snippets.
-#
-# The plugin itself ships exactly one hook, the Claude Code SessionStart entry in
-# hooks/hooks.json (D19). Everything else is opt-in and lives in the target repository,
-# because four agents means four contracts that do not agree with each other.
-#
-# Every snippet calls this installation's ctx-check by absolute path, printed below.
-# Idempotent: a second run with the same arguments changes nothing.
-#
+# Opt-in hook installation. Without --yes, print a proposal and change nothing.
 # Usage: install_hooks.sh [--yes] [--targets codex,gemini,cursor,git,github] [PATH]
-# Exit: 0 written or already current, 2 bad arguments, 3 declined.
-set -u
-
+set -eu
 SELF_DIR="$(cd "$(dirname "$0")" && pwd)"
-CTX="$SELF_DIR/ctx-check"
+exec python3 - "$SELF_DIR/ctx-check" "$@" <<'PY'
+import difflib
+import json
+import os
+from pathlib import Path
+import shlex
+import subprocess
+import sys
+import tempfile
 
-YES=0
-TARGETS="codex,gemini,cursor,git,github"
-REPO="."
-while [ $# -gt 0 ]; do
-  case "$1" in
-    --yes|-y) YES=1 ;;
-    --targets) shift; TARGETS="${1:-}" ;;
-    --targets=*) TARGETS="${1#--targets=}" ;;
-    --help|-h)
-      sed -n '2,13p' "$0" | sed 's/^# \{0,1\}//'
-      exit 0
-      ;;
-    -*) echo "install_hooks.sh: unknown flag $1" >&2; exit 2 ;;
-    *) REPO="$1" ;;
-  esac
-  shift
-done
+runner, *args = sys.argv[1:]
+yes = False
+targets = 'codex,gemini,cursor,git,github'
+repo = '.'
+i = 0
+while i < len(args):
+    arg = args[i]
+    if arg in ('--help', '-h'):
+        print('Usage: install_hooks.sh [--yes] [--targets codex,gemini,cursor,git,github] [PATH]')
+        sys.exit(0)
+    if arg in ('--yes', '-y'):
+        yes = True
+    elif arg == '--targets':
+        i += 1
+        if i == len(args):
+            sys.exit('install_hooks.sh: --targets requires a value')
+        targets = args[i]
+    elif arg.startswith('--targets='):
+        targets = arg.split('=', 1)[1]
+    elif arg.startswith('-'):
+        sys.exit('install_hooks.sh: unknown flag ' + arg)
+    else:
+        repo = arg
+    i += 1
+selected = set(targets.split(','))
+if selected - {'codex', 'gemini', 'cursor', 'git', 'github'}:
+    sys.exit('install_hooks.sh: unknown target')
+root = Path(repo).resolve()
+if not root.is_dir():
+    sys.exit('install_hooks.sh: target is not a directory')
+git = subprocess.run(['git', '-C', str(root), 'rev-parse', '--show-toplevel'], capture_output=True, text=True)
+if git.returncode == 0:
+    root = Path(git.stdout.strip()).resolve()
 
-[ -d "$REPO" ] || { echo "install_hooks.sh: not a directory: $REPO" >&2; exit 2; }
-cd "$REPO" || exit 2
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-cd "$ROOT" || exit 2
+def safe(rel):
+    path = root / rel
+    if not path.resolve().is_relative_to(root):
+        raise ValueError('destination escapes repository: ' + rel)
+    if path.is_symlink():
+        raise ValueError('destination is a symlink: ' + rel)
+    return path
 
-echo "contextify install-hooks"
-echo ""
-echo "Scope    $ROOT"
-echo "Runner   $CTX"
-echo "Targets  $TARGETS"
-echo ""
+command = 'sh ' + shlex.quote(runner)
+plans = []
+def json_hook(rel, event, entry, extras=None):
+    path = safe(rel)
+    old = path.read_text() if path.exists() else None
+    value = json.loads(old) if old is not None else dict(extras or {})
+    if not isinstance(value, dict):
+        raise ValueError(rel + ' must contain a JSON object')
+    for key, default in (extras or {}).items():
+        if key in value and (type(value[key]) is not type(default) or value[key] != default):
+            raise ValueError(rel + ' has an unsupported ' + key)
+        value.setdefault(key, default)
+    hooks = value.setdefault('hooks', {})
+    if not isinstance(hooks, dict):
+        raise ValueError(rel + ' hooks must be an object')
+    entries = hooks.setdefault(event, [])
+    if not isinstance(entries, list):
+        raise ValueError(rel + ' event must be a list')
+    if entry not in entries:
+        entries.append(entry)
+    new = json.dumps(value, indent=2, ensure_ascii=False) + '\n'
+    # Preserve a human file byte-for-byte when the desired entry already exists.
+    if old is not None and json.loads(old) == value:
+        new = old
+    plans.append((rel, old, new, False))
 
-wants() {
-  case ",$TARGETS," in
-    *",$1,"*) return 0 ;;
-    *) return 1 ;;
-  esac
-}
-
-# write_file <path> <tmpfile>: show the diff, ask unless --yes, then replace atomically.
-# A file that already holds exactly these bytes is left alone, mtime included.
-write_file() {
-  target="$1"
-  staged="$2"
-  if [ -f "$target" ] && cmp -s "$target" "$staged"; then
-    echo "  unchanged  $target"
-    rm -f "$staged"
-    return 0
-  fi
-  if [ -f "$target" ] && grep -q "$CTX" "$target" 2>/dev/null; then
-    echo "  unchanged  $target (already calls this ctx-check)"
-    rm -f "$staged"
-    return 0
-  fi
-  if [ -f "$target" ]; then
-    echo "  CONFLICT   $target already exists and does not call this ctx-check."
-    echo "             Merge this by hand; contextify will not rewrite it:"
-    sed 's/^/             /' "$staged"
-    rm -f "$staged"
-    return 0
-  fi
-  if [ "$YES" -ne 1 ]; then
-    echo "  would write $target:"
-    sed 's/^/    /' "$staged"
-    rm -f "$staged"
-    return 0
-  fi
-  mkdir -p "$(dirname "$target")"
-  mv "$staged" "$target"
-  echo "  written    $target"
-}
-
-if wants codex; then
-  TMP="$(mktemp)"
-  cat > "$TMP" <<JSON
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "sh \"$CTX\" --hook codex"
-          }
-        ]
-      }
-    ]
-  }
-}
-JSON
-  write_file ".codex/hooks.json" "$TMP"
-fi
-
-if wants gemini; then
-  TMP="$(mktemp)"
-  cat > "$TMP" <<JSON
-{
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "name": "contextify-check",
-            "command": "sh \"$CTX\" --hook gemini",
-            "timeout": 5000
-          }
-        ]
-      }
-    ]
-  }
-}
-JSON
-  write_file ".gemini/settings.json" "$TMP"
-  echo "             Gemini reads GEMINI.md by default. To have it read AGENTS.md too,"
-  echo "             add this yourself; contextify never edits it silently:"
-  echo '             {"context": {"fileName": ["AGENTS.md", "GEMINI.md"]}}'
-fi
-
-if wants cursor; then
-  TMP="$(mktemp)"
-  cat > "$TMP" <<JSON
-{
-  "version": 1,
-  "hooks": {
-    "sessionStart": [
-      {
-        "command": "sh \"$CTX\" --hook cursor"
-      }
-    ]
-  }
-}
-JSON
-  write_file ".cursor/hooks.json" "$TMP"
-fi
-
-if wants git; then
-  TMP="$(mktemp)"
-  cat > "$TMP" <<HOOK
-#!/bin/sh
-# contextify pre-commit check. Advisory by default: it prints and lets the commit through.
-# Change --ci to "--ci --strict" to make drift block the commit.
-sh "$CTX" --ci
-exit 0
-HOOK
-  write_file ".githooks/pre-commit" "$TMP"
-  [ -f .githooks/pre-commit ] && chmod +x .githooks/pre-commit
-  echo "             Enable it with: git config core.hooksPath .githooks"
-fi
-
-if wants github; then
-  TMP="$(mktemp)"
-  cat > "$TMP" <<YML
-name: contextify check
-
-on:
-  pull_request:
-  push:
-    branches: [main]
-
+try:
+    if 'codex' in selected:
+        json_hook('.codex/hooks.json', 'SessionStart', {'hooks': [{'type': 'command', 'command': command + ' --hook codex'}]})
+    if 'gemini' in selected:
+        json_hook('.gemini/settings.json', 'SessionStart', {'matcher': '*', 'hooks': [{'type': 'command', 'name': 'contextify-check', 'command': command + ' --hook gemini', 'timeout': 5000}]})
+    if 'cursor' in selected:
+        json_hook('.cursor/hooks.json', 'sessionStart', {'command': command + ' --hook cursor'}, {'version': 1})
+    if 'git' in selected:
+        rel = '.githooks/pre-commit'
+        path = safe(rel)
+        old = path.read_text() if path.exists() else None
+        new = '#!/bin/sh\n# contextify: advisory by default; add --strict to block on drift.\nexec ' + command + ' --ci\n'
+        plans.append((rel, old, new, True))
+    if 'github' in selected:
+        rel = '.github/workflows/contextify-check.yml'
+        path = safe(rel)
+        old = path.read_text() if path.exists() else None
+        new = '''name: contextify check
+on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   contextify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Check that AGENTS.md still matches the repository
-        run: sh "$CTX" --ci --strict
-YML
-  write_file ".github/workflows/contextify-check.yml" "$TMP"
-  echo "             The workflow calls this machine's plugin path. On a runner, install"
-  echo "             the plugin first, or vendor ctx-check into the repository."
-fi
-
-echo ""
-echo "Next     sh \"$CTX\" --ci"
-exit 0
+      - name: Fetch released contextify
+        run: git clone --depth 1 --branch v0.1.0 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
+      - name: Check repository context (advisory; add --strict to enforce)
+        run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" --ci
+'''
+        plans.append((rel, old, new, False))
+    # Preflight the complete proposal, including conflicts, before the first write.
+    for rel, old, new, executable in plans:
+        if old is not None and old != new and not rel.endswith('.json'):
+            raise ValueError('existing file needs a manual merge: ' + rel)
+        safe(rel)
+    print('contextify install-hooks\n\nScope    ' + str(root) + '\nRunner   ' + runner)
+    for rel, old, new, executable in plans:
+        if old == new:
+            print('unchanged ' + rel)
+            continue
+        print(''.join(difflib.unified_diff((old or '').splitlines(True), new.splitlines(True), fromfile='a/' + rel, tofile='b/' + rel)), end='')
+    if yes:
+        for rel, old, new, executable in plans:
+            if old == new:
+                continue
+            path = safe(rel)
+            current = path.read_text() if path.exists() else None
+            if current != old:
+                raise ValueError('file changed during preparation: ' + rel)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            safe(rel)
+            fd, temp = tempfile.mkstemp(prefix='.contextify-', dir=path.parent)
+            try:
+                with os.fdopen(fd, 'w') as stream:
+                    stream.write(new)
+                os.chmod(temp, 0o755 if executable else (path.stat().st_mode & 0o777 if path.exists() else 0o644))
+                safe(rel)
+                os.replace(temp, path)
+            finally:
+                if os.path.exists(temp):
+                    os.unlink(temp)
+            print('written ' + rel)
+    else:
+        print('Proposal only; use --yes to apply.')
+    if 'git' in selected:
+        print('Enable git hook: git config core.hooksPath .githooks')
+    if 'gemini' in selected:
+        print('Optional Gemini settings, not applied: {"context":{"fileName":["AGENTS.md","GEMINI.md"]}}')
+except (ValueError, OSError, TypeError) as exc:
+    sys.exit('install_hooks.sh: refused: ' + str(exc))
+PY

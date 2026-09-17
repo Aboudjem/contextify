@@ -1,0 +1,139 @@
+{
+  "generatedAt": "2026-09-17T07:33:02Z",
+  "records": [
+    {
+      "claims": [],
+      "key": "lockfile#present",
+      "source": {
+        "file": "pnpm-lock.yaml",
+        "line": 1
+      },
+      "value": [
+        "pnpm-lock.yaml"
+      ]
+    },
+    {
+      "claims": [],
+      "key": "package.json#deps",
+      "source": {
+        "file": "package.json",
+        "line": 12
+      },
+      "value": {
+        "dependencies": [
+          "@prisma/adapter-pg",
+          "@prisma/client",
+          "@supabase/ssr",
+          "@supabase/supabase-js",
+          "class-variance-authority",
+          "clsx",
+          "lucide-react",
+          "next",
+          "next-intl",
+          "nuqs",
+          "pg",
+          "prisma",
+          "radix-ui",
+          "react",
+          "react-dom",
+          "tailwind-merge"
+        ],
+        "devDependencies": [
+          "@tailwindcss/postcss",
+          "@testing-library/jest-dom",
+          "@testing-library/react",
+          "@types/node",
+          "@types/pg",
+          "@types/react",
+          "@types/react-dom",
+          "@vitejs/plugin-react",
+          "babel-plugin-react-compiler",
+          "dotenv",
+          "eslint",
+          "eslint-config-next",
+          "jsdom",
+          "shadcn",
+          "tailwindcss",
+          "tsx",
+          "tw-animate-css",
+          "typescript",
+          "vitest"
+        ]
+      }
+    },
+    {
+      "claims": [
+        "6a3e9c3cd587",
+        "a722db970e74",
+        "b9f25f57addb"
+      ],
+      "key": "package.json#scripts",
+      "source": {
+        "file": "package.json",
+        "line": 5
+      },
+      "value": {
+        "build": "prisma generate && next build",
+        "dev": "next dev",
+        "lint": "eslint",
+        "postinstall": "prisma generate",
+        "start": "next start"
+      }
+    },
+    {
+      "claims": [
+        "4de705e03ed8",
+        "dff706e3fc3b",
+        "e16209f36ab9"
+      ],
+      "key": "tree#depth2",
+      "source": {
+        "file": ".",
+        "line": 1
+      },
+      "value": [
+        ".env.local.example",
+        ".gitignore",
+        "README.md",
+        "components.json",
+        "docs/architecture.md",
+        "docs/plans/",
+        "docs/research/",
+        "eslint.config.mjs",
+        "messages/en.json",
+        "messages/fr.json",
+        "next.config.ts",
+        "package.json",
+        "pnpm-lock.yaml",
+        "postcss.config.mjs",
+        "prisma.config.ts",
+        "prisma/schema.prisma",
+        "prisma/seed.ts",
+        "public/file.svg",
+        "public/globe.svg",
+        "public/next.svg",
+        "public/vercel.svg",
+        "public/window.svg",
+        "src/actions/",
+        "src/app/",
+        "src/components/",
+        "src/i18n/",
+        "src/lib/",
+        "src/middleware.ts",
+        "tests/unit/",
+        "tsconfig.json",
+        "vitest.config.ts"
+      ]
+    },
+    {
+      "claims": [],
+      "key": "tsconfig#paths+strict+target+module",
+      "source": {
+        "file": "tsconfig.json",
+        "line": 1
+      },
+      "value": "unverified"
+    }
+  ],
+  "version": 1
+}

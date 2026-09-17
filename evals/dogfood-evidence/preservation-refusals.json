@@ -1,0 +1,30 @@
+{
+  "10x": {
+    "--dry-run": {
+      "exit": 4,
+      "stdout": "",
+      "stderr": "contextify: refused: CLAUDE.md is 120 lines; the ceiling is 30\n"
+    },
+    "--yes": {
+      "exit": 4,
+      "stdout": "",
+      "stderr": "contextify: refused: CLAUDE.md is 120 lines; the ceiling is 30\n"
+    },
+    "all_copy_files_byte_identical": true,
+    "stamp_absent": true
+  },
+  "secure-my-app": {
+    "--dry-run": {
+      "exit": 4,
+      "stdout": "",
+      "stderr": "contextify: refused: AGENTS.md is 174 lines; the ceiling is 150 (Claude Code guidance: keep context files under 200 lines)\n"
+    },
+    "--yes": {
+      "exit": 4,
+      "stdout": "",
+      "stderr": "contextify: refused: AGENTS.md is 174 lines; the ceiling is 150 (Claude Code guidance: keep context files under 200 lines)\n"
+    },
+    "all_copy_files_byte_identical": true,
+    "stamp_absent": true
+  }
+}
