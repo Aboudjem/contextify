@@ -30,6 +30,13 @@ claude plugin marketplace add Aboudjem/contextify
 claude plugin install contextify@contextify-marketplace
 ```
 
+Or install via the 10x marketplace, which also lists eight other Claude Code tools. Inside a Claude Code session:
+
+```text
+/plugin marketplace add Aboudjem/10x
+/plugin install contextify@10x
+```
+
 For other agents, install the skill:
 
 ```bash
