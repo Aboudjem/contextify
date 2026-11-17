@@ -168,7 +168,7 @@ CI runs the same `make test` on every push and pull request. This repo's own `AG
 | Agent       | Install path                           | Tested                                                                                                    |
 | ----------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Claude Code | `claude plugin install contextify@10x` | 2026-11-17: plugin install, then a full `init` run ([run record](examples/python-service-0.3.0/README.md)) |
-| Codex       | `npx skills add Aboudjem/contextify`   | 2026-11-17: skill install, then Codex ran the drift check |
+| Codex       | `npx skills add Aboudjem/contextify`   | 2026-11-17: skill install, then Codex ran the drift check ([run log](examples/python-service-0.3.0/codex-run-0.3.1.md)) |
 
 Documented, not tested today: Gemini CLI and Cursor (both CLIs refused to sign in on the test machine), GitHub Copilot, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI. Their install codes are in [editor setup](docs/editors.md).
 

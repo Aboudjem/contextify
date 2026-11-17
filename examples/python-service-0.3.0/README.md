@@ -31,6 +31,7 @@ It copies the fixture into a temp repo and restores the written files and the co
 | [makefile-change.diff](makefile-change.diff)                                    | The edit that caused the drift                              |
 | [drift-notice-0.3.0.txt](drift-notice-0.3.0.txt)                                | The notice 0.3.0 printed in the original run                |
 | [drift-notice.txt](drift-notice.txt)                                            | The notice 0.3.1 prints when `replay.sh` runs               |
+| [codex-run-0.3.1.md](codex-run-0.3.1.md) | Codex installing the skill and running the same drift check |
 
 The files are renamed so an agent browsing this repo does not apply another repo's instructions.
 
