@@ -1,6 +1,6 @@
 # FAQ
 
-Tell every coding agent how your repo works. Then prove it is still true. Contextify writes a short `AGENTS.md`, optional supporting documents and editor pointers. Installed Git hooks check for drift at commit and push.
+Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens. Contextify writes a short `AGENTS.md`, optional supporting documents and editor pointers. Installed Git hooks check for drift at commit and push.
 
 ## Why AGENTS.md and not CLAUDE.md as the source
 

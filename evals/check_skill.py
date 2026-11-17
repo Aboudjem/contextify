@@ -39,7 +39,7 @@ DEFAULT_PATH = os.path.join("skills", NAME, "SKILL.md")
 # marketplace.json, SKILL.md). Compared against the RAW text: the point of locking it is that
 # the wording does not drift. tests/test_manifests.py parses the assignment below with
 # `^STORY = (.*?)\n\n`, so it stays one line followed by one blank line.
-STORY = "Tell every coding agent how your repo works. Then prove it is still true."
+STORY = "Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens."
 
 # The house section skeleton, in order. Each entry is (what the section DOES, the heading
 # prefixes that count as it). Matched on the lowercased heading with backticks stripped, so a

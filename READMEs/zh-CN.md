@@ -11,9 +11,9 @@
 
 <!-- may-lag -->
 
-**告诉每个编码代理你的仓库如何运作，然后证明这些说明仍然成立。**
+**当代理指令指向已不存在的东西时，你会知道。所有代理共用一个 AGENTS.md，再加一个不消耗 token 的本地检查。**
 
-contextify 根据代理会读取的文件，写出一份简短的 `AGENTS.md`。之后，一个本地脚本会在它过时时提醒你。
+contextify 根据你的仓库写出一份简短的 `AGENTS.md`。之后，当它提到的命令、目标或文件消失时，一个本地脚本会告诉你。
 
 ## 安装
 
@@ -40,33 +40,9 @@ npx skills add Aboudjem/contextify
 
 需要 Git、Bash 和 Python 3.11 或更高版本。不需要 Python 包，不需要 MCP 服务器，脚本不发起任何网络请求。
 
-### 手动运行漂移检查
-
-仓库是最新状态时，它什么也不输出。请在仓库根目录运行。
-
-作为插件安装时：
-
-```bash
-sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
-```
-
-通过 `npx skills add` 安装时（Codex、Cursor 和大多数其他代理使用 `.agents/skills`）：
-
-```bash
-sh .agents/skills/contextify/scripts/ctx-check
-```
-
-如果是 Claude Code 的技能安装，目录是 `.claude/skills/contextify`。加上 `--ci --strict`，漂移时退出码为 1。
-
-安装技能本身不算漂移。检查会忽略任何代理目录下 contextify 自己的副本，以及 `skills-lock.json`。你在 `.agents/skills` 中添加的其他技能会被计入，表现为一次 `tree#depth2` 变化。要忽略它们，加上这一行：
-
-```bash
-echo ".agents/" >> .gitignore
-```
-
 ### 示例报告
 
-2026-11-17，contextify 0.3.0 为一个小型 Python 服务写了 `AGENTS.md`。随后，其 `Makefile` 中的 `test-health` 目标被删除。0.3.2 对这个仓库输出如下内容，不消耗任何 token：
+2026-11-17，contextify 0.3.0 为一个小型 Python 服务写了 `AGENTS.md`。随后，其 `Makefile` 中的 `test-health` 目标被删除。0.3.3 对这个仓库输出如下内容，不消耗任何 token：
 
 ```text
 contextify: drift
@@ -90,6 +66,16 @@ sh examples/python-service-0.3.0/replay.sh
 ```
 
 [完整运行记录、文件以及引发漂移的修改](../examples/python-service-0.3.0/README.md)。
+
+Makefile 目标被删了，脚本改了名，测试挪了位置。你的代理还在照旧指令做事，每次失败都要浪费一轮。contextify 会先指出过时的那一行。
+
+### 为什么用它
+
+- **看到确切的过时行。** 通知给出文件、行号和失效的命令，就像上面的重放示例。
+- **只写一次。** 一个 `AGENTS.md`，Codex、Cursor 和 Copilot 直接读取，再为 Claude Code 和 Gemini CLI 加上简短的指针文件。
+- **运行免费。** 本地脚本，不调用模型，也不联网，仓库是最新时不输出任何内容。本仓库自己的 `AGENTS.md` 在 CI 中通过检查：`make test` 最后输出 `29 claims, 0 stale`。
+
+它解析命令、目标和文件，不读散文，也不运行命令。没有研究表明上下文文件能提高任务成功率，所以只保留能防止真实错误的行。
 
 ## 工作原理
 
@@ -147,6 +133,30 @@ bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes 
 ```
 
 [钩子与 CI](../docs/hooks.md)。
+
+### 手动运行漂移检查
+
+仓库是最新状态时，它什么也不输出。请在仓库根目录运行。
+
+作为插件安装时：
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+通过 `npx skills add` 安装时（Codex、Cursor 和大多数其他代理使用 `.agents/skills`）：
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+如果是 Claude Code 的技能安装，目录是 `.claude/skills/contextify`。加上 `--ci --strict`，漂移时退出码为 1。
+
+安装技能本身不算漂移。检查会忽略任何代理目录下 contextify 自己的副本，以及 `skills-lock.json`。你在 `.agents/skills` 中添加的其他技能会被计入，表现为一次 `tree#depth2` 变化。要忽略它们，加上这一行：
+
+```bash
+echo ".agents/" >> .gitignore
+```
 
 ## 证明
 

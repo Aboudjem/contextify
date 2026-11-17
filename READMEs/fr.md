@@ -11,9 +11,9 @@
 
 <!-- may-lag -->
 
-**Dites à chaque agent de code comment marche votre dépôt. Puis prouvez que c'est toujours vrai.**
+**Sachez quand vos instructions d'agent pointent vers quelque chose qui n'existe plus. Un seul AGENTS.md pour tous vos agents, et une vérification locale qui ne coûte aucun token.**
 
-contextify écrit un `AGENTS.md` court à partir des fichiers que votre agent lit. Un script local vous dit ensuite quand il devient périmé.
+contextify écrit un `AGENTS.md` court à partir de votre dépôt. Un script local vous dit ensuite quand une commande, une cible ou un fichier qu'il cite a disparu.
 
 ## Installation
 
@@ -40,33 +40,9 @@ Dans ces agents, il n'y a pas de préfixe `/contextify:`. Demandez en toutes let
 
 Il faut Git, Bash et Python 3.11 ou plus récent. Aucun paquet Python, aucun serveur MCP, aucun appel réseau dans les scripts.
 
-### Lancer la vérification de dérive à la main
-
-Elle n'affiche rien quand le dépôt est à jour. Lancez-la depuis la racine de votre dépôt.
-
-Installé comme plugin :
-
-```bash
-sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
-```
-
-Installé avec `npx skills add` (Codex, Cursor et la plupart des autres utilisent `.agents/skills`) :
-
-```bash
-sh .agents/skills/contextify/scripts/ctx-check
-```
-
-Pour une installation de skills dans Claude Code, le dossier est `.claude/skills/contextify`. Ajoutez `--ci --strict` pour qu'une dérive sorte avec le code 1.
-
-Installer le skill ne compte pas comme une dérive. La vérification ignore la copie de contextify dans tout dossier d'agent, ainsi que `skills-lock.json`. Les autres skills ajoutés dans `.agents/skills` comptent, comme un changement `tree#depth2`. Pour les ignorer, ajoutez cette ligne :
-
-```bash
-echo ".agents/" >> .gitignore
-```
-
 ### Exemple de rapport
 
-Le 2026-11-17, contextify 0.3.0 a écrit `AGENTS.md` pour un petit service Python. Puis la cible `test-health` a été supprimée de son `Makefile`. La version 0.3.2 affiche ceci pour ce dépôt, sans dépenser de token :
+Le 2026-11-17, contextify 0.3.0 a écrit `AGENTS.md` pour un petit service Python. Puis la cible `test-health` a été supprimée de son `Makefile`. La version 0.3.3 affiche ceci pour ce dépôt, sans dépenser de token :
 
 ```text
 contextify: drift
@@ -90,6 +66,16 @@ sh examples/python-service-0.3.0/replay.sh
 ```
 
 [Exécution complète, fichiers et modification qui l'a déclenchée](../examples/python-service-0.3.0/README.md).
+
+Une cible Makefile supprimée, un script renommé, un test déplacé. Vos agents suivent toujours les anciennes instructions, et chaque essai raté coûte un tour. contextify désigne d'abord la ligne périmée.
+
+### Pourquoi l'utiliser
+
+- **Voir la ligne périmée exacte.** L'avis donne le fichier, la ligne et la commande morte, comme dans le rejeu ci-dessus.
+- **L'écrire une fois.** Un seul `AGENTS.md` que Codex, Cursor et Copilot lisent directement, plus de courts renvois pour Claude Code et Gemini CLI.
+- **Gratuit à lancer.** Un script local, sans modèle ni appel réseau, silencieux quand le dépôt est à jour. Le `AGENTS.md` de ce dépôt la passe en CI : `make test` se termine par `29 claims, 0 stale`.
+
+Elle résout des commandes, des cibles et des fichiers. Elle ne lit pas la prose et ne lance pas les commandes. Aucune étude ne montre que les fichiers de contexte améliorent la réussite des tâches : gardez seulement les lignes qui évitent une vraie erreur.
 
 ## Fonctionnement
 
@@ -147,6 +133,30 @@ bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes 
 ```
 
 [Hooks et CI](../docs/hooks.md).
+
+### Lancer la vérification de dérive à la main
+
+Elle n'affiche rien quand le dépôt est à jour. Lancez-la depuis la racine de votre dépôt.
+
+Installé comme plugin :
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+Installé avec `npx skills add` (Codex, Cursor et la plupart des autres utilisent `.agents/skills`) :
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+Pour une installation de skills dans Claude Code, le dossier est `.claude/skills/contextify`. Ajoutez `--ci --strict` pour qu'une dérive sorte avec le code 1.
+
+Installer le skill ne compte pas comme une dérive. La vérification ignore la copie de contextify dans tout dossier d'agent, ainsi que `skills-lock.json`. Les autres skills ajoutés dans `.agents/skills` comptent, comme un changement `tree#depth2`. Pour les ignorer, ajoutez cette ligne :
+
+```bash
+echo ".agents/" >> .gitignore
+```
 
 ## Preuve
 

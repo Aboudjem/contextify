@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="1200" height="400" role="img"
-     aria-label="contextify: tell every coding agent how your repo works, then prove it is still true. One AGENTS.md carries the facts and every line cites a file. CLAUDE.md, GEMINI.md, the Cursor rule and the Copilot instructions point at it. ctx-check is silent while the evidence still holds.">
+     aria-label="contextify: know when your agent instructions point at something gone. One AGENTS.md carries the facts and every line cites a file. CLAUDE.md, GEMINI.md, the Cursor rule and the Copilot instructions point at it. ctx-check is silent while the evidence still holds.">
   <title>contextify</title>
   <desc>Dark-mode hero. One source file carries the repository facts and every claim names the
   file and line it came from. Every other agent file is a thin pointer at that one source. The
@@ -111,12 +111,12 @@
   <line class="flowline" x1="44" y1="88" x2="1156" y2="88" stroke="url(#cx-rule)"
         stroke-width="1.25" stroke-dasharray="3 9"/>
 
-  <text class="disp lede" x="44" y="126" textLength="1112" lengthAdjust="spacing">Tell every coding agent how your repo works. Then prove it is still true.</text>
+  <text class="disp lede" x="44" y="126" textLength="1112" lengthAdjust="spacing">Know when your agent instructions point at something gone. 0 tokens to check.</text>
   <text class="mono eyeb" x="44" y="154" xml:space="preserve">AGENTS.md  -&gt;  CLAUDE.md  GEMINI.md  .cursor  copilot   |   <tspan fill="#E879DF">ctx-check: 0 tokens when fresh</tspan></text>
 
   <text class="mono colhd" x="44"  y="184">ONE SOURCE</text>
   <text class="mono colhd" x="448" y="184">EVERY AGENT</text>
-  <text class="mono colhd" x="852" y="184">STILL TRUE</text>
+  <text class="mono colhd" x="852" y="184">STILL THERE</text>
 
   <rect x="44" y="196" width="340" height="144" rx="10" class="card"/>
   <rect x="44" y="214" width="3" height="108" rx="1.5" fill="#E879DF"/>
@@ -191,8 +191,8 @@
     <rect x="852" y="288" width="3" height="36" rx="1.5" fill="#E879DF"/>
     <text class="mono body" x="874" y="296">$ ctx-check</text>
     <rect class="stB" x="874" y="310" width="7" height="7" rx="2" fill="#E879DF"/>
-    <text class="mono" x="890" y="317" font-size="12" fill="#E879DF">scripts.test moved, 3 stale</text>
-    <text class="mono cite" x="874" y="333">8 lines, then: contextify update</text>
+    <text class="mono" x="890" y="317" font-size="12" fill="#E879DF">contextify: drift</text>
+    <text class="mono cite" x="874" y="333">Stale AGENTS.md:4 pnpm -r test</text>
   </g>
 
   <text class="mono tag" x="44" y="372">one file holds the facts  &#183;  the rest point at it  &#183;  every line cites a file</text>

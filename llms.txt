@@ -1,6 +1,6 @@
 # contextify
 
-> Tell every coding agent how your repo works. Then prove it is still true.
+> Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.
 >
 > contextify is an Agent Skill that writes a short AGENTS.md and thin editor pointers. It reuses
 > accurate existing documentation first and can add docs/context/architecture.md or workflows.md

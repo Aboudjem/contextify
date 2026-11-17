@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" role="img"
-     aria-label="contextify: tell every coding agent how your repo works, then prove it is still true. One AGENTS.md carries the facts, every other agent file points at it, and the commit/push check costs nothing while the evidence still holds.">
+     aria-label="contextify: know when your agent instructions point at something gone. One AGENTS.md carries the facts, every other agent file points at it, and the commit/push check costs nothing while the evidence still holds.">
   <title>contextify</title>
   <desc>Static social preview card. It gets rasterised, so nothing here animates. One source file
   carries the repository facts with a citation on every line, every other agent file is a thin
@@ -84,13 +84,12 @@
 
   <line x1="64" y1="152" x2="1216" y2="152" stroke="url(#cx-rule)" stroke-width="1.5"/>
 
-  <text class="disp lede"  x="64" y="228">One file the agents read.</text>
-  <text class="disp lede2" x="64" y="284">One check that proves it.</text>
-  <text class="disp story" x="64" y="332">Tell every coding agent how your repo works. Then prove it is still true.</text>
+  <text class="disp lede"  x="64" y="244" font-size="54">Is your CLAUDE.md still true?</text>
+  <text class="disp story" x="64" y="306" font-size="27">A local check names the line that points at something gone. No tokens spent.</text>
 
   <text class="mono colhd" x="64"  y="382">ONE SOURCE</text>
   <text class="mono colhd" x="466" y="382">EVERY AGENT</text>
-  <text class="mono colhd" x="868" y="382">STILL TRUE</text>
+  <text class="mono colhd" x="868" y="382">STILL THERE</text>
 
   <rect x="64" y="396" width="338" height="140" rx="12" class="card"/>
   <rect x="64" y="416" width="4" height="100" rx="2" fill="#E879DF"/>
@@ -130,8 +129,8 @@
   <rect x="868" y="490" width="4" height="30" rx="2" fill="#E879DF"/>
   <text class="mono body" x="892" y="500">$ ctx-check</text>
   <rect x="892" y="514" width="8" height="8" rx="2" fill="#E879DF"/>
-  <text class="mono" x="910" y="522" font-size="15" fill="#E879DF">8 lines, names the file</text>
+  <text class="mono" x="910" y="522" font-size="15" fill="#E879DF">Stale AGENTS.md:4 pnpm -r test</text>
 
-  <text class="mono tag" x="64" y="596">every line cites a file  &#183;  no model, no network  &#183;  runs offline</text>
+  <text class="mono" x="64" y="596" font-size="20" fill="#E879DF">$ /contextify:contextify init</text>
   <text class="mono tag" x="1216" y="596" text-anchor="end">github.com/Aboudjem/contextify</text>
 </svg>

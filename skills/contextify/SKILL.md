@@ -1,26 +1,26 @@
 ---
 name: contextify
 description: >-
-  Tell every coding agent how your repo works. Then prove it is still true. Use when the user says
-  "contextify", "contextify this repo", "write an AGENTS.md", "generate CLAUDE.md", "agent context",
-  or "context file is stale", or when a repo has no instruction file at all, or the one it has names
-  a command that no longer exists. Writes one AGENTS.md plus thin pointers for Claude Code, Codex,
-  Gemini CLI, Cursor and Copilot, so the same instructions are never copied into five files. Every
-  line traces to a file the run read, or it is omitted, or it is labelled unverified. The drift check
-  is a shell script: it spends zero tokens, calls no model, and never rewrites a file on its own.
-  Use this when a one-off /init file needs a committed stamp, supporting architecture or workflow
-  docs, or checks at Git commit and push instead of session startup.
+  Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a
+  local check that costs no tokens. Use when the user says "contextify", "contextify this repo", "write
+  an AGENTS.md", "generate CLAUDE.md", "agent context", or "context file is stale", or when a repo has no
+  instruction file at all, or the one it has names a command that no longer exists. Writes one AGENTS.md
+  plus thin pointers for Claude Code, Codex, Gemini CLI, Cursor and Copilot, so the same instructions are
+  never copied into five files. Every line traces to a file the run read, or it is omitted, or it is
+  labelled unverified. The drift check is a shell script: it spends zero tokens, calls no model, and
+  never rewrites a file on its own. Use this when a one-off /init file needs a committed stamp,
+  supporting architecture or workflow docs, or checks at Git commit and push instead of session startup.
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
-  version: "0.3.2"
+  version: "0.3.3"
 ---
 
 # contextify
 
 ## Overview
 
-In one line, for anyone: **Tell every coding agent how your repo works. Then prove it is still true.**
+In one line, for anyone: **Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.**
 
 Writing a context file is only the first step. Later, its commands and paths can drift away from
 the repository. A context file that confidently names a deleted script
@@ -73,7 +73,7 @@ an agent could get wrong; a repository the user does not own and does not want w
 
 **Against the Claude Code `/init` flow inspected on 2026-09-16:** `/init` writes `CLAUDE.md`, for Claude Code, in one pass,
 and it is good at that. It records nothing about where a line came from, so no later run can tell
-whether the line is still true, and it serves one agent. contextify writes the file every agent
+whether what it names still exists, and it serves one agent. contextify writes the file every agent
 reads, keeps the per-line evidence, and ships the check. This comparison is a dated observation, not a claim about later `/init` releases. The full matrix is in `references/comparison.md`.
 
 ## The run

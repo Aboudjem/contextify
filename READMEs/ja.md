@@ -11,9 +11,9 @@
 
 <!-- may-lag -->
 
-**どのコーディングエージェントにもリポジトリの仕組みを伝え、その内容が今も正しいことを証明します。**
+**エージェント向けの指示が、もう存在しないものを指したときに分かります。すべてのエージェントに 1 つの AGENTS.md と、トークンを使わないローカルチェック。**
 
-contextify は、エージェントが読むファイルから短い `AGENTS.md` を 1 つ書きます。その後、内容が古くなるとローカルスクリプトが知らせます。
+contextify はリポジトリから短い `AGENTS.md` を 1 つ書きます。その後、そこに書かれたコマンド、ターゲット、ファイルが消えると、ローカルスクリプトが知らせます。
 
 ## インストール
 
@@ -40,33 +40,9 @@ npx skills add Aboudjem/contextify
 
 必要なのは Git、Bash、Python 3.11 以降です。Python パッケージも MCP サーバーも不要で、スクリプトはネットワークに接続しません。
 
-### ドリフトチェックを手動で実行する
-
-リポジトリが最新なら何も表示しません。リポジトリのルートで実行してください。
-
-プラグインとしてインストールした場合:
-
-```bash
-sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
-```
-
-`npx skills add` でインストールした場合 (Codex、Cursor など多くは `.agents/skills` を使います):
-
-```bash
-sh .agents/skills/contextify/scripts/ctx-check
-```
-
-Claude Code にスキルとしてインストールした場合、フォルダは `.claude/skills/contextify` です。`--ci --strict` を付けると、ドリフト時に終了コード 1 を返します。
-
-スキルのインストール自体はドリフトになりません。チェックは、各エージェントフォルダにある contextify 自身のコピーと `skills-lock.json` を無視します。`.agents/skills` に追加した他のスキルは `tree#depth2` の変更として数えます。無視したい場合は、次の 1 行を追加します。
-
-```bash
-echo ".agents/" >> .gitignore
-```
-
 ### レポートの例
 
-2026-11-17、contextify 0.3.0 が小さな Python サービスの `AGENTS.md` を書きました。その後、`Makefile` から `test-health` ターゲットを削除しました。0.3.2 はこのリポジトリに対して次を表示します。トークンは使いません。
+2026-11-17、contextify 0.3.0 が小さな Python サービスの `AGENTS.md` を書きました。その後、`Makefile` から `test-health` ターゲットを削除しました。0.3.3 はこのリポジトリに対して次を表示します。トークンは使いません。
 
 ```text
 contextify: drift
@@ -90,6 +66,16 @@ sh examples/python-service-0.3.0/replay.sh
 ```
 
 [実行の全記録、ファイル、原因となった変更](../examples/python-service-0.3.0/README.md)。
+
+Makefile のターゲットが削除された。スクリプトの名前が変わった。テストが移動した。エージェントは古い指示に従い続け、失敗するたびに 1 ターンを使います。contextify は先に古い行を示します。
+
+### 使う理由
+
+- **古い行をそのまま特定。** 通知はファイル、行、使えなくなったコマンドを示します。上の再現例のとおりです。
+- **書くのは 1 回。** Codex、Cursor、Copilot が直接読む `AGENTS.md` を 1 つと、Claude Code と Gemini CLI 向けの短いポインター。
+- **実行は無料。** モデルもネットワーク呼び出しも使わないローカルスクリプトで、リポジトリが最新なら何も表示しません。このリポジトリの `AGENTS.md` は CI で通っています。`make test` の最後は `29 claims, 0 stale` です。
+
+チェックするのはコマンド、ターゲット、ファイルです。文章は読まず、コマンドも実行しません。コンテキストファイルでタスク成功率が上がることを示した研究はありません。実際のミスを防ぐ行だけを残してください。
 
 ## 仕組み
 
@@ -147,6 +133,30 @@ bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes 
 ```
 
 [フックと CI](../docs/hooks.md)。
+
+### ドリフトチェックを手動で実行する
+
+リポジトリが最新なら何も表示しません。リポジトリのルートで実行してください。
+
+プラグインとしてインストールした場合:
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+`npx skills add` でインストールした場合 (Codex、Cursor など多くは `.agents/skills` を使います):
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+Claude Code にスキルとしてインストールした場合、フォルダは `.claude/skills/contextify` です。`--ci --strict` を付けると、ドリフト時に終了コード 1 を返します。
+
+スキルのインストール自体はドリフトになりません。チェックは、各エージェントフォルダにある contextify 自身のコピーと `skills-lock.json` を無視します。`.agents/skills` に追加した他のスキルは `tree#depth2` の変更として数えます。無視したい場合は、次の 1 行を追加します。
+
+```bash
+echo ".agents/" >> .gitignore
+```
 
 ## 証拠
 

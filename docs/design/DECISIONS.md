@@ -343,10 +343,12 @@ A single-test example additionally validates the literal test path, and a name-f
 **Decision.**
 
 ```text
-Tell every coding agent how your repo works. Then prove it is still true.
+Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.
 ```
 
-73 characters, counted with `python3 -c "print(len(s))"`. Pure ASCII, no comma, no apostrophe, no em dash, so it survives byte-identically through JSON, YAML and Markdown and smart-quote conversion cannot break it. Two beats, action then proof, matching `Find what a stranger can take from your app. Then close it and prove it closed.` (79) and `Hand Claude a huge task. Come back to proof it's done.` (54), and short enough to sit in a `SKILL.md` frontmatter description verbatim. Stored once in the plugin manifest and asserted from there across `.claude-plugin/marketplace.json` (`plugins[0].description` and `metadata.description`), the Cursor and Copilot manifests, `README.md` and `SKILL.md`.
+**Amended 2026-11-17 (0.3.3).** The first sentence said "prove it is still true". The check does not prove that. It resolves the commands, targets and files a line names, and it runs none of them. Prose is not checked. The new sentence is 132 characters, still pure ASCII with no comma and no apostrophe, and it is asserted across the same files.
+
+The original record follows. The old sentence was `Tell every coding agent how your repo works. Then prove it is still true.`, 73 characters, counted with `python3 -c "print(len(s))"`. Pure ASCII, no comma, no apostrophe, no em dash, so it survives byte-identically through JSON, YAML and Markdown and smart-quote conversion cannot break it. Two beats, action then proof, matching `Find what a stranger can take from your app. Then close it and prove it closed.` (79) and `Hand Claude a huge task. Come back to proof it's done.` (54), and short enough to sit in a `SKILL.md` frontmatter description verbatim. Stored once in the plugin manifest and asserted from there across `.claude-plugin/marketplace.json` (`plugins[0].description` and `metadata.description`), the Cursor and Copilot manifests, `README.md` and `SKILL.md`.
 
 **Why / Source.** A and C converged on it; chairman's pick. B's own `Give your agent the repo facts. Keep them current.` names maintenance but not proof, breaking the sibling pattern the brief locks. Equality chain and the two-suite gap: `07-skeptic.md` claim 10 detail.
 

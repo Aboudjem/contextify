@@ -9,9 +9,9 @@
 
 English | [Français](READMEs/fr.md) | [Español](READMEs/es.md) | [日本語](READMEs/ja.md) | [简体中文](READMEs/zh-CN.md)
 
-**Tell every coding agent how your repo works. Then prove it is still true.**
+**Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.**
 
-contextify writes one short `AGENTS.md` from files your agent reads. A local script then tells you when it goes stale.
+contextify writes one short `AGENTS.md` from your repo. A local script then tells you when a command, target or file it names is gone.
 
 ## Install
 
@@ -38,33 +38,9 @@ In those agents there is no `/contextify:` prefix. Ask in words: "contextify ini
 
 Needs Git, Bash and Python 3.11 or newer. No Python packages, no MCP server, no network call from the scripts.
 
-### Run the drift check by hand
-
-It prints nothing when the repo is fresh. Run it from the root of your repository.
-
-Installed as a plugin:
-
-```bash
-sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
-```
-
-Installed with `npx skills add` (Codex, Cursor and most others use `.agents/skills`):
-
-```bash
-sh .agents/skills/contextify/scripts/ctx-check
-```
-
-For a Claude Code skills install, the folder is `.claude/skills/contextify` instead. Add `--ci --strict` to make drift exit 1.
-
-Installing the skill does not count as drift. The check skips contextify's own copy under any agent folder and `skills-lock.json`. Other skills you add to `.agents/skills` do count, as a `tree#depth2` change. To ignore them, add this one line:
-
-```bash
-echo ".agents/" >> .gitignore
-```
-
 ### Sample report
 
-On 2026-11-17, contextify 0.3.0 wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. 0.3.2 prints this for that repo, at no token cost:
+On 2026-11-17, contextify 0.3.0 wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. 0.3.3 prints this for that repo, at no token cost:
 
 ```text
 contextify: drift
@@ -88,6 +64,16 @@ sh examples/python-service-0.3.0/replay.sh
 ```
 
 [Full run, files and the edit that caused it](examples/python-service-0.3.0/README.md).
+
+A deleted Makefile target, a renamed script, a test that moved. Your agents keep following the old instructions, and each wrong try costs a turn. contextify names the stale line first.
+
+### Why use it
+
+- **See the exact stale line.** The notice gives the file, the line and the dead command, as in the replay above.
+- **Write it once.** One `AGENTS.md` that Codex, Cursor and Copilot read directly, plus short pointers for Claude Code and Gemini CLI.
+- **Free to run.** A local script with no model and no network call, silent when the repo is fresh. This repo's own `AGENTS.md` passes it in CI: `make test` ends with `29 claims, 0 stale`.
+
+It resolves commands, targets and files. It does not read prose or run the commands. No study shows context files raise task success, so keep only lines that prevent a real mistake.
 
 ## How it works
 
@@ -146,6 +132,30 @@ bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes 
 
 [Hooks and CI](docs/hooks.md).
 
+### Run the drift check by hand
+
+It prints nothing when the repo is fresh. Run it from the root of your repository.
+
+Installed as a plugin:
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+Installed with `npx skills add` (Codex, Cursor and most others use `.agents/skills`):
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+For a Claude Code skills install, the folder is `.claude/skills/contextify` instead. Add `--ci --strict` to make drift exit 1.
+
+Installing the skill does not count as drift. The check skips contextify's own copy under any agent folder and `skills-lock.json`. Other skills you add to `.agents/skills` do count, as a `tree#depth2` change. To ignore them, add this one line:
+
+```bash
+echo ".agents/" >> .gitignore
+```
+
 ## Proof
 
 One command runs every suite, the skill contract and this repo's own drift check:
@@ -168,7 +178,7 @@ make dogfood                   PASS: ctx-check is fresh and silent
                                29 claims, 0 stale, 0 unverified
 ```
 
-CI runs the same `make test` on every push and pull request. This repo's own `AGENTS.md` was written by contextify, so the last step fails if it ever goes stale.
+CI runs the same `make test` on every push and pull request. This repo's own `AGENTS.md` was written by contextify, so the last step fails on drift.
 
 ## Works with
 

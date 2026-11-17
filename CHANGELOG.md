@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.3] - 2026-11-17
+
+### Changed
+
+- The one-line description is now true to what the check does. It said "prove it is still true". The check resolves the commands, targets and files a line names. It does not read prose and does not run commands. The new line is: "Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens." It ships in `plugin.json`, the Cursor, Copilot and marketplace manifests, `SKILL.md`, `llms.txt` and the FAQ.
+- The README first screen is shorter. It shows the install, the drift sample, the problem it solves and a `Why use it` block, with the limit next to the promise. The hand-run command and the `.gitignore` note moved under How it works. The four translations match.
+- The hero images and the social preview show the current drift notice wording instead of the old "8 lines" card.
+- The generated CI workflow clones tag `v0.3.3`.
+
+No behaviour change in the scripts.
+
 ## [0.3.2] - 2026-11-17
 
 ### Fixed
@@ -101,6 +112,7 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 
 [0.1.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.1.0
 
+[0.3.3]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.3
 [0.3.2]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.2
 [0.3.1]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.1
 [0.3.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.0
