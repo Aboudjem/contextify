@@ -440,7 +440,7 @@
       }
     ]
   },
-  "commit": "d368a4bc559bc96aefc170ac3a9afdb1e2abaf4e",
+  "commit": "60c92d94b985b3022de2052aba4adebcf3c05f43",
   "contextFiles": {
     "AGENTS.md": {
       "digest": "sha256:2e52711a7edaf058db4f9541eef478d378f20b28e8a8f8597cba115d1e14530b",
@@ -471,9 +471,9 @@
     "makefile#targets": "sha256:fd8139a4a29e33cd40627181e291746835602322ed394a7bb85bc4b8d3b22a71",
     "tree#depth2": "sha256:947995e42a5f5d44728833d9340bebd1a2589d7aca45020926e61235caeea7d9"
   },
-  "evidenceFileDigest": "sha256:cd2d97ee424993b614687da4146e23f83a6628d09d4407569e6bb240c51fede9",
+  "evidenceFileDigest": "sha256:c7d89934c4c69c01a05065521d887208eb90aac2af8224b9287a2b894be20841",
   "fastKey": "sha256:0be4a324acca8a30171335bc419fcf11078f45674e32fb9bedca0757811ad578",
-  "generatedAt": "2026-11-17T22:09:39Z",
+  "generatedAt": "2026-11-17T22:19:38Z",
   "generatedBy": "accept",
   "normalizerVersion": 1,
   "provenance": [

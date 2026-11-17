@@ -248,7 +248,7 @@ CI 在每次推送和拉取请求时运行同样的 `make test`。本仓库的 `
 | GitHub Copilot | `npx skills add Aboudjem/contextify -g -a github-copilot` | 2026-11-17：仅安装，装进一个空的主目录。skill 落在 `~/.agents/skills`。 |
 | OpenCode | `npx skills add Aboudjem/contextify -g -a opencode` | 2026-11-17：仅安装，装进一个空的主目录。skill 落在 `~/.agents/skills`。 |
 
-“仅安装”表示检查了文件，但那个代理没有运行这个 skill。已有文档、今天未测试：运行 skill 的 Gemini CLI 和 Cursor（两个 CLI 在测试机上都拒绝登录）、GitHub Copilot、OpenCode、Windsurf、Zed、Continue.dev 和 Kimi Code CLI。它们的安装代码见 [编辑器设置](../docs/editors.md)。
+“仅安装”表示检查了文件，但那个代理没有运行这个 skill。已有文档、今天未测试：运行 skill 的 Gemini CLI、Cursor、GitHub Copilot 和 OpenCode，以及 Windsurf、Zed、Continue.dev 和 Kimi Code CLI。Gemini CLI 和 Cursor 在测试机上拒绝登录。它们的安装代码见 [编辑器设置](../docs/editors.md)。
 
 ## FAQ
 

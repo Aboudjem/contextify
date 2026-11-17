@@ -248,7 +248,7 @@ La CI lance le même `make test` à chaque push et pull request. Le `AGENTS.md` 
 | GitHub Copilot | `npx skills add Aboudjem/contextify -g -a github-copilot` | 2026-11-17 : installation seule, dans un dossier personnel vide. Le skill est arrivé dans `~/.agents/skills`. |
 | OpenCode | `npx skills add Aboudjem/contextify -g -a opencode` | 2026-11-17 : installation seule, dans un dossier personnel vide. Le skill est arrivé dans `~/.agents/skills`. |
 
-"Installation seule" veut dire que les fichiers ont été vérifiés, mais que cet agent n'a pas lancé le skill. Documentés, non testés aujourd'hui : Gemini CLI et Cursor lançant le skill (les deux CLI ont refusé la connexion sur la machine de test), GitHub Copilot, OpenCode, Windsurf, Zed, Continue.dev et Kimi Code CLI. Leur configuration est dans [la configuration des éditeurs](../docs/editors.md).
+"Installation seule" veut dire que les fichiers ont été vérifiés, mais que cet agent n'a pas lancé le skill. Documentés, non testés aujourd'hui : Gemini CLI, Cursor, GitHub Copilot et OpenCode lançant le skill, ainsi que Windsurf, Zed, Continue.dev et Kimi Code CLI. Gemini CLI et Cursor ont refusé la connexion sur la machine de test. Leur configuration est dans [la configuration des éditeurs](../docs/editors.md).
 
 ## FAQ
 

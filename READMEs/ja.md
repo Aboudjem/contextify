@@ -248,7 +248,7 @@ CI はプッシュとプルリクエストのたびに同じ `make test` を実�
 | GitHub Copilot | `npx skills add Aboudjem/contextify -g -a github-copilot` | 2026-11-17: インストールのみ、空のホームフォルダーで実施。skill は `~/.agents/skills` に入りました。 |
 | OpenCode | `npx skills add Aboudjem/contextify -g -a opencode` | 2026-11-17: インストールのみ、空のホームフォルダーで実施。skill は `~/.agents/skills` に入りました。 |
 
-「インストールのみ」は、ファイルを確認したが、そのエージェントで skill を実行していないという意味です。文書化済みだが今日はテストしていないもの: skill を実行する Gemini CLI と Cursor (テスト用マシンで両方の CLI がサインインを拒否)、GitHub Copilot、OpenCode、Windsurf、Zed、Continue.dev、Kimi Code CLI。インストール用のコードは [エディターの設定](../docs/editors.md) にあります。
+「インストールのみ」は、ファイルを確認したが、そのエージェントで skill を実行していないという意味です。文書化済みだが今日はテストしていないもの: skill を実行する Gemini CLI、Cursor、GitHub Copilot、OpenCode と、Windsurf、Zed、Continue.dev、Kimi Code CLI。Gemini CLI と Cursor はテスト用マシンでサインインを拒否しました。インストール用のコードは [エディターの設定](../docs/editors.md) にあります。
 
 ## FAQ
 
