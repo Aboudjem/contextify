@@ -25,8 +25,9 @@
 
 ## Install
 
-- Plugin (recommended): `claude plugin marketplace add Aboudjem/10x` then `claude plugin install contextify@10x`. Invoke it as `/contextify:contextify init`.
-- Skills CLI, any agent: `npx skills add Aboudjem/contextify -g -a codex`, swapping the `-a` code for your agent (`claude-code`, `cursor`, `gemini-cli`, `github-copilot`, `opencode`). `-g` installs for all your projects; drop it to install in one project only.
+- Recommended, Vercel skills CLI: `npx skills add Aboudjem/contextify -g`, then pick your agent in the menu. Works in more than 70 agents ([supported agents](https://github.com/vercel-labs/skills#supported-agents)). `-g` installs for all your projects; drop it for one project. In a script, add `-a <agent>`, or it installs into every agent folder. Directory page: [skills.sh/aboudjem/contextify](https://skills.sh/aboudjem/contextify).
+- One agent: `npx skills add Aboudjem/contextify -g -a <agent>`, with `claude-code`, `codex`, `cursor`, `gemini-cli`, `github-copilot` or `opencode`.
+- Claude Code plugin (the same skill, called as `/contextify:contextify`, no hooks registered): `claude plugin marketplace add Aboudjem/10x` then `claude plugin install contextify@10x`.
 - Manual: `git clone https://github.com/Aboudjem/contextify`, then copy `skills/contextify` into your agent's skills directory. Copy the whole directory: `references/` and `scripts/` load by relative path.
 
 ## Skill

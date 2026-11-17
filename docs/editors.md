@@ -4,7 +4,17 @@ One Agent Skill: a `SKILL.md` with frontmatter, Markdown underneath, and `refere
 directories beside it. No server or compiled binary. The scripts use Git, POSIX tools, Bash and Python 3.11 or newer. Claude Code
 has a first-party path; every other agent installs the same directory through the skills CLI.
 
-## Claude Code
+## Recommended: the Vercel skills CLI
+
+```bash
+npx skills add Aboudjem/contextify -g
+```
+
+Works in more than 70 agents: pick yours in the menu ([supported agents](https://github.com/vercel-labs/skills#supported-agents)). In a terminal it shows the agent menu. In a script it installs into every agent folder, so add `-a <agent>` there (codes below). Drop `-g` to install in the current project only.
+
+## Claude Code plugin
+
+The same skill, called as `/contextify:contextify`. It registers no hooks.
 
 ```bash
 claude plugin marketplace add Aboudjem/10x
