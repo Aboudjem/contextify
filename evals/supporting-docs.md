@@ -29,7 +29,7 @@ Codex read implementation and workflow sources, drafted three documents and mapp
 | [AGENTS.md](../AGENTS.md) | 21 |
 | [Architecture](../docs/context/architecture.md) | 20 |
 | [Workflows](../docs/context/workflows.md) | 21 |
-| [CLAUDE.md](../CLAUDE.md), preserved pointer | 4 |
+| [CLAUDE.md](https://github.com/Aboudjem/contextify/blob/v0.2.0/CLAUDE.md) at v0.2.0, preserved pointer (moved to `.claude/CLAUDE.md` in 0.3.0) | 4 |
 
 Strict claim and budget validation resolved 29 command/path claims, with zero stale or unverified claims. These resolver results do not replace the separate review of the prose. The checker is fresh and silent; a repeated strict write preserves all output and metadata bytes. See the [example guide](../examples/supporting-docs/README.md).
 
