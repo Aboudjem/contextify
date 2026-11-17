@@ -4,6 +4,25 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-11-17
+
+### Changed
+
+- The drift notice now opens with the verdict and three numbered actions, then the detail. A reader who stops after four lines knows what to run. The first line is still `contextify: drift`, so existing hooks and greps keep working.
+- With a dead claim, the first action names the file, the line and the dead command (cut to 60 characters).
+- The closing `Next` line is gone; the actions replace it. The notice stays within 12 lines and 2,048 bytes.
+- The generated CI workflow clones tag `v0.3.0`.
+
+### Added
+
+- `make test` runs every suite plus the self-dogfood check. CI runs the same target, and a pinned `skills@1.9.0` discovery check.
+- A plugin icon at `.claude-plugin/icon.png`. `claude plugin validate . --strict` now exits 0.
+- A current example: a real 0.3.0 run on the Python service fixture, with init and a caught drift.
+
+### Fixed
+
+- This repository's contributor pointer moved from a root `CLAUDE.md` to `.claude/CLAUDE.md`, which the strict plugin validator accepts.
+
 ## [0.2.0] - 2026-09-17
 
 ### Added
@@ -49,4 +68,5 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 
 [0.1.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.1.0
 
+[0.3.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.2.0

@@ -7,12 +7,12 @@ has a first-party path; every other agent installs the same directory through th
 ## Claude Code
 
 ```bash
-claude plugin marketplace add Aboudjem/contextify
-claude plugin install contextify@contextify-marketplace
+claude plugin marketplace add Aboudjem/10x
+claude plugin install contextify@10x
 ```
 
-Then run `/contextify init`, `/contextify update`, `/contextify check`, or `/contextify accept` in
-your project, or describe the same intent in words, telling your agent how the repo works and asking
+Then run `/contextify:contextify init` (or `update`, `check`, `accept`) in your project. Installed as a
+plugin, the skill takes the `contextify:` prefix. You can also describe the same intent in words, telling your agent how the repo works and asking
 it to keep that current. The plugin registers no session-start hooks by default. Install the Git checks to report drift at commit and push, or select a session adapter explicitly. See [hooks and CI](hooks.md).
 
 ## Any other agent

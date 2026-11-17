@@ -6,7 +6,6 @@
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-E879DF)](../LICENSE)
-[![Stars](https://img.shields.io/github/stars/Aboudjem/contextify?style=flat)](https://github.com/Aboudjem/contextify/stargazers)
 
 [English](../README.md) | Français | [Español](es.md) | [日本語](ja.md) | [简体中文](zh-CN.md)
 
@@ -30,8 +29,8 @@ contextify est un skill qui rédige des instructions courtes à partir des fichi
 Dans Claude Code :
 
 ```bash
-claude plugin marketplace add Aboudjem/contextify
-claude plugin install contextify@contextify-marketplace
+claude plugin marketplace add Aboudjem/10x
+claude plugin install contextify@10x
 ```
 
 Pour les autres agents, installez le skill :
@@ -43,7 +42,7 @@ npx skills add Aboudjem/contextify
 Demandez ensuite à votre agent de lancer contextify sur le dépôt courant. Dans Claude Code :
 
 ```text
-/contextify init
+/contextify:contextify init
 ```
 
 Vérifiez le diff proposé, puis commitez les fichiers de contexte et les métadonnées `.contextify/`. Les scripts nécessitent Git, les outils shell POSIX, Bash et Python 3.11+, sans paquet Python supplémentaire ni serveur MCP. L'installateur utilise Node.js via `npx`. [Installation par éditeur](../docs/editors.md).

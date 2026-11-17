@@ -240,7 +240,7 @@ def tool_version():
                 return v
         except ValueError:
             pass
-    return "0.2.0"
+    return "0.3.0"
 
 
 def load_json_file(path):
@@ -2083,7 +2083,8 @@ def gitignore_merged_text(root):
 # --------------------------------------------------------------------------------------
 
 def label(text):
-    return text.ljust(LABEL_WIDTH)
+    # A label as long as the column (Unverified) still gets one space before its value.
+    return (text + " ").ljust(LABEL_WIDTH)
 
 
 def label_wide(text):
@@ -2249,8 +2250,24 @@ def _run_check(root, strict=False):
     return result
 
 
+def notice_actions(result):
+    """The three numbered actions printed right under the verdict line."""
+    if result.stale:
+        first = result.stale[0]
+        quoted = _sanitize(first["text"])
+        if len(quoted) > 60:
+            quoted = quoted[:57] + "..."
+        return ["1. Run /contextify update to fix %s:%s (%s)" % (first["file"], first["line"], quoted),
+                "2. Review the diff it shows before it writes",
+                "3. Commit the context files with .contextify/"]
+    return ["1. Run /contextify update if the instructions must change",
+            "2. Run /contextify accept if they are still right",
+            "3. Commit the refreshed .contextify/ metadata"]
+
+
 def notice_lines(result):
-    """The D11 drift notice: dead claims first, bounded to 12 lines and 2,048 bytes."""
+    """The D11 drift notice: the verdict, three actions, then the detail with dead claims
+    first. Bounded to 12 lines and 2,048 bytes."""
     findings = []
     for item in result.stale:
         findings.append((label("Stale"),
@@ -2273,15 +2290,12 @@ def notice_lines(result):
     for rel in result.edited:
         findings.append((label("Edited"), "%s managed block was edited by hand" % rel))
 
-    head = ["contextify: drift", label("Scope") + result.scope]
+    # Verdict, then the three things to do, then the detail. A reader who stops after
+    # four lines still knows the state and the next command.
+    head = ["contextify: drift"] + notice_actions(result) + [label("Scope") + result.scope]
+    tail = [label("Files") + "0 written"]
     if result.stale:
-        tail = [label("Files") + "0 written",
-                label("Next") + "/contextify update",
-                label("Accept") + "unavailable until the stale command is corrected"]
-    else:
-        tail = [label("Files") + "0 written",
-                label("Next") + "/contextify update, or /contextify accept if the docs "
-                                "are still right"]
+        tail.append(label("Accept") + "unavailable until the stale command is corrected")
 
     room = NOTICE_MAX_LINES - len(head) - len(tail)
     if len(findings) > room:

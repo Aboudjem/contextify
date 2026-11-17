@@ -1,6 +1,6 @@
 # Worked examples
 
-Current0.2 example: [Contextify with optional architecture and workflow docs](supporting-docs/README.md). The earlier examples below retain their original0.1 outputs and measurements.
+Current 0.3.0 example: [Python service, init and a caught drift](python-service-0.3.0/README.md). The 0.2 example covers [optional architecture and workflow docs](supporting-docs/README.md). The earlier examples below keep their original 0.1 outputs.
 
 Read the generated instructions alongside the files that support them. These are saved outputs, not templates to paste into an unrelated repository.
 

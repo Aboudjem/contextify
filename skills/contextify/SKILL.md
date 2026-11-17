@@ -13,7 +13,7 @@ description: >-
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
-  version: "0.2.0"
+  version: "0.3.0"
 ---
 
 # contextify
@@ -292,16 +292,19 @@ Next         /contextify check
 
 Every file actually written appears in it. Lines are counted after serialization.
 
-**On screen, from the drift check**, at most 12 lines, dead claims first, again a fixture rendering:
+**On screen, from the drift check**, at most 12 lines: the verdict, three numbered actions, then the
+detail with dead claims first. Again a fixture rendering:
 
 ```text
 contextify: drift
+1. Run /contextify update to fix AGENTS.md:14 (npm run lint:css)
+2. Review the diff it shows before it writes
+3. Commit the context files with .contextify/
 Scope    .
+Stale    AGENTS.md:14 references npm run lint:css
 Changed  package.json#scripts
 Removed  script lint:css
-Stale    AGENTS.md:14 references npm run lint:css
 Files    0 written
-Next     /contextify update
 Accept   unavailable until the stale command is corrected
 ```
 

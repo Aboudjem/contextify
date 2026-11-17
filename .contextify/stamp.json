@@ -4,12 +4,27 @@
       {
         "cwd": ".",
         "evidenceRefs": [
+          "makefile#targets"
+        ],
+        "id": "65c279e18260",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "make-target",
+        "status": "verified",
+        "target": "test",
+        "text": "make test"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
           "tree#depth2"
         ],
         "id": "3ab6a98bfab8",
         "location": {
           "file": "AGENTS.md",
-          "line": 6
+          "line": 7
         },
         "resolver": "python-script",
         "status": "verified",
@@ -24,27 +39,12 @@
         "id": "d5228ee3491c",
         "location": {
           "file": "AGENTS.md",
-          "line": 7
+          "line": 8
         },
         "resolver": "python-script",
         "status": "verified",
         "target": "tests/test_verify_claims.py",
         "text": "python3 tests/test_verify_claims.py"
-      },
-      {
-        "cwd": ".",
-        "evidenceRefs": [
-          "tree#depth2"
-        ],
-        "id": "72f7d37f4c93",
-        "location": {
-          "file": "AGENTS.md",
-          "line": 8
-        },
-        "resolver": "python-script",
-        "status": "verified",
-        "target": "tests/test_manifests.py",
-        "text": "python3 tests/test_manifests.py"
       },
       {
         "cwd": ".",
@@ -64,17 +64,32 @@
       {
         "cwd": ".",
         "evidenceRefs": [
-          "tree#depth2"
+          "makefile#targets"
         ],
-        "id": "85a86cb82b4a",
+        "id": "164edf6997af",
         "location": {
           "file": "AGENTS.md",
           "line": 10
         },
-        "resolver": "python-script",
+        "resolver": "make-target",
         "status": "verified",
-        "target": "skills/contextify/scripts/ctx-check",
-        "text": "sh skills/contextify/scripts/ctx-check"
+        "target": "dogfood",
+        "text": "make dogfood"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "makefile#targets"
+        ],
+        "id": "603c2bb17785",
+        "location": {
+          "file": "docs/context/workflows.md",
+          "line": 6
+        },
+        "resolver": "make-target",
+        "status": "verified",
+        "target": "test",
+        "text": "make test"
       },
       {
         "cwd": ".",
@@ -84,7 +99,7 @@
         "id": "d3199a447076",
         "location": {
           "file": "docs/context/workflows.md",
-          "line": 6
+          "line": 7
         },
         "resolver": "python-script",
         "status": "verified",
@@ -111,21 +126,6 @@
         "evidenceRefs": [
           "tree#depth2"
         ],
-        "id": "9194703eaf59",
-        "location": {
-          "file": "docs/context/workflows.md",
-          "line": 7
-        },
-        "resolver": "python-script",
-        "status": "verified",
-        "target": "tests/test_regressions.py",
-        "text": "python3 tests/test_regressions.py"
-      },
-      {
-        "cwd": ".",
-        "evidenceRefs": [
-          "tree#depth2"
-        ],
         "id": "ac3885045a83",
         "location": {
           "file": "docs/context/workflows.md",
@@ -141,10 +141,25 @@
         "evidenceRefs": [
           "tree#depth2"
         ],
-        "id": "b08a5094f80f",
+        "id": "9194703eaf59",
         "location": {
           "file": "docs/context/workflows.md",
           "line": 8
+        },
+        "resolver": "python-script",
+        "status": "verified",
+        "target": "tests/test_regressions.py",
+        "text": "python3 tests/test_regressions.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "b08a5094f80f",
+        "location": {
+          "file": "docs/context/workflows.md",
+          "line": 9
         },
         "resolver": "python-script",
         "status": "verified",
@@ -165,21 +180,6 @@
         "status": "verified",
         "target": "tests/test_manifests.py",
         "text": "python3 tests/test_manifests.py"
-      },
-      {
-        "cwd": ".",
-        "evidenceRefs": [
-          "tree#depth2"
-        ],
-        "id": "2d77bcfa5994",
-        "location": {
-          "file": "docs/context/workflows.md",
-          "line": 9
-        },
-        "resolver": "python-script",
-        "status": "verified",
-        "target": "evals/check_skill.py",
-        "text": "python3 evals/check_skill.py skills/contextify/SKILL.md"
       }
     ],
     "paths": [
@@ -440,17 +440,12 @@
       }
     ]
   },
-  "commit": "007e76498f2657699b02ec3698443ac041e14f53",
+  "commit": "9516479c82f9df7ed318f6eea9f7ba412dc1df69",
   "contextFiles": {
     "AGENTS.md": {
-      "digest": "sha256:de69b34649f5a707a6b10b5e6b8adcbf8360701a61db4e075554ef757f1fe3ed",
+      "digest": "sha256:2e52711a7edaf058db4f9541eef478d378f20b28e8a8f8597cba115d1e14530b",
       "kind": "file",
-      "managedBlockDigest": "sha256:bf1e668620e4ecffc5507194f78ffa9bd4b5692e8e444b767c9f50087e3d2142"
-    },
-    "CLAUDE.md": {
-      "digest": "sha256:1c58e6817ebbf9ee9b63e85c24200d70ffdcf8e35b9490630c30ca7890d025fd",
-      "kind": "file",
-      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "managedBlockDigest": "sha256:782b8d7919c45aaac45bbdead8b81617e5d947d6a0f96769c64b43da64bd685e"
     },
     "docs/context/architecture.md": {
       "digest": "sha256:354659d21cca45ad5f6098038c1a90dd1cb0963b61d20c714e2254ec1ff009b4",
@@ -458,62 +453,78 @@
       "managedBlockDigest": "sha256:d28d839ca116319972c350fa8c640119d7aa8d0c94f79ea23ca5c48f9fe197da"
     },
     "docs/context/workflows.md": {
-      "digest": "sha256:4546287215aa23b75c156d71e63e680adeee585913493d02d145b8f2b701443c",
+      "digest": "sha256:1f81fd0f1501e84552e93682703546d7a8b9afe65cea011835bd333e4276ec9c",
       "kind": "file",
-      "managedBlockDigest": "sha256:77faf3696482755bd4fba76158e649cba7523aaa748ea526728b4d7b4e02297e"
+      "managedBlockDigest": "sha256:496038520f48e682f2c9ffca16cb91ce9e89a7efba785ddeb09f1d9635bf67b7"
     }
   },
   "discovery": [
     ".github/workflows/release.yml",
     ".github/workflows/validate.yml",
+    "Makefile",
     "examples/python-service/source/Makefile",
     "examples/python-service/source/pyproject.toml",
     "examples/tiny/source/Makefile"
   ],
   "evidence": {
-    "ci#jobs": "sha256:16ae2c618603063a44a3cdd1f40f5c0eb0de88f5f8389045b582444a0c937e43",
-    "tree#depth2": "sha256:0e2f9a3cc6125cdc658216e88611f9836cd94f9bc70a73cb1212c2d45f742392"
+    "ci#jobs": "sha256:c8e4238d559393ff409e2ac866a7d0abc26452e4a9f55dcb0d8edb287cc0ff60",
+    "makefile#targets": "sha256:fd8139a4a29e33cd40627181e291746835602322ed394a7bb85bc4b8d3b22a71",
+    "tree#depth2": "sha256:947995e42a5f5d44728833d9340bebd1a2589d7aca45020926e61235caeea7d9"
   },
-  "evidenceFileDigest": "sha256:d64f95ac5e5bd44b480b0bf16c58eddd010abcb59d4b1b5b7dcded344d4ee40c",
-  "fastKey": "sha256:eb2cedc34a2f920c514fe735cd8cdea73e3313b577c830577c60aeb3a36e8def",
-  "generatedAt": "2026-09-17T09:18:21Z",
-  "generatedBy": "codex",
+  "evidenceFileDigest": "sha256:463737f1014fe399c304ee3e81be3f63492172f59ce71c6c0421cc817caf472c",
+  "fastKey": "sha256:24d85dd893fe506438c86ba6a4ba3128a879ad11b294cd1ec2e9e8544b509e21",
+  "generatedAt": "2026-11-17T12:07:23Z",
+  "generatedBy": "accept",
   "normalizerVersion": 1,
   "provenance": [
     {
       "file": "AGENTS.md",
       "line": 6,
-      "lineHash": "sha256:d993810bf1f1842d683b2a1660b1d1e5b6cfc6e44c2b373dae2c97b566a1f4bf",
-      "source": ".github/workflows/validate.yml:200",
-      "sourceDigest": "sha256:e579276a32e63a1b62b6f0a9129e7ff383e7d458657a1fce67bf8fc8a1c99e90"
+      "lineHash": "sha256:92e8b52ce0ef8f1ee4eed1c73545dfd69908c709998fb560a45d686dfccf2f28",
+      "source": "Makefile:4",
+      "sourceDigest": "sha256:5aff61a9e847bc2ad1dd16e20f0ef038069d101f512bb47bf5a594b5f0209928"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:92e8b52ce0ef8f1ee4eed1c73545dfd69908c709998fb560a45d686dfccf2f28",
+      "source": ".github/workflows/validate.yml:189",
+      "sourceDigest": "sha256:645dd82335c7f6b4cd06da2308c859da6d3f9eb38ca8de754a459fbdb9746ff8"
     },
     {
       "file": "AGENTS.md",
       "line": 7,
-      "lineHash": "sha256:62d312384a10cdb2ef815d6d8654042b424e01ea7639f792374f071ebb57dd3a",
-      "source": ".github/workflows/validate.yml:204",
-      "sourceDigest": "sha256:7c77dda5a45da9f642eae5ae389bfb79698155933df96b0253830e0b7435eabb"
+      "lineHash": "sha256:41dadcdf9d90f085e4582e69a64d69e5c9e52dcdb1c6b69ba3489585c894c320",
+      "source": "Makefile:5",
+      "sourceDigest": "sha256:4b28744565b047f018500e6606ffc1d54818bce3ae4463a20e74a6d5919435c4"
     },
     {
       "file": "AGENTS.md",
       "line": 8,
-      "lineHash": "sha256:7f6ee11da159bcf4854c25d9c7dcd7c5287eb65264a31c6f13c654881482542a",
-      "source": ".github/workflows/validate.yml:193",
-      "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
+      "lineHash": "sha256:ec858710389a70ea9679eddec81e05c9c6a2590a0f0d1d342d3acaeff8b96359",
+      "source": "Makefile:6",
+      "sourceDigest": "sha256:6e072c6da0b37b08a753e570a9176c1535c2b1fba3b6ab70b73bc43532ba0934"
     },
     {
       "file": "AGENTS.md",
       "line": 9,
       "lineHash": "sha256:ff1aa39b0ae117a97df242ff6640f7db63baebc1643772e0e0a75795b524515f",
-      "source": ".github/workflows/validate.yml:186",
-      "sourceDigest": "sha256:d7d1a2c4c0efa868a552e0f334c58ee6752f3fee91385dba460f7a715bb0e9a9"
+      "source": "Makefile:11",
+      "sourceDigest": "sha256:e22b34873ea3119481152d11f7d320a94b97ed5956f9dfb434e7de96dd02522e"
     },
     {
       "file": "AGENTS.md",
       "line": 10,
-      "lineHash": "sha256:5ebf5583bc7385dfc8976677757c68d9fe8fb663c0f59a617e3b4bdd45907035",
-      "source": ".github/workflows/validate.yml:222",
-      "sourceDigest": "sha256:ee95a9d7d7646cc7681c9866d07429a027493ffe4e98d70a8df652176cad6900"
+      "lineHash": "sha256:626e73ace7af04945e817198a6ed2f763902f86da2330bf0b4ec96be29db850a",
+      "source": "Makefile:15",
+      "sourceDigest": "sha256:9f6bab948e117d8049497a576f5d3b58217d581956e6e8845e7ba3498fad4abe"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:626e73ace7af04945e817198a6ed2f763902f86da2330bf0b4ec96be29db850a",
+      "source": "Makefile:16",
+      "sourceDigest": "sha256:649464b4df4e928581d75e3fcb5599a849a2119817691603bf8019ebc2af5573"
     },
     {
       "file": "AGENTS.md",
@@ -646,7 +657,7 @@
       "line": 12,
       "lineHash": "sha256:d2c3a4493e30ccb2bb16b06469e6f6f309990a0c4213b95fa6abc011c8de56a7",
       "source": "skills/contextify/scripts/ctxlib.py:2198",
-      "sourceDigest": "sha256:27cfe4bdade1f4d033d01b7002f01eccb555d56a5d518a629c4bbf0aceecfdf5"
+      "sourceDigest": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     {
       "file": "docs/context/architecture.md",
@@ -707,44 +718,58 @@
     {
       "file": "docs/context/workflows.md",
       "line": 6,
-      "lineHash": "sha256:263f8ddbb6530cc8688d91b74b673869d0669bfe408a37fbdcd60f21bd6dba4f",
-      "source": ".github/workflows/validate.yml:200",
-      "sourceDigest": "sha256:e579276a32e63a1b62b6f0a9129e7ff383e7d458657a1fce67bf8fc8a1c99e90"
+      "lineHash": "sha256:eac36ff79f1a01d70edacedf074357b8010e17d5fa7a808c2d745e84690abff8",
+      "source": "Makefile:4",
+      "sourceDigest": "sha256:5aff61a9e847bc2ad1dd16e20f0ef038069d101f512bb47bf5a594b5f0209928"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 6,
+      "lineHash": "sha256:eac36ff79f1a01d70edacedf074357b8010e17d5fa7a808c2d745e84690abff8",
+      "source": ".github/workflows/validate.yml:189",
+      "sourceDigest": "sha256:645dd82335c7f6b4cd06da2308c859da6d3f9eb38ca8de754a459fbdb9746ff8"
     },
     {
       "file": "docs/context/workflows.md",
       "line": 7,
-      "lineHash": "sha256:6976b568c7d4bd79f4e47c974d2b92d467a9c55616e179fed0eed6ef7e1bfddb",
-      "source": ".github/workflows/validate.yml:204",
-      "sourceDigest": "sha256:7c77dda5a45da9f642eae5ae389bfb79698155933df96b0253830e0b7435eabb"
+      "lineHash": "sha256:679cd42bd7cd685d2e4de8290b00bd2eba6230e4d2cadb4ffdb43352c4f041da",
+      "source": "Makefile:5",
+      "sourceDigest": "sha256:4b28744565b047f018500e6606ffc1d54818bce3ae4463a20e74a6d5919435c4"
+    },
+    {
+      "file": "docs/context/workflows.md",
+      "line": 7,
+      "lineHash": "sha256:679cd42bd7cd685d2e4de8290b00bd2eba6230e4d2cadb4ffdb43352c4f041da",
+      "source": "Makefile:6",
+      "sourceDigest": "sha256:6e072c6da0b37b08a753e570a9176c1535c2b1fba3b6ab70b73bc43532ba0934"
     },
     {
       "file": "docs/context/workflows.md",
       "line": 8,
-      "lineHash": "sha256:7d1da7d92ba074b9ced407e986e40487d3598ded4de0be843578936840d6ba41",
-      "source": ".github/workflows/validate.yml:207",
-      "sourceDigest": "sha256:cba188d70741883846d97a96d9affb46d96a3f798c4fcc691d5e8a3af4de4765"
+      "lineHash": "sha256:9de119835462fdff811054de1be094681c69056e5b37ac8e4236135dbc3fad26",
+      "source": "Makefile:7",
+      "sourceDigest": "sha256:96d9b91286def2c9ea94dcbcdc85f0c146af2b96fe5555181027bce2555bae9b"
     },
     {
       "file": "docs/context/workflows.md",
       "line": 8,
-      "lineHash": "sha256:7d1da7d92ba074b9ced407e986e40487d3598ded4de0be843578936840d6ba41",
-      "source": ".github/workflows/validate.yml:214",
-      "sourceDigest": "sha256:8934cdd2d0a10e3538fb0fac80752216ed8778acf09633d0c6c0d470423a7d0b"
+      "lineHash": "sha256:9de119835462fdff811054de1be094681c69056e5b37ac8e4236135dbc3fad26",
+      "source": "Makefile:8",
+      "sourceDigest": "sha256:cbce178d4ef5e1fb3af0ca758a2cb4cda473aa6a2b093c887aec61f730813496"
     },
     {
       "file": "docs/context/workflows.md",
       "line": 9,
-      "lineHash": "sha256:c44a30777c745d682fdc50ce84f9f9b1382829b0677b29ede99db0f3c326c6b9",
-      "source": ".github/workflows/validate.yml:193",
-      "sourceDigest": "sha256:167c10934afe832a4e30fc857f397a9dc11c989d5782c7f9caf7a65e30dd69f4"
+      "lineHash": "sha256:06a04d1e144cce4f03a077807cbd5318a6ef23a30ae9e0b928c6f8aba510f4b2",
+      "source": "Makefile:9",
+      "sourceDigest": "sha256:6fd762f70c111ee542fe06e87d12a8b172f146e134c0592ca83d79a7bda1a893"
     },
     {
       "file": "docs/context/workflows.md",
       "line": 9,
-      "lineHash": "sha256:c44a30777c745d682fdc50ce84f9f9b1382829b0677b29ede99db0f3c326c6b9",
-      "source": ".github/workflows/validate.yml:186",
-      "sourceDigest": "sha256:d7d1a2c4c0efa868a552e0f334c58ee6752f3fee91385dba460f7a715bb0e9a9"
+      "lineHash": "sha256:06a04d1e144cce4f03a077807cbd5318a6ef23a30ae9e0b928c6f8aba510f4b2",
+      "source": "Makefile:10",
+      "sourceDigest": "sha256:11da991cd2e27eb9dd91699c6b48f24b9e5713e4af0cfd88a5b0c5bf3d4ff59f"
     },
     {
       "file": "docs/context/workflows.md",
@@ -819,11 +844,10 @@
   ],
   "scope": ".",
   "targets": [
-    "claude",
     "codex"
   ],
   "tool": "contextify",
-  "toolVersion": "0.2.0",
+  "toolVersion": "0.3.0",
   "unverifiedLines": [],
   "version": 2
 }

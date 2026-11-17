@@ -329,9 +329,17 @@ check("3e the notice is at most 2048 bytes", len(out3.encode("utf-8")) <= 2048,
       "%d bytes" % len(out3.encode("utf-8")))
 check("3f the notice opens on the locked first line",
       out3.startswith("contextify: drift\n"), "stdout=%r" % out3[:40])
-check("3g the last line names the next command",
-      out3.rstrip("\n").splitlines()[-1].startswith("Next"),
-      "last line=%r" % out3.rstrip("\n").splitlines()[-1])
+_l3 = out3.rstrip("\n").splitlines()
+check("3g three numbered actions follow the verdict, before any detail",
+      [l[:3] for l in _l3[1:4]] == ["1. ", "2. ", "3. "] and _l3[4].startswith("Scope"),
+      "lines=%r" % _l3[:5])
+check("3g2 with no dead claim the actions name both update and accept",
+      "/contextify update" in _l3[1] and "/contextify accept" in _l3[2],
+      "lines=%r" % _l3[1:3])
+check("3g3 the notice ends on the reassurance that nothing was written",
+      _l3[-1] == "Files    0 written", "last line=%r" % _l3[-1])
+check("3g4 no dead claim: the notice carries no Accept refusal",
+      not any(l.startswith("Accept") for l in _l3), "stdout=%r" % out3)
 
 # The notice is bounded however much moved, which is the point of injecting it at
 # session start: an unbounded report becomes the bloat contextify exists to prevent.
@@ -351,8 +359,9 @@ check("3i and in 2048 bytes", len(out3b.encode("utf-8")) <= 2048,
 check("3j the excess is collapsed into a count rather than dropped silently",
       any(l.startswith("More") for l in lines3b), "stdout=%r" % out3b)
 check("3k a flooded notice still exits 0 and still names the next command",
-      r.returncode == 0 and lines3b[-1].startswith(("Next", "Accept")),
-      "exit %d last=%r" % (r.returncode, lines3b[-1]))
+      r.returncode == 0 and lines3b[1].startswith("1. Run /contextify update")
+      and lines3b[-1].startswith(("Files", "Accept")),
+      "exit %d second=%r last=%r" % (r.returncode, lines3b[1], lines3b[-1]))
 
 
 # ======================================================================================
@@ -402,11 +411,36 @@ check("5d dead claims are listed before changed evidence",
       stale_idx is not None and changed_idx is not None and stale_idx < changed_idx,
       "stale at %s, changed at %s" % (stale_idx, changed_idx))
 check("5e a dead claim disables accept in the notice",
-      any(l.startswith("Accept") for l in lines5), "stdout=%r" % out5)
+      lines5[-1].startswith("Accept") and not any("/contextify accept" in l for l in lines5[1:4]),
+      "stdout=%r" % out5)
+check("5e2 the first action names update, the file, the line and the dead command",
+      stale_idx is not None and lines5[1].startswith("1. Run /contextify update to fix AGENTS.md:")
+      and "npm run lint:css" in lines5[1], "line=%r" % lines5[1])
+check("5e3 actions two and three follow, then the detail",
+      lines5[2].startswith("2. ") and lines5[3].startswith("3. ") and stale_idx > 3,
+      "lines=%r" % lines5[:5])
 check("5f a stale claim still exits 0", r.returncode == 0, "exit %d" % r.returncode)
 check("5g the notice stays inside both bounds",
       len(lines5) <= 12 and len(out5.encode("utf-8")) <= 2048,
       "%d lines, %d bytes" % (len(lines5), len(out5.encode("utf-8"))))
+
+# The first action quotes the dead command, so a very long command must not blow the byte
+# bound: it is cut to 60 characters with an ellipsis.
+sys.path.insert(0, SCRIPTS)
+import ctxlib as _ctxlib  # noqa: E402
+
+
+class _FakeResult:
+    stale = [{"file": "AGENTS.md", "line": 9, "text": "npm run " + "x" * 200, "reason": ""}]
+
+
+_acts = _ctxlib.notice_actions(_FakeResult())
+check("5h a long dead command is cut to 60 characters in the first action",
+      len(_acts) == 3 and _acts[0].endswith("...)") and len(_acts[0]) <= 110,
+      "action=%r" % _acts[0])
+check("5i a label as wide as the column keeps a space before its value",
+      _ctxlib.label("Unverified") == "Unverified " and _ctxlib.label("Scope") == "Scope    ",
+      "labels=%r %r" % (_ctxlib.label("Unverified"), _ctxlib.label("Scope")))
 
 
 # ======================================================================================
@@ -998,7 +1032,7 @@ check("22c every JSON snippet parses as JSON", not bad_json, "; ".join(bad_json)
 
 no_path = [rel for rel in expected22[:-1] if CTX_CHECK not in read(repo22, rel)]
 workflow22 = read(repo22, expected22[-1])
-portable22 = (CTX_CHECK not in workflow22 and '--branch v0.2.0' in workflow22
+portable22 = (CTX_CHECK not in workflow22 and '--branch v0.3.0' in workflow22
               and '$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check' in workflow22)
 check("22d local hooks use this installation and CI fetches a portable release",
       not no_path and portable22, "local missing: %s; portable CI=%s" % (no_path, portable22))

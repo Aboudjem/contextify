@@ -6,7 +6,6 @@
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-E879DF)](../LICENSE)
-[![Stars](https://img.shields.io/github/stars/Aboudjem/contextify?style=flat)](https://github.com/Aboudjem/contextify/stargazers)
 
 [English](../README.md) | [Français](fr.md) | [Español](es.md) | 日本語 | [简体中文](zh-CN.md)
 
@@ -30,8 +29,8 @@ contextify は、エージェントが読んだファイルを基に、短いリ
 Claude Code の場合:
 
 ```bash
-claude plugin marketplace add Aboudjem/contextify
-claude plugin install contextify@contextify-marketplace
+claude plugin marketplace add Aboudjem/10x
+claude plugin install contextify@10x
 ```
 
 ほかのエージェントにはスキルをインストールします。
@@ -43,7 +42,7 @@ npx skills add Aboudjem/contextify
 現在のリポジトリで contextify を実行するようエージェントに依頼してください。Claude Code では次のコマンドを使います。
 
 ```text
-/contextify init
+/contextify:contextify init
 ```
 
 提示された差分を確認してから、生成された指示ファイルと `.contextify/` のメタデータをコミットします。スクリプトには Git、POSIX シェルツール、Bash、Python 3.11 以降が必要です。追加の Python パッケージや MCP サーバーは不要です。インストーラーは `npx` 経由で Node.js を使います。[エディター別の設定](../docs/editors.md)。

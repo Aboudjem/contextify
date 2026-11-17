@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index ac1ceeb..7d94ff6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,5 @@
+-.PHONY: serve test test-health
++.PHONY: serve test
+ serve:
+ 	python3 -m service
+ test:
+ 	python3 -m unittest discover -s tests
+-test-health:
+-	python3 -m unittest tests.test_health

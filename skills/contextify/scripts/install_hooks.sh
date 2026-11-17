@@ -171,7 +171,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch released contextify
-        run: git clone --depth 1 --branch v0.2.0 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
+        run: git clone --depth 1 --branch v0.3.0 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
       - name: Check repository context (advisory; add --strict to enforce)
         run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" --ci
 '''

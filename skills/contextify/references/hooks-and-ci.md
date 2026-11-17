@@ -55,4 +55,4 @@ Add `--strict` to the workflow's checker command to fail on drift or missing met
 
 ## Upgrade from 0.1
 
-The bundled Claude SessionStart registration is removed in0.2.0. Independently installed project hooks are separate files and are not removed by upgrading the package. Inspect those settings and remove only the Contextify entry if switching to Git-only checks; preserve other tools' entries. Existing0.1 Git templates may require a manual merge because different hook files are never overwritten silently.
+The bundled Claude SessionStart registration is removed in 0.2.0. Independently installed project hooks are separate files and are not removed by upgrading the package. Inspect those settings and remove only the Contextify entry if switching to Git-only checks; preserve other tools' entries. Existing 0.1 Git templates may require a manual merge because different hook files are never overwritten silently.

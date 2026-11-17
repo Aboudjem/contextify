@@ -6,154 +6,169 @@
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-E879DF)](LICENSE)
-[![Stars](https://img.shields.io/github/stars/Aboudjem/contextify?style=flat)](https://github.com/Aboudjem/contextify/stargazers)
 
 English | [Français](READMEs/fr.md) | [Español](READMEs/es.md) | [日本語](READMEs/ja.md) | [简体中文](READMEs/zh-CN.md)
 
 **Tell every coding agent how your repo works. Then prove it is still true.**
 
-contextify is an Agent Skill that writes short repository instructions from files your agent reads. It records the evidence so a local script can report when those instructions need another look.
-
-## What it does
-
-- Writes one `AGENTS.md`, with thin pointers for your other agents. Targets 20, 40 or 60 lines by repository size; refuses files above 150 lines.
-- Records commands and paths against repository evidence. Unsupported claims must be labelled `unverified` or omitted; a separate agent reviews the draft.
-- Checks for drift without calling a model. Fresh checks are silent; updates show a diff and preserve human content outside the managed blocks.
-- Adds focused architecture or workflow notes when the repository needs them, with links from `AGENTS.md`. Reuses accurate existing docs first.
+contextify writes one short `AGENTS.md` from files your agent reads. A local script then tells you when it goes stale.
 
 ## Install
 
-In Claude Code:
+In Claude Code, from your terminal:
 
 ```bash
-claude plugin marketplace add Aboudjem/contextify
-claude plugin install contextify@contextify-marketplace
+claude plugin marketplace add Aboudjem/10x
+claude plugin install contextify@10x
 ```
 
-Or install via the 10x marketplace, which also lists eight other Claude Code tools. Inside a Claude Code session:
+Then, inside your repository, ask for a first draft:
 
 ```text
-/plugin marketplace add Aboudjem/10x
-/plugin install contextify@10x
+/contextify:contextify init
 ```
 
-For other agents, install the skill:
+For Codex, Cursor, Gemini CLI and other agents, install the skill:
 
 ```bash
 npx skills add Aboudjem/contextify
 ```
 
-Then ask your agent to run contextify on the current repository. In Claude Code, use:
+Needs Git, Bash and Python 3.11 or newer. No Python packages, no MCP server, no network call from the scripts.
 
-```text
-/contextify init
-```
+### Sample report
 
-Review the proposed diff, then commit the generated context files and `.contextify/` metadata. The scripts need Git, POSIX shell tools, Bash and Python 3.11+; there are no Python package dependencies or MCP server. The installer uses Node.js through `npx`. [Editor-specific setup](docs/editors.md).
-
-## What you get
-
-Historical **v0.1.0** example; this is not evidence of the 0.2.0 extension. Excerpt from a real run on an isolated copy of HazeLab, a Next.js app, on 2026-09-17. Codex drafted the instructions and Contextify wrote the files. [Full output and evidence](examples/nextjs/README.md).
-
-```markdown
-## Commands
-- Development from the repository root: `pnpm run dev`.
-- Build: `pnpm run build`; this generates the Prisma client before building Next.js.
-- Lint: `pnpm run lint`.
-## Testing
-- No test script is declared in `package.json`; do not assume a package-manager test command exists.
-- `vitest.config.ts` selects jsdom and discovers TypeScript tests under the tests directory.
-```
-
-Removing the quoted `lint` script in that copy produced this notice:
+A real run of 0.3.0 on 2026-11-17. contextify wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. The next check printed this, at no token cost:
 
 ```text
 contextify: drift
+1. Run /contextify update to fix AGENTS.md:6 (make test-health)
+2. Review the diff it shows before it writes
+3. Commit the context files with .contextify/
 Scope    .
-Stale    AGENTS.md:7 references pnpm run lint
-Changed  package.json#scripts
-Changed  provenance:package.json:10
-Removed  script lint
+Stale    AGENTS.md:6 references make test-health
+Unverified AGENTS.md:6 python3 -m unittest tests.test_health
+Changed  makefile#targets
+Changed  provenance:Makefile:6
+More     +2 findings
 Files    0 written
-Next     /contextify update
 Accept   unavailable until the stale command is corrected
 ```
 
-The source repository was not changed. See the [run record and validation limits](evals/dogfood.md).
-
-## What it writes
-
-Defaults below describe newly generated files. Human content already present still counts toward the budget.
-
-| File | Reader | Lines |
-| --- | --- | --- |
-| `AGENTS.md` | Codex, Cursor and other agents supporting this convention | Target 20/40/60; maximum 150 |
-| `CLAUDE.md` | Claude Code, through `@AGENTS.md` | 4 by default |
-| `GEMINI.md` | Gemini CLI, through `@AGENTS.md` | 3 |
-| `.cursor/rules/contextify.mdc` | Cursor; optional because it also reads `AGENTS.md` | 9 |
-| `.github/copilot-instructions.md` | GitHub Copilot | 4 |
-| `docs/context/architecture.md` | Optional map of components, boundaries and data flow | Maximum 120 |
-| `docs/context/workflows.md` | Optional development, testing and release procedures | Maximum 120 |
-| `.contextify/evidence.json` | Contextify's evidence records | Depends on repository |
-| `.contextify/stamp.json` | Contextify's freshness check | Depends on repository |
-
-Only selected targets get pointer files. Supporting documents are optional, capped at 120 lines each, and read when relevant. See [supporting documents](docs/supporting-docs.md) and [loading rules](docs/editors.md).
+A fresh repo prints nothing. [Full run, files and the edit that caused it](examples/python-service-0.3.0/README.md).
 
 ## How it works
 
 ![Evidence, draft, review, write, check](assets/how-it-works.svg)
 
-| Mode | What happens |
-| --- | --- |
-| `init` | Read the repository, draft instructions, review evidence, show a diff, then write and check. |
-| `update` | Re-read evidence and revise affected managed content. Human edits outside the block survive; edits inside it raise a conflict. |
-| `check` | Compare evidence with the committed stamp and resolve quoted commands and paths. Nothing is written. |
-| `accept` | Refresh metadata when the instructions are still right. Dead claims are refused; prose stays unchanged. |
+| Mode     | What happens                                                                               |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `init`   | Read the repo, draft instructions, review the evidence, show a diff, then write and check. |
+| `update` | Re-read the evidence and revise the managed block. Your edits outside the block survive.   |
+| `check`  | Compare the evidence with the committed stamp. Nothing is written.                         |
+| `accept` | Refresh the stamp when the instructions are still right. Dead claims are refused.          |
 
-`init --dry-run` shows the proposed files and their line/byte costs. `--yes` skips routine questions, never a managed-block conflict or a hard ceiling.
+What it writes:
 
-The plugin registers no session-start hook by default. The installer proposes Git `pre-commit` and `pre-push` checks; applying files and activating them are explicit steps. From a Contextify checkout, with the target repository path supplied:
+| File                                         | Reader                                                   | Lines                            |
+| -------------------------------------------- | -------------------------------------------------------- | -------------------------------- |
+| `AGENTS.md`                                  | Codex, Cursor and other agents that read this convention | Target 20, 40 or 60; maximum 150 |
+| `CLAUDE.md`                                  | Claude Code, through `@AGENTS.md`                        | 4 by default                     |
+| `GEMINI.md`                                  | Gemini CLI, through `@AGENTS.md`                         | 3                                |
+| `.cursor/rules/contextify.mdc`               | Cursor; optional, since Cursor also reads `AGENTS.md`    | 9                                |
+| `.github/copilot-instructions.md`            | GitHub Copilot                                           | 4                                |
+| `docs/context/architecture.md`               | Optional map of components and data flow                 | Maximum 120                      |
+| `docs/context/workflows.md`                  | Optional build, test and release steps                   | Maximum 120                      |
+| `.contextify/evidence.json` and `stamp.json` | The drift check                                          | Depends on the repo              |
+
+Only the targets you pick get a pointer file. Every factual line maps to a source file and line. A separate agent reviews the draft before contextify writes anything.
+
+The drift check exits 0 with no output when the repo is fresh. On drift it prints the notice above and still exits 0. It never rewrites a file.
+
+| Exit         | Meaning                                           |
+| ------------ | ------------------------------------------------- |
+| 0, no output | Fresh                                             |
+| 0, a notice  | Drift found; at most 12 lines and 2,048 bytes     |
+| 1            | The check itself broke, or drift under `--strict` |
+| 3            | No stamp yet: run `init` first                    |
+
+Git checks are opt-in. At the end of `init` the skill offers to install `pre-commit` and `pre-push` checks. From a clone of this repo you can also run:
 
 ```bash
-bash skills/contextify/scripts/install_hooks.sh /path/to/repo
 bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
 ```
 
-Git checks inspect the current working tree, not the staged snapshot or pushed commits. They warn by default and never rewrite files; strict mode is optional. Activation refuses to replace existing hooks or a custom/global hooks path. [Installation, migration and CI](docs/hooks.md).
+They warn by default and refuse to replace existing hooks. [Hooks and CI](docs/hooks.md).
 
-## Compared with
+## Proof
 
-This is a narrow comparison of sources inspected on **2026-09-16**, not a claim about every current release. The [full matrix and source paths](docs/comparison.md) document the scope and trade-offs.
+One command runs every suite, the skill contract and this repo's own drift check:
 
-| Tool | What to compare |
-| --- | --- |
-| contextify | Evidence records, one instruction source, enforced line ceiling, deterministic drift checks and managed-block updates. |
-| ruler / rulesync | Broader configuration distribution across agents; rulesync also imports existing configurations. |
-| ClaudeForge | Claude-focused organization and examples for different project sizes. |
-| agents-md-generator | Small seed template with `CLAUDE.md` symlinked to `AGENTS.md`. |
+```bash
+make test
+```
 
-## Good to know
+It printed this on 2026-11-17 (one summary line per suite, in run order):
 
-A resolved command is one whose declaration or target exists. Contextify does **not** run it to prove it works. Repository evidence can be stale, and the deterministic resolver does not understand every shell expression or build system. Read the [limits](docs/limits.md).
+```text
+tests/test_ctx_check.py        126/126 checks passed
+tests/test_verify_claims.py     30/30 checks passed
+tests/test_hooks.py             Ran 20 tests, OK
+tests/test_regressions.py       Ran 23 tests, OK
+tests/test_supporting_docs.py   Ran 16 tests, OK
+tests/test_manifests.py        130/130 checks passed
+evals/check_skill.py           114/114 checks passed
+make dogfood                   PASS: ctx-check is fresh and silent
+                               29 claims, 0 stale, 0 unverified
+```
 
-An [ETH Zurich study](https://arxiv.org/abs/2602.11988) found no general task-success improvement from repository context files and an average inference-cost increase above 20%. Contextify has no measured task-success advantage. Keep only instructions that prevent a concrete mistake.
+CI runs the same `make test` on every push and pull request. This repo's own `AGENTS.md` was written by contextify, so the last step fails if it ever goes stale.
 
-The hook never rewrites files. Generation and revision use your coding agent; the freshness check runs locally without a model or network request. The [dogfood report](evals/dogfood.md) separates script evidence from host-agent behavior, including any Claude validation left untested.
+## Works with
+
+| Agent       | Install path                           | Tested                                                    |
+| ----------- | -------------------------------------- | --------------------------------------------------------- |
+| Claude Code | `claude plugin install contextify@10x` | 2026-11-17: plugin install, then a full `init` run        |
+| Codex       | `npx skills add Aboudjem/contextify`   | 2026-11-17: skill install, then Codex ran the drift check |
+
+Documented, not tested today: Gemini CLI and Cursor (both CLIs refused to sign in on the test machine), GitHub Copilot, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI. Their install codes are in [editor setup](docs/editors.md).
+
+## FAQ
+
+### Why is AGENTS.md the source and not CLAUDE.md?
+
+Codex, Cursor and Copilot read `AGENTS.md` directly. Claude Code and Gemini CLI get a short file that imports it. So the same facts live in one place.
+
+### Does the drift check call a model?
+
+No. It is a shell and Python script. It reads Git and the files the stamp points at, then compares hashes. It spends zero tokens.
+
+### Will it overwrite what I wrote by hand?
+
+No. contextify owns only the block between its markers. Text outside the block survives every update. An edit inside the block raises a conflict instead of being lost.
+
+### Does a verified command actually work?
+
+Not proven. A verified command is one whose script, target or file exists. contextify does not run it. Your tests still decide whether it works.
+
+### What does accept do?
+
+It refreshes the stamp when the evidence moved but the instructions are still right. It refuses while a quoted command is dead, so a broken line cannot be waved through.
+
+More answers in the [full FAQ](docs/faq.md).
+
+## Limits
+
+- A resolved command was found, not executed. Repository evidence can itself be wrong.
+- The resolver does not understand every shell expression or build system. Lines it cannot check are labelled `unverified`.
+- An [ETH Zurich study](https://arxiv.org/abs/2602.11988) found no general task-success gain from context files, and an inference cost rise above 20%. contextify has no measured task-success advantage. Keep only lines that prevent a concrete mistake.
+- Writing a plugin repo? `claude plugin validate --strict` warns on a root `CLAUDE.md`. Point `.claude/CLAUDE.md` at `@../AGENTS.md` by hand, as this repo does. The writer does not target that path yet.
+- Privacy: the scripts make no network call. Drafting uses your own coding agent and its usual connection.
+
+All limits, with sources: [docs/limits.md](docs/limits.md).
 
 ## Learn more
 
-[Quickstart](docs/quickstart.md) · [Worked examples](examples/README.md) · [Hooks and CI](docs/hooks.md) · [FAQ](docs/faq.md) · [Evaluation](evals/README.md) · [Design decisions](docs/design/DECISIONS.md)
+[Quickstart](docs/quickstart.md) · [Worked examples](examples/README.md) · [Editor setup](docs/editors.md) · [Comparison](docs/comparison.md) · [Design decisions](docs/design/DECISIONS.md)
 
 [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) · [Changelog](CHANGELOG.md) · [MIT license](LICENSE) · [10x plugin hub](https://github.com/Aboudjem/10x)
-
-Run these local checks for the revision you are reviewing. Historical results belong to the [v0.1.0 evaluation](evals/dogfood.md); they do not establish that new changes passed.
-
-```bash
-python3 tests/test_ctx_check.py
-python3 tests/test_verify_claims.py
-python3 tests/test_hooks.py
-python3 tests/test_regressions.py
-python3 tests/test_supporting_docs.py
-python3 tests/test_manifests.py
-python3 evals/check_skill.py skills/contextify/SKILL.md
-```

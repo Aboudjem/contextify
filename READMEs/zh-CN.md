@@ -6,7 +6,6 @@
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
 [![MIT](https://img.shields.io/badge/license-MIT-E879DF)](../LICENSE)
-[![Stars](https://img.shields.io/github/stars/Aboudjem/contextify?style=flat)](https://github.com/Aboudjem/contextify/stargazers)
 
 [English](../README.md) | [Français](fr.md) | [Español](es.md) | [日本語](ja.md) | 简体中文
 
@@ -30,8 +29,8 @@ contextify 是一个 Agent Skill，根据代理读过的文件编写简短的仓
 在 Claude Code 中：
 
 ```bash
-claude plugin marketplace add Aboudjem/contextify
-claude plugin install contextify@contextify-marketplace
+claude plugin marketplace add Aboudjem/10x
+claude plugin install contextify@10x
 ```
 
 其他代理可安装同一个 skill：
@@ -43,7 +42,7 @@ npx skills add Aboudjem/contextify
 然后请代理在当前仓库中运行 contextify。在 Claude Code 中使用：
 
 ```text
-/contextify init
+/contextify:contextify init
 ```
 
 审核差异后，将生成的上下文文件和 `.contextify/` 元数据提交到 Git。脚本需要 Git、POSIX shell 工具、Bash 和 Python 3.11+，无需额外的 Python 包或 MCP 服务器。安装器通过 `npx` 使用 Node.js。[各编辑器的安装方式](../docs/editors.md)。

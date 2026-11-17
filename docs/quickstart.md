@@ -7,8 +7,8 @@ Contextify writes a short `AGENTS.md`, pointers for selected editors, and eviden
 For Claude Code:
 
 ```bash
-claude plugin marketplace add Aboudjem/contextify
-claude plugin install contextify@contextify-marketplace
+claude plugin marketplace add Aboudjem/10x
+claude plugin install contextify@10x
 ```
 
 For Codex:
@@ -19,7 +19,7 @@ npx skills add Aboudjem/contextify -a codex
 
 ## 2. Run it
 
-Run `/contextify init` in Claude Code. In another agent, ask the installed Contextify skill to initialize the current repository.
+Run `/contextify:contextify init` in Claude Code (the plugin adds the `contextify:` prefix). In another agent, ask the installed Contextify skill to initialize the current repository.
 
 The agent reads repository evidence, reviews existing documentation and drafts concise instructions. It reuses accurate architecture/workflow docs first. When useful information needs its own page, it proposes `docs/context/architecture.md` or `docs/context/workflows.md`, each capped at 120 lines. `AGENTS.md` links to them for tasks that need more detail.
 

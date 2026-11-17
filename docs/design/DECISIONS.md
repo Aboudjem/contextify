@@ -196,20 +196,22 @@ Every file actually written appears, lines measured after serialization, aligned
 
 ## D11. The drift notice
 
-**Decision.** Literal shape, eight lines here, 12 the hard maximum, dead claims first, excess findings collapsed into a count.
+**Decision.** Literal shape, ten lines here, 12 the hard maximum. The order is fixed: the verdict line, three numbered actions, then the detail with dead claims first. Excess findings collapse into a count.
 
 ```text
 contextify: drift
+1. Run /contextify update to fix AGENTS.md:14 (npm run lint:css)
+2. Review the diff it shows before it writes
+3. Commit the context files with .contextify/
 Scope    .
+Stale    AGENTS.md:14 references npm run lint:css
 Changed  package.json#scripts
 Removed  script lint:css
-Stale    AGENTS.md:14 references npm run lint:css
 Files    0 written
-Next     /contextify update
 Accept   unavailable until the stale command is corrected
 ```
 
-When only moved-evidence rows exist and no claim is dead, the last line reads `Next     /contextify update, or /contextify accept if the docs are still right`. Control characters are escaped. An evidence key that no generated line cites changes silently.
+When only moved-evidence rows exist and no claim is dead, the actions read `1. Run /contextify update if the instructions must change`, `2. Run /contextify accept if they are still right` and `3. Commit the refreshed .contextify/ metadata`, and the notice ends on `Files    0 written`. A dead command quoted in the first action is cut to 60 characters. Releases before 0.3.0 printed the detail first and a closing `Next` line; 0.3.0 moved the actions under the verdict so a reader who stops after four lines knows what to do. Control characters are escaped. An evidence key that no generated line cites changes silently.
 
 **Why / Source.** B, primary. A bounded notice is the only kind that can be injected at session start without becoming the bloat it prevents. Shape and the roughly 70-token cost target: `04-auto-update-mechanics.md`, SessionStart hook section.
 
