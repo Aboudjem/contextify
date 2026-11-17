@@ -440,7 +440,7 @@
       }
     ]
   },
-  "commit": "025c03dd51db0d46719b7924eb2157c5c86bc9e3",
+  "commit": "cbe69a509ea140db3e57609bc3a878331baad0c2",
   "contextFiles": {
     "AGENTS.md": {
       "digest": "sha256:2e52711a7edaf058db4f9541eef478d378f20b28e8a8f8597cba115d1e14530b",
@@ -467,13 +467,13 @@
     "examples/tiny/source/Makefile"
   ],
   "evidence": {
-    "ci#jobs": "sha256:c8e4238d559393ff409e2ac866a7d0abc26452e4a9f55dcb0d8edb287cc0ff60",
+    "ci#jobs": "sha256:1f986ea92fdb52f4471b5801f917615db40fcb58c31a92e75dd27e71b7085f1b",
     "makefile#targets": "sha256:fd8139a4a29e33cd40627181e291746835602322ed394a7bb85bc4b8d3b22a71",
     "tree#depth2": "sha256:947995e42a5f5d44728833d9340bebd1a2589d7aca45020926e61235caeea7d9"
   },
-  "evidenceFileDigest": "sha256:5abc7b6063d98562069bd2169bf045b4ca23a9d1ad7288a5c174364bf53efc2c",
+  "evidenceFileDigest": "sha256:bb50c1be4b6f774453ea80fa31e3d72ec0d09e85280baf5a8b0749ba00a7ee97",
   "fastKey": "sha256:f3b27980d75e11af0550c5d2504a56bd21890147033bb8d45f4b7a175325f0a4",
-  "generatedAt": "2026-11-17T17:42:02Z",
+  "generatedAt": "2026-11-17T21:04:32Z",
   "generatedBy": "accept",
   "normalizerVersion": 1,
   "provenance": [

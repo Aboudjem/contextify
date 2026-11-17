@@ -4,7 +4,7 @@
   "description": "Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.",
   "author": {
     "name": "Adam Boudjemaa",
-    "email": "boudjemaa.adam@gmail.com"
+    "url": "https://github.com/Aboudjem"
   },
   "homepage": "https://github.com/Aboudjem/contextify",
   "repository": "https://github.com/Aboudjem/contextify",

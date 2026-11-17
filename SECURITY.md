@@ -15,7 +15,7 @@ Contextify is an Agent Skill and Claude Code plugin: Markdown plus standard-libr
 
 ## Report a vulnerability
 
-Please do not open a public issue for a security problem. Use GitHub private vulnerability reporting for `Aboudjem/contextify`, or email **boudjemaa.adam@gmail.com** with the affected revision, impact and reproduction steps.
+Please do not open a public issue for a security problem. Use GitHub private vulnerability reporting at https://github.com/Aboudjem/contextify/security/advisories/new with the affected revision, impact and reproduction steps.
 
 Relevant reports include writes outside the selected scope, symlink escapes, command execution caused by repository text, check-time exfiltration, unintended overwrites of human content or hooks, and secret values being copied into generated evidence by a normalizer.
 

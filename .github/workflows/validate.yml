@@ -24,7 +24,7 @@ jobs:
       - name: Set Git identity for disposable fixture commits
         run: |
           git config --global user.name "Adam Boudjemaa"
-          git config --global user.email "boudjemaa.adam@gmail.com"
+          git config --global user.email "Aboudjem@users.noreply.github.com"
 
       # (a) FRONTMATTER CHECK
       - name: Frontmatter check (SKILL.md)
