@@ -72,7 +72,7 @@ Une cible Makefile supprimée, un script renommé, un test déplacé. Vos agents
 ### Pourquoi l'utiliser
 
 - **Voir la ligne périmée exacte.** L'avis donne le fichier, la ligne et la commande morte, comme dans le rejeu ci-dessus.
-- **L'écrire une fois.** Un seul `AGENTS.md` que Codex, Cursor et Copilot lisent directement, plus de courts renvois pour Claude Code et Gemini CLI.
+- **L'écrire une fois.** Un seul `AGENTS.md`, que Codex et Cursor lisent sans fichier en plus. Seuls les agents choisis reçoivent un renvoi : `CLAUDE.md` (par défaut), `GEMINI.md`, un fichier Copilot si `.github/` existe, une règle Cursor optionnelle.
 - **Gratuit à lancer.** Un script local, sans modèle ni appel réseau, silencieux quand le dépôt est à jour. Le `AGENTS.md` de ce dépôt la passe en CI : `make test` se termine par `29 claims, 0 stale`.
 
 Elle résout des commandes, des cibles et des fichiers. Elle ne lit pas la prose et ne lance pas les commandes. Aucune étude ne montre que les fichiers de contexte améliorent la réussite des tâches : gardez seulement les lignes qui évitent une vraie erreur.
@@ -105,7 +105,7 @@ Seules les cibles que vous choisissez reçoivent un fichier de renvoi. Chaque li
 
 La vérification de dérive sort avec 0 et n'affiche rien quand le dépôt est à jour. En cas de dérive, elle affiche l'avis ci-dessus et sort quand même avec 0. Elle ne réécrit jamais un fichier.
 
-Codes de sortie, mesurés dans bash le 2026-11-17 avec la 0.3.2 :
+Codes de sortie, mesurés dans bash le 2026-11-17 avec la 0.3.3 :
 
 | Mode                                           | À jour                 | Dérive               | Pas encore de tampon | Vérification cassée |
 | ---------------------------------------------- | ---------------------- | -------------------- | -------------------- | ------------------- |

@@ -70,7 +70,7 @@ A deleted Makefile target, a renamed script, a test that moved. Your agents keep
 ### Why use it
 
 - **See the exact stale line.** The notice gives the file, the line and the dead command, as in the replay above.
-- **Write it once.** One `AGENTS.md` that Codex, Cursor and Copilot read directly, plus short pointers for Claude Code and Gemini CLI.
+- **Write it once.** One `AGENTS.md`, which Codex and Cursor read with no extra file. Only the agents you pick get a pointer: `CLAUDE.md` (the default), `GEMINI.md`, a Copilot file when `.github/` exists, an optional Cursor rule.
 - **Free to run.** A local script with no model and no network call, silent when the repo is fresh. This repo's own `AGENTS.md` passes it in CI: `make test` ends with `29 claims, 0 stale`.
 
 It resolves commands, targets and files. It does not read prose or run the commands. No study shows context files raise task success, so keep only lines that prevent a real mistake.
@@ -103,7 +103,7 @@ Only the targets you pick get a pointer file. Every factual line maps to a sourc
 
 The drift check exits 0 with no output when the repo is fresh. On drift it prints the notice above and still exits 0. It never rewrites a file.
 
-Exit codes, measured in bash on 2026-11-17 with 0.3.2:
+Exit codes, measured in bash on 2026-11-17 with 0.3.3:
 
 | Mode                                             | Fresh                   | Drift                   | No stamp yet            | Check broke |
 | ------------------------------------------------ | ----------------------- | ----------------------- | ----------------------- | ----------- |

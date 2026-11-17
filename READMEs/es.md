@@ -72,7 +72,7 @@ Un objetivo de Makefile borrado, un script renombrado, un test que se movió. Tu
 ### Por qué usarlo
 
 - **Ve la línea desactualizada exacta.** El aviso da el archivo, la línea y el comando muerto, como en la reproducción de arriba.
-- **Escríbelo una vez.** Un solo `AGENTS.md` que Codex, Cursor y Copilot leen directamente, más punteros cortos para Claude Code y Gemini CLI.
+- **Escríbelo una vez.** Un solo `AGENTS.md`, que Codex y Cursor leen sin ningún archivo extra. Solo los agentes que eliges reciben un puntero: `CLAUDE.md` (por defecto), `GEMINI.md`, uno para Copilot si existe `.github/`, una regla de Cursor opcional.
 - **Gratis de ejecutar.** Un script local, sin modelo ni llamada de red, en silencio cuando el repositorio está al día. El `AGENTS.md` de este repositorio la pasa en CI: `make test` termina con `29 claims, 0 stale`.
 
 Resuelve comandos, objetivos y archivos. No lee la prosa ni ejecuta los comandos. Ningún estudio muestra que los archivos de contexto mejoren el éxito de las tareas: conserva solo las líneas que evitan un error real.
@@ -105,7 +105,7 @@ Solo los destinos que elijas reciben un archivo puntero. Cada línea factual apu
 
 La comprobación de deriva sale con 0 y sin salida cuando el repositorio está al día. Si hay deriva, imprime el aviso de arriba y aun así sale con 0. Nunca reescribe un archivo.
 
-Códigos de salida, medidos en bash el 2026-11-17 con la 0.3.2:
+Códigos de salida, medidos en bash el 2026-11-17 con la 0.3.3:
 
 | Modo                                           | Al día                 | Deriva                | Aún sin sello         | La comprobación falló |
 | ---------------------------------------------- | ---------------------- | --------------------- | --------------------- | --------------------- |
