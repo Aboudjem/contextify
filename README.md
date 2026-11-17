@@ -34,28 +34,54 @@ For Codex, Cursor, Gemini CLI and other agents, install the skill:
 npx skills add Aboudjem/contextify
 ```
 
+In those agents there is no `/contextify:` prefix. Ask in words: "contextify init", "contextify update".
+
 Needs Git, Bash and Python 3.11 or newer. No Python packages, no MCP server, no network call from the scripts.
+
+### Run the drift check by hand
+
+It prints nothing when the repo is fresh. Run it from the root of your repository.
+
+Installed as a plugin:
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+Installed with `npx skills add` (Codex, Cursor and most others use `.agents/skills`):
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+For a Claude Code skills install, the folder is `.claude/skills/contextify` instead. Add `--ci --strict` to make drift exit 1.
 
 ### Sample report
 
-A real run of 0.3.0 on 2026-11-17. contextify wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. The next check printed this, at no token cost:
+On 2026-11-17, contextify 0.3.0 wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. 0.3.1 prints this for that repo, at no token cost:
 
 ```text
 contextify: drift
-1. Run /contextify update to fix AGENTS.md:6 (make test-health)
+1. Run /contextify:contextify update to fix AGENTS.md:6 (make test-health)
 2. Review the diff it shows before it writes
 3. Commit the context files with .contextify/
-Scope    .
-Stale    AGENTS.md:6 references make test-health
+Agents     outside Claude Code, ask for "contextify update"
+Scope      .
+Stale      AGENTS.md:6 references make test-health
 Unverified AGENTS.md:6 python3 -m unittest tests.test_health
-Changed  makefile#targets
-Changed  provenance:Makefile:6
-More     +2 findings
-Files    0 written
-Accept   unavailable until the stale command is corrected
+Changed    makefile#targets
+More       +3 findings
+Files      0 written
+Accept     unavailable until the stale command is corrected
 ```
 
-A fresh repo prints nothing. [Full run, files and the edit that caused it](examples/python-service-0.3.0/README.md).
+A fresh repo prints nothing. The run's files and stamp ship with the example, so you can replay it:
+
+```bash
+sh examples/python-service-0.3.0/replay.sh
+```
+
+[Full run, files and the edit that caused it](examples/python-service-0.3.0/README.md).
 
 ## How it works
 
@@ -85,12 +111,15 @@ Only the targets you pick get a pointer file. Every factual line maps to a sourc
 
 The drift check exits 0 with no output when the repo is fresh. On drift it prints the notice above and still exits 0. It never rewrites a file.
 
-| Exit         | Meaning                                           |
-| ------------ | ------------------------------------------------- |
-| 0, no output | Fresh                                             |
-| 0, a notice  | Drift found; at most 12 lines and 2,048 bytes     |
-| 1            | The check itself broke, or drift under `--strict` |
-| 3            | No stamp yet: run `init` first                    |
+| Exit         | Meaning                                                           |
+| ------------ | ----------------------------------------------------------------- |
+| 0, no output | Fresh                                                             |
+| 0, a notice  | Drift found; at most 12 lines and 2,048 bytes                     |
+| 1            | The check itself broke                                            |
+| 1            | Drift or no stamp, under `--ci --strict` or `--git --strict` only |
+| 3            | No stamp yet: run `init` first                                    |
+
+`--strict` alone does not change the exit code. It only reports unverified claims as drift. In CI, use `ctx-check --ci --strict` so drift fails the job.
 
 Git checks are opt-in. At the end of `init` the skill offers to install `pre-commit` and `pre-push` checks. From a clone of this repo you can also run:
 
@@ -98,7 +127,17 @@ Git checks are opt-in. At the end of `init` the skill offers to install `pre-com
 bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
 ```
 
-They warn by default and refuse to replace existing hooks. [Hooks and CI](docs/hooks.md).
+They warn by default and refuse to replace existing hooks. Add `--strict` to block a commit or push on drift.
+
+Activation refuses when a global `core.hooksPath` is set, since it would hide your other hooks. Call `ctx-check --git` from the hook manager you already use instead.
+
+For a CI job that fails on drift, generate the workflow in strict mode. Its step runs `ctx-check --ci --strict`:
+
+```bash
+bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes /path/to/repo
+```
+
+[Hooks and CI](docs/hooks.md).
 
 ## Proof
 
@@ -111,12 +150,12 @@ make test
 It printed this on 2026-11-17 (one summary line per suite, in run order):
 
 ```text
-tests/test_ctx_check.py        126/126 checks passed
+tests/test_ctx_check.py        128/128 checks passed
 tests/test_verify_claims.py     30/30 checks passed
-tests/test_hooks.py             Ran 20 tests, OK
+tests/test_hooks.py             Ran 22 tests, OK
 tests/test_regressions.py       Ran 23 tests, OK
 tests/test_supporting_docs.py   Ran 16 tests, OK
-tests/test_manifests.py        130/130 checks passed
+tests/test_manifests.py        131/131 checks passed
 evals/check_skill.py           114/114 checks passed
 make dogfood                   PASS: ctx-check is fresh and silent
                                29 claims, 0 stale, 0 unverified
@@ -126,9 +165,9 @@ CI runs the same `make test` on every push and pull request. This repo's own `AG
 
 ## Works with
 
-| Agent       | Install path                           | Tested                                                    |
-| ----------- | -------------------------------------- | --------------------------------------------------------- |
-| Claude Code | `claude plugin install contextify@10x` | 2026-11-17: plugin install, then a full `init` run        |
+| Agent       | Install path                           | Tested                                                                                                    |
+| ----------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Claude Code | `claude plugin install contextify@10x` | 2026-11-17: plugin install, then a full `init` run ([run record](examples/python-service-0.3.0/README.md)) |
 | Codex       | `npx skills add Aboudjem/contextify`   | 2026-11-17: skill install, then Codex ran the drift check |
 
 Documented, not tested today: Gemini CLI and Cursor (both CLIs refused to sign in on the test machine), GitHub Copilot, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI. Their install codes are in [editor setup](docs/editors.md).

@@ -51,7 +51,7 @@ bash scripts/install_hooks.sh --targets github --yes /path/to/repository
 
 The generated workflow runs on push and pull requests, checks out the target repo, fetches the released Contextify tag and runs `ctx-check --ci`. It does not contain the author's machine-specific path. CI emits a freshness/drift message and writes to `GITHUB_STEP_SUMMARY` when set; Git mode does neither of these things when fresh.
 
-Add `--strict` to the workflow's checker command to fail on drift or missing metadata. Internal errors remain errors in CI. A hook's read-only notice never updates documentation by itself; use `update`, or `accept` after confirming the prose is still correct.
+To fail on drift or missing metadata, install with `--strict --targets github`; the step then runs `ctx-check --ci --strict`. `--strict` without `--ci` keeps exit 0 on drift. Internal errors remain errors in CI. A hook's read-only notice never updates documentation by itself; use `update`, or `accept` after confirming the prose is still correct.
 
 ## Upgrade from 0.1
 

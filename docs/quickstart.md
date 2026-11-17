@@ -50,11 +50,17 @@ When the context is fresh, the Git checks print nothing. If evidence changes, th
 
 The checks inspect the **current working tree**, not the staged index or the exact commits being pushed. They never rewrite context, refresh metadata or stage files.
 
-You can also ask the agent to run `/contextify check` at any time.
+You can also ask the agent to run `/contextify:contextify check` at any time, or run the script yourself:
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+That path is for a skills CLI install; the [README](../README.md#run-the-drift-check-by-hand) lists the plugin path. It prints nothing when the repo is fresh.
 
 ## 7. Update or accept
 
-Run `/contextify update` when instructions need revising. Run `/contextify accept` only after confirming that the instructions remain correct and the evidence alone changed. It refreshes metadata while leaving context files byte-identical. A missing or renamed source needs its provenance mapping corrected; accepting cannot invent a replacement source or adopt edited managed prose.
+Run `/contextify:contextify update` when instructions need revising (in other agents, ask for "contextify update"). Run `/contextify:contextify accept` only after confirming that the instructions remain correct and the evidence alone changed. It refreshes metadata while leaving context files byte-identical. A missing or renamed source needs its provenance mapping corrected; accepting cannot invent a replacement source or adopt edited managed prose.
 
 ## Next
 

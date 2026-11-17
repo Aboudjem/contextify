@@ -1,12 +1,12 @@
 contextify: drift
-1. Run /contextify update to fix AGENTS.md:6 (make test-health)
+1. Run /contextify:contextify update to fix AGENTS.md:6 (make test-health)
 2. Review the diff it shows before it writes
 3. Commit the context files with .contextify/
-Scope    .
-Stale    AGENTS.md:6 references make test-health
+Agents     outside Claude Code, ask for "contextify update"
+Scope      .
+Stale      AGENTS.md:6 references make test-health
 Unverified AGENTS.md:6 python3 -m unittest tests.test_health
-Changed  makefile#targets
-Changed  provenance:Makefile:6
-More     +2 findings
-Files    0 written
-Accept   unavailable until the stale command is corrected
+Changed    makefile#targets
+More       +3 findings
+Files      0 written
+Accept     unavailable until the stale command is corrected

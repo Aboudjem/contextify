@@ -331,13 +331,20 @@ check("3f the notice opens on the locked first line",
       out3.startswith("contextify: drift\n"), "stdout=%r" % out3[:40])
 _l3 = out3.rstrip("\n").splitlines()
 check("3g three numbered actions follow the verdict, before any detail",
-      [l[:3] for l in _l3[1:4]] == ["1. ", "2. ", "3. "] and _l3[4].startswith("Scope"),
-      "lines=%r" % _l3[:5])
-check("3g2 with no dead claim the actions name both update and accept",
-      "/contextify update" in _l3[1] and "/contextify accept" in _l3[2],
+      [l[:3] for l in _l3[1:4]] == ["1. ", "2. ", "3. "] and _l3[4].startswith("Agents")
+      and _l3[5].startswith("Scope"),
+      "lines=%r" % _l3[:6])
+check("3g2 with no dead claim the actions name both update and accept, as Claude Code types them",
+      "/contextify:contextify update" in _l3[1] and "/contextify:contextify accept" in _l3[2],
       "lines=%r" % _l3[1:3])
+check("3g2b the Agents line says what to type outside Claude Code",
+      _l3[4] == 'Agents     outside Claude Code, ask for "contextify update" or "contextify accept"',
+      "line=%r" % _l3[4])
+check("3g2c every detail value starts in the same column",
+      all(len(l) > 11 and l[10] == " " and l[11] != " " for l in _l3[4:]),
+      "lines=%r" % _l3[4:])
 check("3g3 the notice ends on the reassurance that nothing was written",
-      _l3[-1] == "Files    0 written", "last line=%r" % _l3[-1])
+      _l3[-1] == "Files      0 written", "last line=%r" % _l3[-1])
 check("3g4 no dead claim: the notice carries no Accept refusal",
       not any(l.startswith("Accept") for l in _l3), "stdout=%r" % out3)
 
@@ -359,7 +366,7 @@ check("3i and in 2048 bytes", len(out3b.encode("utf-8")) <= 2048,
 check("3j the excess is collapsed into a count rather than dropped silently",
       any(l.startswith("More") for l in lines3b), "stdout=%r" % out3b)
 check("3k a flooded notice still exits 0 and still names the next command",
-      r.returncode == 0 and lines3b[1].startswith("1. Run /contextify update")
+      r.returncode == 0 and lines3b[1].startswith("1. Run /contextify:contextify update")
       and lines3b[-1].startswith(("Files", "Accept")),
       "exit %d second=%r last=%r" % (r.returncode, lines3b[1], lines3b[-1]))
 
@@ -414,7 +421,7 @@ check("5e a dead claim disables accept in the notice",
       lines5[-1].startswith("Accept") and not any("/contextify accept" in l for l in lines5[1:4]),
       "stdout=%r" % out5)
 check("5e2 the first action names update, the file, the line and the dead command",
-      stale_idx is not None and lines5[1].startswith("1. Run /contextify update to fix AGENTS.md:")
+      stale_idx is not None and lines5[1].startswith("1. Run /contextify:contextify update to fix AGENTS.md:")
       and "npm run lint:css" in lines5[1], "line=%r" % lines5[1])
 check("5e3 actions two and three follow, then the detail",
       lines5[2].startswith("2. ") and lines5[3].startswith("3. ") and stale_idx > 3,
@@ -436,11 +443,14 @@ class _FakeResult:
 
 _acts = _ctxlib.notice_actions(_FakeResult())
 check("5h a long dead command is cut to 60 characters in the first action",
-      len(_acts) == 3 and _acts[0].endswith("...)") and len(_acts[0]) <= 110,
+      len(_acts) == 3 and _acts[0].endswith("...)")
+      and len(_acts[0]) == len("1. Run /contextify:contextify update to fix AGENTS.md:9 (") + 60 + 1,
       "action=%r" % _acts[0])
-check("5i a label as wide as the column keeps a space before its value",
-      _ctxlib.label("Unverified") == "Unverified " and _ctxlib.label("Scope") == "Scope    ",
-      "labels=%r %r" % (_ctxlib.label("Unverified"), _ctxlib.label("Scope")))
+_labels = ["Unverified", "Scope", "Stale", "Changed", "Agents", "Files", "Accept", "More"]
+check("5i every label pads to one column, so Unverified lines up with Scope",
+      len({len(_ctxlib.label(t)) for t in _labels}) == 1
+      and _ctxlib.label("Unverified") == "Unverified " and _ctxlib.label("Scope") == "Scope      ",
+      "labels=%r" % [_ctxlib.label(t) for t in _labels])
 
 
 # ======================================================================================
@@ -450,7 +460,8 @@ r = ctx_check(repo6)
 check("6a an unstamped repo exits 3", r.returncode == 3, "exit %d" % r.returncode)
 check("6b an unstamped repo prints exactly one line",
       len(r.stdout.rstrip("\n").splitlines()) == 1, "stdout=%r" % r.stdout)
-check("6c that line names /contextify init", "/contextify init" in r.stdout,
+check("6c that line names the Claude Code command and the words other agents use",
+      "/contextify:contextify init" in r.stdout and '"contextify init"' in r.stdout,
       "stdout=%r" % r.stdout)
 
 
@@ -1032,7 +1043,7 @@ check("22c every JSON snippet parses as JSON", not bad_json, "; ".join(bad_json)
 
 no_path = [rel for rel in expected22[:-1] if CTX_CHECK not in read(repo22, rel)]
 workflow22 = read(repo22, expected22[-1])
-portable22 = (CTX_CHECK not in workflow22 and '--branch v0.3.0' in workflow22
+portable22 = (CTX_CHECK not in workflow22 and '--branch v0.3.1' in workflow22
               and '$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check' in workflow22)
 check("22d local hooks use this installation and CI fetches a portable release",
       not no_path and portable22, "local missing: %s; portable CI=%s" % (no_path, portable22))

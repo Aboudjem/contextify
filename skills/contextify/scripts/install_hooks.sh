@@ -46,8 +46,8 @@ while i < len(args):
 selected = set(targets.split(','))
 if selected - {'claude', 'codex', 'gemini', 'cursor', 'git', 'github'}:
     sys.exit('install_hooks.sh: unknown target')
-if (activate or strict) and 'git' not in selected:
-    sys.exit('install_hooks.sh: --activate and --strict require the git target')
+if activate and 'git' not in selected: sys.exit('install_hooks.sh: --activate requires the git target')
+if strict and not selected & {'git', 'github'}: sys.exit('install_hooks.sh: --strict requires the git or github target')
 root = Path(repo).resolve()
 if not root.is_dir():
     sys.exit('install_hooks.sh: target is not a directory')
@@ -95,14 +95,14 @@ def activation_preflight():
     local = git_value('config', '--local', '--get', 'core.hooksPath')
     if effective is not None:
         if effective != '.githooks' or local != '.githooks':
-            raise ValueError('existing effective core.hooksPath would be replaced; integrate Contextify into your existing hooks manually')
+            raise ValueError('core.hooksPath is already set to ' + effective + ' (see git config --show-origin --get core.hooksPath); it would be replaced. Add this line to the pre-commit and pre-push hooks there instead: sh ' + shlex.quote(runner) + ' --git')
         # Inherited global/system paths must not be silently masked either.
         origins = git_run('config', '--show-origin', '--get-all', 'core.hooksPath')
         expected = 'file:' + str(gitdir / 'config')
         for line in origins.stdout.splitlines():
             origin = line.split('\t', 1)[0]
             if origin != expected and origin != 'file:.git/config':
-                raise ValueError('inherited core.hooksPath exists; integrate Contextify into your existing hooks manually')
+                raise ValueError('an inherited core.hooksPath exists (' + origin + '); add this line to your existing hooks instead: sh ' + shlex.quote(runner) + ' --git')
     else:
         hooksdir = gitdir / 'hooks'
         active = sorted(p.name for p in hooksdir.iterdir() if p.is_file() and not p.name.endswith('.sample') and os.access(p, os.X_OK)) if hooksdir.exists() else []
@@ -161,6 +161,11 @@ try:
         rel = '.github/workflows/contextify-check.yml'
         path = safe(rel)
         old = path.read_text() if path.exists() else None
+        # Strict fails the job on drift or a missing stamp; advisory only reports it.
+        if strict:
+            step, mode = 'Check repository context (fails on drift)', '--ci --strict'
+        else:
+            step, mode = 'Check repository context (advisory; use --ci --strict to fail on drift)', '--ci'
         new = '''name: contextify check
 on: [push, pull_request]
 permissions:
@@ -171,10 +176,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch released contextify
-        run: git clone --depth 1 --branch v0.3.0 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
-      - name: Check repository context (advisory; add --strict to enforce)
-        run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" --ci
-'''
+        run: git clone --depth 1 --branch v0.3.1 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
+      - name: %s
+        run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" %s
+''' % (step, mode)
         plans.append((rel, old, new, False))
     # Preflight the complete proposal, including conflicts, before the first write.
     for rel, old, new, executable in plans:

@@ -15,7 +15,7 @@ The first command is a read-only proposal. The second writes `.githooks/pre-comm
 
 `--yes` without `--activate` only writes files. They are inactive unless Git already uses `.githooks`. `--activate` without `--yes` remains a proposal, including its configuration change.
 
-Activation refuses a custom/global hooks path, existing executable default hooks that it would hide, and linked worktrees whose configuration could affect sibling checkouts. It never edits global Git configuration or global hooks. In these cases, integrate the checker through your existing hook manager instead of replacing its configuration. Git documents hook lookup and working directories in [githooks](https://git-scm.com/docs/githooks) and [`core.hooksPath`](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath).
+Activation refuses a custom/global hooks path (for example a global `core.hooksPath` set by another tool), existing executable default hooks that it would hide, and linked worktrees whose configuration could affect sibling checkouts. It never edits global Git configuration or global hooks. In these cases, integrate the checker through your existing hook manager instead of replacing its configuration. Git documents hook lookup and working directories in [githooks](https://git-scm.com/docs/githooks) and [`core.hooksPath`](https://git-scm.com/docs/git-config#Documentation/git-config.txt-corehooksPath).
 
 ## What an installed Git hook does
 
@@ -23,7 +23,7 @@ Activation refuses a custom/global hooks path, existing executable default hooks
 - Drift, no stamp or a checker/setup failure: an actionable notice; advisory mode still exits 0.
 - Strict mode: drift, no stamp and failures return nonzero and block the operation.
 
-For enforcing hooks, add `--strict` to the installer before applying the proposal. For example, use `install_hooks.sh --strict --yes --activate /path/to/repo`. This flag requires the `git` target; it does not make the optional GitHub workflow strict. Existing differing wrappers still need a manual merge.
+For enforcing hooks, add `--strict` to the installer before applying the proposal. For example, use `install_hooks.sh --strict --yes --activate /path/to/repo`. With the `github` target, the same flag writes a workflow whose step runs `ctx-check --ci --strict`. Existing differing wrappers still need a manual merge.
 
 The wrapper calls `ctx-check --git`, adding `--strict` for enforcement. The raw checker returns nonzero on internal errors; the installed advisory wrapper converts those failures to a warning and exit 0. When integrating through another hook manager, preserve that policy deliberately. It reads the current working tree, **not** the staged snapshot or the exact refs being pushed. It does not read pre-push ref data from stdin, modify the index, write a CI summary or update any context file.
 
@@ -54,12 +54,20 @@ Updating the plugin removes its packaged session hook, but previously installed 
 
 ## Optional GitHub checks
 
+For a job that fails on drift or a missing stamp:
+
 ```bash
-bash skills/contextify/scripts/install_hooks.sh --targets github --yes /path/to/repo
+bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes /path/to/repo
 ```
 
-The generated workflow runs on pushes and pull requests, fetches a pinned Contextify release into the runner's temporary directory and uses `ctx-check --ci`. It does not embed a machine-specific installation path. Inspect the generated release pin before committing it.
+Its check step is:
 
-CI prints a summary and appends to `GITHUB_STEP_SUMMARY` when available. It warns on drift by default; `--ci --strict` fails on drift or a missing stamp. Internal checker errors fail the job in either mode. Git mode deliberately has different advisory error handling.
+```yaml
+run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" --ci --strict
+```
+
+Drop `--strict` from the installer for an advisory job that reports drift and stays green. The generated workflow runs on pushes and pull requests, fetches a pinned Contextify release into the runner's temporary directory and uses `ctx-check --ci`. It does not embed a machine-specific installation path. Inspect the generated release pin before committing it.
+
+CI prints a summary and appends to `GITHUB_STEP_SUMMARY` when available. It warns on drift by default; `--ci --strict` fails on drift or a missing stamp. `--strict` without `--ci` or `--git` keeps exit 0 on drift, so never use that form in CI. Internal checker errors fail the job in either mode. Git mode deliberately has different advisory error handling.
 
 [Quickstart](quickstart.md) · [Supporting documents](supporting-docs.md) · [Limits](limits.md)

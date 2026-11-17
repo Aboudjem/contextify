@@ -1,0 +1,335 @@
+{
+  "claims": {
+    "commands": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "makefile#targets"
+        ],
+        "id": "1f9308c4f394",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 4
+        },
+        "resolver": "make-target",
+        "status": "verified",
+        "target": "serve",
+        "text": "make serve"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "makefile#targets"
+        ],
+        "id": "65c279e18260",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 5
+        },
+        "resolver": "make-target",
+        "status": "verified",
+        "target": "test",
+        "text": "make test"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "makefile#targets"
+        ],
+        "id": "54205527f080",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "make-target",
+        "status": "verified",
+        "target": "test-health",
+        "text": "make test-health"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [],
+        "id": "0a517a420b39",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 6
+        },
+        "resolver": "python-module",
+        "status": "unverified",
+        "target": "unittest",
+        "text": "python3 -m unittest tests.test_health"
+      }
+    ],
+    "paths": [
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "8e04bcd4f7ac",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 7
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "pyproject.toml",
+        "text": "pyproject.toml"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "b006c02c854e",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "service/__main__.py",
+        "text": "service/__main__.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "d4f539c74985",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "service/server.py",
+        "text": "service/server.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "ba601b29f96b",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 10
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "service/config.py",
+        "text": "service/config.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "e8d6fafd49bd",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 11
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "service/handler.py",
+        "text": "service/handler.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "706243ed626b",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 11
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "service/health.py",
+        "text": "service/health.py"
+      },
+      {
+        "cwd": ".",
+        "evidenceRefs": [
+          "tree#depth2"
+        ],
+        "id": "0753f9631da3",
+        "location": {
+          "file": "AGENTS.md",
+          "line": 14
+        },
+        "resolver": "tracked-file",
+        "status": "verified",
+        "target": "tests/test_config.py",
+        "text": "tests/test_config.py"
+      }
+    ]
+  },
+  "commit": "dfb73254294b7fce9059835a05f0eb87b69ef887",
+  "contextFiles": {
+    "AGENTS.md": {
+      "digest": "sha256:9be7d62c04279afbcd1f49abed8840ac7171d0c3bd65c8172e912b12d1947bb9",
+      "kind": "file",
+      "managedBlockDigest": "sha256:956f4cdc918ffac2833f08831ea5098ce71efd109fba62c6e70d9dfd6b7c2bab"
+    },
+    "CLAUDE.md": {
+      "digest": "sha256:9c2687bdbf038176ef82e4b2ec2ea2c8a6a885bd6049cb21b2363f1bff1b701c",
+      "kind": "file",
+      "managedBlockDigest": "sha256:4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "discovery": [
+    "Makefile",
+    "pyproject.toml"
+  ],
+  "evidence": {
+    "makefile#targets": "sha256:d1ce37baa14dea485d0628cc118de5f2f9652eefda7f0c2d8584d377a6b1789c",
+    "pyproject#scripts": "sha256:ac4cd4f7c43474cae47891c2d4fe20b3d1635cfbdbf6bf1f297d1f9cb00016f7",
+    "tree#depth2": "sha256:acbdb3c9dffc0072bf729039f6c951f785a328e9f9d60417cb365ff84cd4120e"
+  },
+  "evidenceFileDigest": "sha256:430eb97b73a1fa3a24ff6ad05d817b353b30b6bca1f062eea403b861580db9e4",
+  "fastKey": "sha256:95b74e964d7328007b68665eb78ce5d6bb561321950b9112d66fd2cb1f27e543",
+  "generatedAt": "2026-11-17T12:05:23Z",
+  "generatedBy": "accept",
+  "normalizerVersion": 1,
+  "provenance": [
+    {
+      "file": "AGENTS.md",
+      "line": 4,
+      "lineHash": "sha256:4caad2c44bd73d92ecfbb2c49498306851f7346eb2c3940d025099a787a41f6d",
+      "source": "Makefile:2",
+      "sourceDigest": "sha256:1585f247ab06b276306ae2f6b92229c4d541fe20b2fdf19e20723a1c7c820fd2"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 4,
+      "lineHash": "sha256:4caad2c44bd73d92ecfbb2c49498306851f7346eb2c3940d025099a787a41f6d",
+      "source": "Makefile:3",
+      "sourceDigest": "sha256:7e195e334d4a3a114ccab5837911563047d4eec5a4ec82534487f0fa78088811"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 5,
+      "lineHash": "sha256:ad6e8127f292be577c6f5db9688eb7cfb8bd6d7ea5b325a7e5aab64c3bd26009",
+      "source": "Makefile:4",
+      "sourceDigest": "sha256:5aff61a9e847bc2ad1dd16e20f0ef038069d101f512bb47bf5a594b5f0209928"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 5,
+      "lineHash": "sha256:ad6e8127f292be577c6f5db9688eb7cfb8bd6d7ea5b325a7e5aab64c3bd26009",
+      "source": "Makefile:5",
+      "sourceDigest": "sha256:9ae4ff0ba9ed16a1071b14bae61fd3a91c593682661bf000fd03999a7dcb3ff2"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:d9d78db3eb4792b4ff2a7a5d6a1a2f682969cc122754a150e6de8fb5a171a64e",
+      "source": "Makefile:6",
+      "sourceDigest": "sha256:b1d623df5a1e232f37a24ef7edea2778d09cd4dd6a7d90c88757aa066e5e2e7c"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:d9d78db3eb4792b4ff2a7a5d6a1a2f682969cc122754a150e6de8fb5a171a64e",
+      "source": "Makefile:7",
+      "sourceDigest": "sha256:7540a2e04cc309e1cc3e188980857958ce2a6546e84a0760a956c190b7e832c4"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 6,
+      "lineHash": "sha256:d9d78db3eb4792b4ff2a7a5d6a1a2f682969cc122754a150e6de8fb5a171a64e",
+      "source": "tests/test_health.py:4",
+      "sourceDigest": "sha256:d29375b52a886af3b1e740ed61a9a1ed5e39d6647ed5d0e6bacfd42c4f11b6b9"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 7,
+      "lineHash": "sha256:3bc3438ca9bedadfb58a61c683b0676e68e561a0fdf1c5409202fc77768437c7",
+      "source": "Makefile:1",
+      "sourceDigest": "sha256:28b9974308b30b6cc02fff93c250de9eb982edef5ce6cb71462b825269e4aea2"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 7,
+      "lineHash": "sha256:3bc3438ca9bedadfb58a61c683b0676e68e561a0fdf1c5409202fc77768437c7",
+      "source": "pyproject.toml:1",
+      "sourceDigest": "sha256:9db496674d490e553881abaea32031d2ce1b1636c60d33f6efac50161253faf4"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:00c10c7a8dac0f8f79eaf2996bd5aa37a1ef0996c9366f2277ff875934d41b4b",
+      "source": "service/__main__.py:4",
+      "sourceDigest": "sha256:18fca7c6c82df81e5c5b8cbe32664c07ecadfe1dc75df034625ed346eeb6f4f2"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:00c10c7a8dac0f8f79eaf2996bd5aa37a1ef0996c9366f2277ff875934d41b4b",
+      "source": "service/server.py:6",
+      "sourceDigest": "sha256:7fffc26a72884d93bd77e596a4c9b80e31434abe63532ec83708f86363adba82"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 10,
+      "lineHash": "sha256:00c10c7a8dac0f8f79eaf2996bd5aa37a1ef0996c9366f2277ff875934d41b4b",
+      "source": "service/config.py:1",
+      "sourceDigest": "sha256:f39384191e8cc0cd25d700fbbfa6c83de9b63aed764d62016691d812493af85a"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 11,
+      "lineHash": "sha256:48a73989bb7f2ffe57cd58fce2905c1101c0a12db8554aa8c5672ee379e90fce",
+      "source": "service/handler.py:7",
+      "sourceDigest": "sha256:678549f42d14542a163e5beba94688d061890c3aa94a2d4202f19a5729c62237"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 11,
+      "lineHash": "sha256:48a73989bb7f2ffe57cd58fce2905c1101c0a12db8554aa8c5672ee379e90fce",
+      "source": "service/handler.py:10",
+      "sourceDigest": "sha256:b5e73ebdf75555cb15e1bf6b968d00b58569d0068905495936beb3cc214b0511"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 11,
+      "lineHash": "sha256:48a73989bb7f2ffe57cd58fce2905c1101c0a12db8554aa8c5672ee379e90fce",
+      "source": "service/health.py:2",
+      "sourceDigest": "sha256:0f9ef99e8e8f6265b6091bc45a1b5431dc65bb066794d44a0c02821b68670127"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:e33c213078d0539f39f198ad9c8a4eca79b683f47ff24d4f312e448aa62d9480",
+      "source": "tests/test_config.py:6",
+      "sourceDigest": "sha256:dd6096ea60af6de777f3a347083ca330d9d235873833f20353f91450539fb052"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:e33c213078d0539f39f198ad9c8a4eca79b683f47ff24d4f312e448aa62d9480",
+      "source": "tests/test_config.py:7",
+      "sourceDigest": "sha256:f377c37686d4b6122362966a2db613ed4f183e38eaf89cdb9ab31811b0bc012c"
+    },
+    {
+      "file": "AGENTS.md",
+      "line": 14,
+      "lineHash": "sha256:e33c213078d0539f39f198ad9c8a4eca79b683f47ff24d4f312e448aa62d9480",
+      "source": "service/config.py:2",
+      "sourceDigest": "sha256:c42109b381afe96e309212b9b8b3a53e7278b2ed4ba85533cf4df0b08262872a"
+    }
+  ],
+  "scope": ".",
+  "targets": [
+    "claude",
+    "codex"
+  ],
+  "tool": "contextify",
+  "toolVersion": "0.3.0",
+  "unverifiedLines": [],
+  "version": 2
+}

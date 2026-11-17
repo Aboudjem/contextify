@@ -362,7 +362,7 @@ def do_recover(root):
     lines = ["contextify recover", "",
              ctxlib.label("Result") + "previous generation restored",
              ctxlib.label("Files") + (", ".join(restored) if restored else "none changed"),
-             ctxlib.label("Next") + "/contextify check"]
+             ctxlib.label("Next") + ctxlib.CLAUDE_COMMAND + " check"]
     sys.stdout.write("\n".join(lines) + "\n")
     return 0
 
@@ -485,7 +485,7 @@ def run_with_draft(root, opts, draft):
                     for rel, new_text, old_text, _n in merged if new_text != old_text]
         out.extend(summary_block("init --dry-run", scope, size_class, targets, proposed,
                                  len(ctxlib.collect_evidence(root)), len(unverified),
-                                 "/contextify init --yes", verb_result="proposed"))
+                                 ctxlib.CLAUDE_COMMAND + " init --yes", verb_result="proposed"))
         for warning in warnings:
             out.append(ctxlib.label("Warning") + warning)
         sys.stdout.write("\n".join(out) + "\n")
@@ -513,7 +513,7 @@ def run_with_draft(root, opts, draft):
             return 0
         sys.stdout.write("\n".join(summary_block(
             "update", scope, size_class, targets, [], len(new_stamp["evidence"]),
-            len(unverified), "/contextify check")) + "\n")
+            len(unverified), ctxlib.CLAUDE_COMMAND + " check")) + "\n")
         return 0
 
     if stamp_is_current and old_stamp_text is not None:
@@ -570,7 +570,7 @@ def run_with_draft(root, opts, draft):
 
     lines = summary_block("init", scope, size_class, targets, written,
                           len(new_stamp["evidence"]), len(unverified),
-                          "/contextify check")
+                          ctxlib.CLAUDE_COMMAND + " check")
     for warning in warnings:
         lines.append(ctxlib.label("Warning") + warning)
     for note in notes:

@@ -161,7 +161,7 @@ Colour is off by default and a non-empty `NO_COLOR` beats `--color`. An unsuppor
 
 ## D9. The `ctx-check` exit contract
 
-**Decision.** Locked, in every invocation mode: `0` with empty stdout is fresh; `0` with non-empty stdout is drift or a strict-policy finding, at most 12 lines and 2,048 UTF-8 bytes; `3` is no stamp; `1` is the check itself breaking, stderr only with stdout empty. Never `2`, never a model call, never a write, never a touch of the index. A non-git directory exits 0 silently. CI strictness is a separate opt-in adapter, `ctx-gate`, that turns a missing stamp or a reported finding into a non-zero CI result; it wraps `ctx-check` and does not redefine its codes.
+**Decision.** Locked, in every invocation mode: `0` with empty stdout is fresh; `0` with non-empty stdout is drift or a strict-policy finding, at most 12 lines and 2,048 UTF-8 bytes; `3` is no stamp; `1` is the check itself breaking, stderr only with stdout empty. Never `2`, never a model call, never a write, never a touch of the index. A non-git directory exits 0 silently. CI strictness is a separate opt-in adapter, `ctx-gate`, that turns a missing stamp or a reported finding into a non-zero CI result; it wraps `ctx-check` and does not redefine its codes. As shipped, that adapter is the `--ci --strict` and `--git --strict` modes: they exit 1 on drift or a missing stamp. `--strict` alone keeps every code above.
 
 **Why / Source.** B, honouring the locked contract. A session-start hook that blocks or errors gets blamed for everything else and switched off within a week. Exit table and non-git guard: `04-auto-update-mechanics.md`. A and C both proposed exit 4 here and were corrected.
 
@@ -172,9 +172,9 @@ Colour is off by default and a non-empty `NO_COLOR` beats `--color`. An unsuppor
 ```text
 contextify init
 
-Result   written
-Scope    .
-Targets  claude, gemini, cursor-rule, copilot
+Result     written
+Scope      .
+Targets    claude, gemini, cursor-rule, copilot
 
 Files written                              Lines
 AGENTS.md                                     60
@@ -187,7 +187,7 @@ GEMINI.md                                      3
 
 Evidence     18 records
 Unverified    0 claims
-Next         /contextify check
+Next         /contextify:contextify check
 ```
 
 Every file actually written appears, lines measured after serialization, aligned columns, no colour, one final summary block.
@@ -196,22 +196,23 @@ Every file actually written appears, lines measured after serialization, aligned
 
 ## D11. The drift notice
 
-**Decision.** Literal shape, ten lines here, 12 the hard maximum. The order is fixed: the verdict line, three numbered actions, then the detail with dead claims first. Excess findings collapse into a count.
+**Decision.** Literal shape, eleven lines here, 12 the hard maximum. The order is fixed: the verdict line, three numbered actions, the `Agents` line, then the detail with dead claims first. Excess findings collapse into a count.
 
 ```text
 contextify: drift
-1. Run /contextify update to fix AGENTS.md:14 (npm run lint:css)
+1. Run /contextify:contextify update to fix AGENTS.md:14 (npm run lint:css)
 2. Review the diff it shows before it writes
 3. Commit the context files with .contextify/
-Scope    .
-Stale    AGENTS.md:14 references npm run lint:css
-Changed  package.json#scripts
-Removed  script lint:css
-Files    0 written
-Accept   unavailable until the stale command is corrected
+Agents     outside Claude Code, ask for "contextify update"
+Scope      .
+Stale      AGENTS.md:14 references npm run lint:css
+Changed    package.json#scripts
+Removed    script lint:css
+Files      0 written
+Accept     unavailable until the stale command is corrected
 ```
 
-When only moved-evidence rows exist and no claim is dead, the actions read `1. Run /contextify update if the instructions must change`, `2. Run /contextify accept if they are still right` and `3. Commit the refreshed .contextify/ metadata`, and the notice ends on `Files    0 written`. A dead command quoted in the first action is cut to 60 characters. Releases before 0.3.0 printed the detail first and a closing `Next` line; 0.3.0 moved the actions under the verdict so a reader who stops after four lines knows what to do. Control characters are escaped. An evidence key that no generated line cites changes silently.
+When only moved-evidence rows exist and no claim is dead, the actions read `1. Run /contextify:contextify update if the instructions must change`, `2. Run /contextify:contextify accept if they are still right` and `3. Commit the refreshed .contextify/ metadata`, and the notice ends on `Files      0 written`. Since 0.3.1 the actions use the command Claude Code accepts, `/contextify:contextify`, because the plugin prefixes the skill. The `Agents` line says what to type in other agents, which have no prefix. Every label pads to 11 columns, so `Unverified` lines up with the rest. A dead command quoted in the first action is cut to 60 characters. Releases before 0.3.0 printed the detail first and a closing `Next` line; 0.3.0 moved the actions under the verdict so a reader who stops after four lines knows what to do. Control characters are escaped. An evidence key that no generated line cites changes silently.
 
 **Why / Source.** B, primary. A bounded notice is the only kind that can be injected at session start without becoming the bloat it prevents. Shape and the roughly 70-token cost target: `04-auto-update-mechanics.md`, SessionStart hook section.
 

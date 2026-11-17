@@ -109,7 +109,7 @@ def main(argv):
                                  "resolves (%s)\n"
                                  % (claim.file, claim.line, claim.text, claim.reason))
             sys.stderr.write("contextify: accept refuses while a quoted command is dead; "
-                             "run /contextify update instead\n")
+                             "run /contextify:contextify update instead\n")
             return 4
         problems = []
         for rel in before:
@@ -161,7 +161,7 @@ def main(argv):
         ctxlib.label("Claims") + "%d checked" % len(claims),
         ctxlib.label("Unverified") + "%d claims"
         % (len([c for c in claims if c.status == "unverified"]) + len(evidence.get("unverifiedLines", []))),
-        ctxlib.label("Next") + "/contextify check",
+        ctxlib.label("Next") + ctxlib.CLAUDE_COMMAND + " check",
     ]
     sys.stdout.write("\n".join(lines) + "\n")
     return 0

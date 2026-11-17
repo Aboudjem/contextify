@@ -82,9 +82,42 @@ class HookTests(unittest.TestCase):
         result = self.install('--yes', '--targets', 'github')
         self.assertEqual(result.returncode, 0, result.stderr)
         workflow = (self.root / '.github/workflows/contextify-check.yml').read_text()
-        self.assertIn('--branch v0.3.0', workflow)
+        self.assertIn('--branch v0.3.1', workflow)
         self.assertIn('$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check', workflow)
         self.assertNotIn(str(INSTALLER.parent), workflow)
+
+    def workflow_run_line(self):
+        workflow = (self.root / '.github/workflows/contextify-check.yml').read_text()
+        line = [l for l in workflow.splitlines() if 'ctx-check' in l][0]
+        # Run the generated step with this checkout standing in for the released clone.
+        command = line.split('run: ', 1)[1].replace('$RUNNER_TEMP/contextify/', str(INSTALLER.parents[3]) + '/')
+        return subprocess.run(['sh', '-c', command], cwd=self.root, capture_output=True, text=True, env=self.env)
+
+    def test_strict_ci_workflow_fails_on_drift_and_advisory_does_not(self):
+        self.init_git()
+        result = self.install('--yes', '--strict', '--targets', 'github')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.fresh()
+        workflow = (self.root / '.github/workflows/contextify-check.yml').read_text()
+        self.assertIn('ctx-check" --ci --strict\n', workflow)
+        fresh = self.workflow_run_line()
+        self.assertEqual(fresh.returncode, 0, fresh.stdout + fresh.stderr)
+        (self.root / 'package.json').write_text('{"name":"fixture","scripts":{}}')
+        drift = self.workflow_run_line()
+        self.assertEqual(drift.returncode, 1, drift.stdout + drift.stderr)
+        self.assertIn('contextify: drift', drift.stdout)
+        (self.root / '.github/workflows/contextify-check.yml').unlink()
+        result = self.install('--yes', '--targets', 'github')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        advisory = self.workflow_run_line()
+        self.assertEqual(advisory.returncode, 0, advisory.stdout + advisory.stderr)
+        self.assertIn('contextify: drift', advisory.stdout)
+
+    def test_strict_needs_a_git_or_github_target(self):
+        result = self.install('--yes', '--strict', '--targets', 'codex')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('--strict requires the git or github target', result.stderr)
+        self.assertFalse((self.root / '.codex').exists())
 
     def test_cursor_existing_config_gets_version_and_unknown_version_refuses(self):
         path = self.root / '.cursor/hooks.json'
@@ -158,6 +191,9 @@ class HookTests(unittest.TestCase):
         before = global_config.read_bytes()
         result = self.install('--yes', '--activate')
         self.assertNotEqual(result.returncode, 0)
+        # The refusal names the way forward: the exact line to add to the existing hooks.
+        self.assertIn('core.hooksPath', result.stderr)
+        self.assertIn('ctx-check --git', result.stderr)
         self.assertFalse((self.root / '.githooks').exists())
         self.assertEqual(global_config.read_bytes(), before)
 

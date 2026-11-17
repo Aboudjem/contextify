@@ -13,7 +13,7 @@ description: >-
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
-  version: "0.3.0"
+  version: "0.3.1"
 ---
 
 # contextify
@@ -171,8 +171,8 @@ You write a draft. You never write a target file yourself.
 
 1. Run `sh "${CLAUDE_SKILL_DIR}/scripts/ctx-check" <path>`.
 2. Relay its output exactly. Empty output means fresh: say so in one line and stop.
-3. Write nothing in this mode, not even a fix the notice makes obvious. Offer `/contextify update`
-   and let the user decide.
+3. Write nothing in this mode, not even a fix the notice makes obvious. Offer `update` (in Claude Code,
+   `/contextify:contextify update`) and let the user decide.
 
 ### accept
 
@@ -218,8 +218,9 @@ touch the git index, or rewrite context or metadata. CI mode may append its repo
 `GITHUB_STEP_SUMMARY`; Git mode is read-only. Exit 0 with empty output is fresh, exit 0 with a notice is drift,
 exit 3 is no stamp yet, exit 1 is the check itself breaking. When the repo is fresh it prints
 nothing, which is why a fresh hook adds no output. Git mode (`--git`) is read-only and silent when
-fresh. Default Git wrappers warn without blocking; `--strict` opts into blocking drift, missing
-stamps or errors. They check the working tree, not the staged index or the refs being pushed.
+fresh. Default Git wrappers warn without blocking; installer `--strict` opts into blocking drift, missing
+stamps or errors (`ctx-check --git --strict`). For CI, only `ctx-check --ci --strict` fails on drift;
+`--strict` alone keeps exit 0. They check the working tree, not the staged index or the refs being pushed.
 
 **Read-only for any live fact.** Cloud, deploy and CI reads are describe, list and get calls only,
 and only when the CLI and credentials already exist. Credentials absent means skip in silence and
@@ -272,9 +273,9 @@ the numbers come from a fixture:
 ```text
 contextify init
 
-Result   written
-Scope    .
-Targets  claude, gemini, cursor-rule, copilot
+Result     written
+Scope      .
+Targets    claude, gemini, cursor-rule, copilot
 
 Files written                              Lines
 AGENTS.md                                     60
@@ -287,25 +288,26 @@ GEMINI.md                                      3
 
 Evidence     18 records
 Unverified    0 claims
-Next         /contextify check
+Next         /contextify:contextify check
 ```
 
 Every file actually written appears in it. Lines are counted after serialization.
 
-**On screen, from the drift check**, at most 12 lines: the verdict, three numbered actions, then the
-detail with dead claims first. Again a fixture rendering:
+**On screen, from the drift check**, at most 12 lines: the verdict, three numbered actions, an
+`Agents` line for hosts without the plugin prefix, then the detail with dead claims first. Again a fixture rendering:
 
 ```text
 contextify: drift
-1. Run /contextify update to fix AGENTS.md:14 (npm run lint:css)
+1. Run /contextify:contextify update to fix AGENTS.md:14 (npm run lint:css)
 2. Review the diff it shows before it writes
 3. Commit the context files with .contextify/
-Scope    .
-Stale    AGENTS.md:14 references npm run lint:css
-Changed  package.json#scripts
-Removed  script lint:css
-Files    0 written
-Accept   unavailable until the stale command is corrected
+Agents     outside Claude Code, ask for "contextify update"
+Scope      .
+Stale      AGENTS.md:14 references npm run lint:css
+Changed    package.json#scripts
+Removed    script lint:css
+Files      0 written
+Accept     unavailable until the stale command is corrected
 ```
 
 **The files, and who reads which:**
@@ -327,8 +329,9 @@ the tool version, the commit, the normalized digest of every piece of evidence, 
 claim with its resolver and location. Commit it. Without it, `check` exits 3 and the repo is back to
 a context file nobody can date.
 
-**The next commands**, printed in this order: `/contextify check` after a write, `/contextify update`
-after a drift notice, `/contextify accept` when only evidence moved.
+**The next commands**, printed in this order: `check` after a write, `update` after a drift notice,
+`accept` when only evidence moved. In Claude Code they are `/contextify:contextify check` and so on.
+In other agents, name the mode in words, such as "contextify update".
 
 ## Reference files
 

@@ -101,7 +101,7 @@ VENDOR_DIRS = (
     ".next/", ".git/", "__pycache__/", ".tox/", "site-packages/",
 )
 
-LABEL_WIDTH = 9
+LABEL_WIDTH = 11  # the longest label (Unverified) plus one space, so every value lines up
 
 
 class CtxError(Exception):
@@ -240,7 +240,7 @@ def tool_version():
                 return v
         except ValueError:
             pass
-    return "0.3.0"
+    return "0.3.1"
 
 
 def load_json_file(path):
@@ -2083,7 +2083,7 @@ def gitignore_merged_text(root):
 # --------------------------------------------------------------------------------------
 
 def label(text):
-    # A label as long as the column (Unverified) still gets one space before its value.
+    # Every label pads to one column, so the values of a notice line up.
     return (text + " ").ljust(LABEL_WIDTH)
 
 
@@ -2257,12 +2257,19 @@ def notice_actions(result):
         quoted = _sanitize(first["text"])
         if len(quoted) > 60:
             quoted = quoted[:57] + "..."
-        return ["1. Run /contextify update to fix %s:%s (%s)" % (first["file"], first["line"], quoted),
+        return ["1. Run %s update to fix %s:%s (%s)" % (CLAUDE_COMMAND, first["file"], first["line"], quoted),
                 "2. Review the diff it shows before it writes",
                 "3. Commit the context files with .contextify/"]
-    return ["1. Run /contextify update if the instructions must change",
-            "2. Run /contextify accept if they are still right",
+    return ["1. Run %s update if the instructions must change" % CLAUDE_COMMAND,
+            "2. Run %s accept if they are still right" % CLAUDE_COMMAND,
             "3. Commit the refreshed .contextify/ metadata"]
+
+
+def notice_elsewhere(result):
+    """What to type outside Claude Code, where the plugin prefix does not exist."""
+    if result.stale:
+        return label("Agents") + 'outside Claude Code, ask for "contextify update"'
+    return label("Agents") + 'outside Claude Code, ask for "contextify update" or "contextify accept"'
 
 
 def notice_lines(result):
@@ -2290,9 +2297,10 @@ def notice_lines(result):
     for rel in result.edited:
         findings.append((label("Edited"), "%s managed block was edited by hand" % rel))
 
-    # Verdict, then the three things to do, then the detail. A reader who stops after
-    # four lines still knows the state and the next command.
-    head = ["contextify: drift"] + notice_actions(result) + [label("Scope") + result.scope]
+    # Verdict, then the three things to do and what to type outside Claude Code, then the
+    # detail. A reader who stops after five lines still knows the state and the next command.
+    head = (["contextify: drift"] + notice_actions(result)
+            + [notice_elsewhere(result), label("Scope") + result.scope])
     tail = [label("Files") + "0 written"]
     if result.stale:
         tail.append(label("Accept") + "unavailable until the stale command is corrected")
@@ -2314,7 +2322,10 @@ def notice_text(result):
     return "\n".join(notice_lines(result))
 
 
-NOSTAMP_LINE = "contextify: no stamp yet. Run /contextify init"
+# In Claude Code the plugin prefixes the skill; other agents run it when asked by name.
+CLAUDE_COMMAND = "/contextify:contextify"
+NOSTAMP_LINE = ('contextify: no stamp yet. Run %s init (other agents: ask for "contextify init")'
+                % CLAUDE_COMMAND)
 
 
 def envelope(hook, text):

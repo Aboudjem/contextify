@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2026-11-17
+
+### Fixed
+
+- The README exit table was wrong. `--strict` alone keeps exit 0 on drift. Only `--ci --strict` and `--git --strict` exit 1, and the docs now say so.
+- The drift notice now gives `/contextify:contextify update`, the command Claude Code accepts. A new `Agents` line says what to type in other agents.
+- Every notice label pads to 11 columns, so `Unverified` no longer breaks the alignment.
+- Writer and accept summaries name `/contextify:contextify check` for the same reason. The no-stamp line names both forms.
+
+### Added
+
+- `install_hooks.sh --strict --targets github` writes a CI workflow whose step runs `ctx-check --ci --strict`, so drift fails the job.
+- The hooks installer refusal for an existing `core.hooksPath` now prints the exact line to add to your own hooks.
+- The README shows how to run the drift check by hand for the plugin and the skills CLI installs.
+- The 0.3.0 example ships its stamp, evidence and draft, plus `replay.sh`, which replays the README sample.
+- A test fails if any doc shows `--strict` without `--ci` or `--git`.
+- The generated CI workflow clones tag `v0.3.1`.
+
 ## [0.3.0] - 2026-11-17
 
 ### Changed
@@ -68,5 +86,6 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 
 [0.1.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.1.0
 
+[0.3.1]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.1
 [0.3.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.2.0

@@ -140,7 +140,7 @@ def main(argv):
 
     if os.path.exists(os.path.join(root, ctxlib.JOURNAL_REL)):
         sys.stderr.write("contextify: an interrupted write left .contextify/journal.json; "
-                         "run /contextify update to recover\n")
+                         "run /contextify:contextify update to recover (other agents: ask for \"contextify update\")\n")
         return 1
 
     try:

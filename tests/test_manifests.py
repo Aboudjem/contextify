@@ -16,6 +16,7 @@ Manifest + contract tests for contextify (a release gate; runs in CI).
   7. Every references/*.md path SKILL.md mentions exists on disk.
   8. READMEs/{es,fr,ja,zh-CN}.md exist and carry the may-lag marker.
   9. No tracked file matches a credential pattern.
+ 10. No doc shows `ctx-check --strict` without `--ci` or `--git`, a form that exits 0 on drift.
 
 Standard library only. Run: python3 tests/test_manifests.py   (exit 0 = all pass)
 """
@@ -408,6 +409,32 @@ for _rel in subprocess.run(["git", "ls-files"], capture_output=True, text=True,
     except (OSError, UnicodeDecodeError):
         continue
 check("no em dash (U+2014) in any tracked text file", not _em_hits, ", ".join(_em_hits[:6]))
+
+# --- 10. every documented strict check fails on drift ---
+# `--strict` alone keeps exit 0 on drift (D9): only `--ci --strict` and `--git --strict` exit 1.
+# A doc that shows the checker with `--strict` but without `--ci` or `--git` would hand a reader
+# a CI line that never fails, so every doc is scanned for that form.
+_CHECK_CALL = re.compile(r"ctx[-_]check(?:\.py)?\"?((?:\s+--?[\w=-]+)+)")
+_strict_hits = []
+for _rel in subprocess.run(["git", "ls-files"], capture_output=True, text=True,
+                           cwd=ROOT).stdout.splitlines():
+    if _rel.startswith(("tests/", "evals/dogfood-evidence/")):
+        continue
+    if not (_rel.endswith((".md", ".txt", ".yml", ".yaml")) or _rel.endswith("install_hooks.sh")):
+        continue
+    try:
+        _text = read(_rel)
+    except (OSError, UnicodeDecodeError):
+        continue
+    for _n, _line in enumerate(_text.splitlines(), 1):
+        for _m in _CHECK_CALL.finditer(_line):
+            _flags = _m.group(1).split()
+            if "--strict" in _flags and "--ci" not in _flags and "--git" not in _flags:
+                _strict_hits.append(f"{_rel}:{_n}")
+        if re.search(r"drift under `--strict`|add `?--strict`? to the workflow", _line, re.I):
+            _strict_hits.append(f"{_rel}:{_n}")
+check("no doc shows a strict check that would exit 0 on drift (needs --ci or --git)",
+      not _strict_hits, ", ".join(_strict_hits[:6]))
 
 # --- 9. no secrets (the CI patterns, mirrored so a local run catches them too) ---
 SECRETS = [re.compile(p) for p in (
