@@ -14,7 +14,8 @@ Manifest + contract tests for contextify (a release gate; runs in CI).
   5. Every relative link in README.md resolves to a file that exists.
   6. Every asset README.md references resolves to a file that exists.
   7. Every references/*.md path SKILL.md mentions exists on disk.
-  8. READMEs/{es,fr,ja,zh-CN}.md exist and carry the may-lag marker.
+  8. READMEs/{es,fr,ja,zh-CN}.md exist, carry the may-lag marker, and match README.md:
+     same code blocks, heading levels and <picture> tag, a closing note, live links.
   9. No tracked file matches a credential pattern.
  10. No doc shows `ctx-check --strict` without `--ci` or `--git`, a form that exits 0 on drift.
 
@@ -337,6 +338,33 @@ else:
           "missing under skills/contextify/references/: " + ", ".join(missing_refs[:8]))
 
 # --- 8. translations ---
+FENCE_RE = re.compile(r"^```[^\n]*\n.*?^```[ \t]*$", re.M | re.S)
+RELLINK_RE = re.compile(r"\]\(([^)\s]+)\)")
+
+
+def strip_code(text):
+    return FENCE_RE.sub("", text)
+
+
+def readme_shape(text):
+    pic = re.search(r"<picture>.*?</picture>", text, re.S)
+    return {
+        "code": FENCE_RE.findall(text),
+        "levels": [len(m.group(1)) for m in re.finditer(r"^(#{1,6}) ", strip_code(text), re.M)],
+        "picture": pic.group(0) if pic else "",
+    }
+
+
+def first_diff(a, b):
+    if len(a) != len(b):
+        return "%d code blocks vs %d in English" % (len(a), len(b))
+    for x, y in zip(a, b):
+        if x != y:
+            return "differs at: %r" % x[:120]
+    return ""
+
+
+_readme_en = read("README.md")
 for lang in TRANSLATIONS:
     rel = f"READMEs/{lang}.md"
     exists = os.path.isfile(os.path.join(ROOT, rel))
@@ -348,6 +376,25 @@ for lang in TRANSLATIONS:
           f"{rel} has no language switcher pointing at ../README.md")
     check(f"{rel} carries the may-lag marker", "<!-- may-lag -->" in t,
           f"{rel} must carry the literal `<!-- may-lag -->` marker")
+    # A translation is the English README in another language, not a summary of an old one.
+    ours, theirs = readme_shape(t), readme_shape(_readme_en)
+    check(f"{rel} has the same code blocks as README.md, byte for byte",
+          ours["code"] == theirs["code"], first_diff(ours["code"], theirs["code"]))
+    check(f"{rel} has the same heading levels as README.md, in order",
+          ours["levels"] == theirs["levels"],
+          "%s vs English %s" % (ours["levels"], theirs["levels"]))
+    check(f"{rel} keeps the <picture> tag of README.md (paths one level up)",
+          ours["picture"] == theirs["picture"].replace('"assets/', '"../assets/'),
+          ours["picture"][:200])
+    check(f"{rel} ends with the machine-assisted translation note",
+          "../README.md" in t.strip().splitlines()[-1], t.strip().splitlines()[-1][:120])
+    bad = [m for m in ("\u2014", "&" + "mdash;", "&#" + "8212;", " \u2013 ", "/stargazers", "img.shields.io/github/stars")
+           if m in t]
+    check(f"{rel} has no em dash and no stars badge", not bad, ", ".join(bad))
+    dead = [l for l in RELLINK_RE.findall(strip_code(t))
+            if not l.startswith(("http://", "https://", "#", "mailto:"))
+            and not os.path.exists(os.path.normpath(os.path.join(ROOT, "READMEs", l.split("#")[0])))]
+    check(f"every relative link in {rel} resolves", not dead, ", ".join(dead[:5]))
 
 # --- 8b. contextify-specific: the hook manifest and the scripts ---
 # Installation does not register automatic session events. Git checks require the installer.

@@ -13,7 +13,7 @@ description: >-
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
-  version: "0.3.1"
+  version: "0.3.2"
 ---
 
 # contextify
@@ -216,7 +216,7 @@ hook. Session hooks are optional adapters and must be explicitly selected.
 **The check reports, and that is all.** `ctx-check` must never exit 2, never call a model, never
 touch the git index, or rewrite context or metadata. CI mode may append its report to
 `GITHUB_STEP_SUMMARY`; Git mode is read-only. Exit 0 with empty output is fresh, exit 0 with a notice is drift,
-exit 3 is no stamp yet, exit 1 is the check itself breaking. When the repo is fresh it prints
+exit 3 is no stamp yet (exit 0 under `--ci` and `--git`), exit 1 is the check itself breaking. When the repo is fresh it prints
 nothing, which is why a fresh hook adds no output. Git mode (`--git`) is read-only and silent when
 fresh. Default Git wrappers warn without blocking; installer `--strict` opts into blocking drift, missing
 stamps or errors (`ctx-check --git --strict`). For CI, only `ctx-check --ci --strict` fails on drift;

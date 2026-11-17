@@ -56,9 +56,15 @@ sh .agents/skills/contextify/scripts/ctx-check
 
 For a Claude Code skills install, the folder is `.claude/skills/contextify` instead. Add `--ci --strict` to make drift exit 1.
 
+Installing the skill does not count as drift. The check skips contextify's own copy under any agent folder and `skills-lock.json`. Other skills you add to `.agents/skills` do count, as a `tree#depth2` change. To ignore them, add this one line:
+
+```bash
+echo ".agents/" >> .gitignore
+```
+
 ### Sample report
 
-On 2026-11-17, contextify 0.3.0 wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. 0.3.1 prints this for that repo, at no token cost:
+On 2026-11-17, contextify 0.3.0 wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. 0.3.2 prints this for that repo, at no token cost:
 
 ```text
 contextify: drift
@@ -111,15 +117,16 @@ Only the targets you pick get a pointer file. Every factual line maps to a sourc
 
 The drift check exits 0 with no output when the repo is fresh. On drift it prints the notice above and still exits 0. It never rewrites a file.
 
-| Exit         | Meaning                                                           |
-| ------------ | ----------------------------------------------------------------- |
-| 0, no output | Fresh                                                             |
-| 0, a notice  | Drift found; at most 12 lines and 2,048 bytes                     |
-| 1            | The check itself broke                                            |
-| 1            | Drift or no stamp, under `--ci --strict` or `--git --strict` only |
-| 3            | No stamp yet: run `init` first                                    |
+Exit codes, measured in bash on 2026-11-17 with 0.3.2:
 
-`--strict` alone does not change the exit code. It only reports unverified claims as drift. In CI, use `ctx-check --ci --strict` so drift fails the job.
+| Mode                                             | Fresh                   | Drift                   | No stamp yet            | Check broke |
+| ------------------------------------------------ | ----------------------- | ----------------------- | ----------------------- | ----------- |
+| plain, `--strict`, `--json`, `--hook <agent>`    | 0, no output            | 0, the notice           | 3, the `init` notice    | 1           |
+| `--ci`                                           | 0, `contextify: fresh`  | 0, the notice           | 0, the `init` notice    | 1           |
+| `--git`                                          | 0, no output            | 0, the notice on stderr | 0, the notice on stderr | 1           |
+| `--ci --strict`, `--git --strict`                | 0                       | 1                       | 1                       | 1           |
+
+The notice is at most 12 lines and 2,048 bytes. `--json` prints it as one line of JSON. `--strict` alone never changes the exit code. It only counts unverified claims as drift.
 
 Git checks are opt-in. At the end of `init` the skill offers to install `pre-commit` and `pre-push` checks. From a clone of this repo you can also run:
 
@@ -131,7 +138,7 @@ They warn by default and refuse to replace existing hooks. Add `--strict` to blo
 
 Activation refuses when a global `core.hooksPath` is set, since it would hide your other hooks. Call `ctx-check --git` from the hook manager you already use instead.
 
-For a CI job that fails on drift, generate the workflow in strict mode. Its step runs `ctx-check --ci --strict`:
+For a CI job that fails on drift, generate the workflow in strict mode. Its step runs `ctx-check --ci --strict`. That also fails on a missing stamp and on any unverified claim, even in a repo with no other drift:
 
 ```bash
 bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes /path/to/repo
@@ -153,9 +160,9 @@ It printed this on 2026-11-17 (one summary line per suite, in run order):
 tests/test_ctx_check.py        128/128 checks passed
 tests/test_verify_claims.py     30/30 checks passed
 tests/test_hooks.py             Ran 22 tests, OK
-tests/test_regressions.py       Ran 23 tests, OK
+tests/test_regressions.py       Ran 25 tests, OK
 tests/test_supporting_docs.py   Ran 16 tests, OK
-tests/test_manifests.py        131/131 checks passed
+tests/test_manifests.py        155/155 checks passed
 evals/check_skill.py           114/114 checks passed
 make dogfood                   PASS: ctx-check is fresh and silent
                                29 claims, 0 stale, 0 unverified
@@ -201,6 +208,8 @@ More answers in the [full FAQ](docs/faq.md).
 - A resolved command was found, not executed. Repository evidence can itself be wrong.
 - The resolver does not understand every shell expression or build system. Lines it cannot check are labelled `unverified`.
 - An [ETH Zurich study](https://arxiv.org/abs/2602.11988) found no general task-success gain from context files, and an inference cost rise above 20%. contextify has no measured task-success advantage. Keep only lines that prevent a concrete mistake.
+- Other skills installed next to contextify, in `.agents/skills` or another agent folder, show as tree drift. Add `.agents/` (or that folder) to `.gitignore` to ignore them.
+- A stamp written by 0.3.1 or older, with the skill already installed, lists `.agents/skills/`. After the upgrade the check shows one `Changed tree#depth2`. Run `accept` once.
 - Writing a plugin repo? `claude plugin validate --strict` warns on a root `CLAUDE.md`. Point `.claude/CLAUDE.md` at `@../AGENTS.md` by hand, as this repo does. The writer does not target that path yet.
 - Privacy: the scripts make no network call. Drafting uses your own coding agent and its usual connection.
 

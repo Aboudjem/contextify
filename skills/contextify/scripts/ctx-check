@@ -1,7 +1,7 @@
 #!/bin/sh
 # ctx-check - contextify's freshness check. Resolves the installation path and
 # runs ctx_check.py on every check. POSIX sh; see SCRIPTS-SPEC.md.
-# Exit: 0 empty stdout = fresh; 0 with stdout = drift; 3 = no stamp; 1 = the check broke.
+# Exit: 0 empty stdout = fresh; 0 with stdout = drift; 3 = no stamp (0 under --ci, --git); 1 = broke.
 set -f
 
 # DISCOVERY_GLOBS_BEGIN

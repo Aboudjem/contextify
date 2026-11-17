@@ -5,12 +5,12 @@ Recomputes every normalizer over the working tree, compares against the stamp,
 re-resolves every claim quoted in the context files and prints the bounded drift
 notice (D11). Never writes, never calls a model, never touches the git index.
 
-Exit contract (D9), locked in every mode:
+Exit contract (D9). Session modes (plain, --strict, --json, --hook):
   0 with empty stdout   fresh
   0 with stdout         drift, at most 12 lines and 2,048 bytes
-  3                     no stamp yet
+  3                     no stamp yet (--ci and --git exit 0 here and still print the notice)
   1                     the check itself broke (stderr only, stdout empty)
-Never 2. --ci --strict and --git --strict turn drift into exit 1.
+Never 2. --ci --strict and --git --strict turn drift and a missing stamp into exit 1.
 """
 
 import json

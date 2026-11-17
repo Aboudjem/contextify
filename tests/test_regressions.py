@@ -324,5 +324,42 @@ class ReviewRegressions(unittest.TestCase):
         self.assertIn('integrity', r.stderr)
 
 
+    def test_skills_cli_install_of_contextify_is_not_drift(self):
+        # `npx skills add Aboudjem/contextify` drops these into a project (skills@1.9.0, 2026-11-17).
+        self.assertEqual(self.write().returncode, 0)
+        self.assertEqual(self.cli('ctx_check.py').stdout, '')
+        self.put('.agents/skills/contextify/SKILL.md', '---\nname: contextify\n---\n')
+        self.put('.agents/skills/contextify/scripts/ctx-check', '#!/bin/sh\n')
+        self.put('.agents/skills/contextify/references/verification.md', '# v\n')
+        (self.repo / '.claude/skills').mkdir(parents=True)
+        (self.repo / '.claude/skills/contextify').symlink_to('../../.agents/skills/contextify', target_is_directory=True)
+        self.put('skills-lock.json', '{"skills": {"contextify": {}}}\n')
+        r = self.cli('ctx_check.py')
+        self.assertEqual((r.returncode, r.stdout), (0, ''), r.stderr)
+        # Only contextify's own copy is ignored: another skill in the same folder still counts.
+        self.put('.agents/skills/other/SKILL.md', '---\nname: other\n---\n')
+        r = self.cli('ctx_check.py')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertIn('tree#depth2', r.stdout)
+        self.assertFalse(ctxlib.is_excluded('skills/contextify/SKILL.md'))
+        self.assertFalse(ctxlib.is_excluded('docs/skills-lock.json'))
+
+    def test_json_next_is_the_command_the_text_notice_prints(self):
+        r = self.cli('ctx_check.py', '--json')
+        self.assertEqual(r.returncode, 3, r.stderr)
+        nostamp = json.loads(r.stdout)
+        text = self.cli('ctx_check.py').stdout
+        self.assertEqual(nostamp['next'], '/contextify:contextify init')
+        self.assertIn('Run %s ' % nostamp['next'], text)
+        self.assertEqual(self.write().returncode, 0)
+        self.put('package.json', '{"scripts":{"lint":"runner"}}\n')
+        r = self.cli('ctx_check.py', '--json')
+        self.assertEqual(r.returncode, 0, r.stderr)
+        drift = json.loads(r.stdout)
+        self.assertEqual(drift['status'], 'drift')
+        self.assertEqual(drift['next'], '/contextify:contextify update')
+        self.assertIn('1. Run %s ' % drift['next'], self.cli('ctx_check.py').stdout)
+
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

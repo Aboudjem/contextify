@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/hero-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../assets/hero-light.svg">
-  <img alt="contextify" src="../assets/hero.svg" width="100%">
+  <img alt="contextify: one repository, one source of instructions, multiple coding agents" src="../assets/hero.svg" width="100%">
 </picture>
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
@@ -11,146 +11,216 @@
 
 <!-- may-lag -->
 
-**Tell every coding agent how your repo works. Then prove it is still true.**
+**どのコーディングエージェントにもリポジトリの仕組みを伝え、その内容が今も正しいことを証明します。**
 
-どのコーディングエージェントにもリポジトリの仕組みを伝え、その説明が今も有効か確認します。
-
-contextify は、エージェントが読んだファイルを基に、短いリポジトリ指示書を作る Agent Skill です。根拠を記録しておくことで、ローカルスクリプトが見直しの必要な変更を検出します。
-
-## できること
-
-- 共通の指示を一つの `AGENTS.md` にまとめ、ほかのエージェント向けには参照用ファイルを作ります。規模に応じて20、40、60行を目安とし、150行を超えるファイルは拒否します。
-- コマンドとパスをリポジトリ内の根拠に結び付けます。裏付けのない記述は `unverified` と明示するか省き、別のエージェントが草案を確認します。
-- モデルを呼び出さずに変更を検出します。最新なら何も表示せず、更新時は差分を提示します。管理対象ブロックの外にある人の記述は保持します。
-- 必要な場合だけアーキテクチャや作業手順の資料を追加し、`AGENTS.md` からリンクします。既存の正確な資料を優先して使います。
+contextify は、エージェントが読むファイルから短い `AGENTS.md` を 1 つ書きます。その後、内容が古くなるとローカルスクリプトが知らせます。
 
 ## インストール
 
-Claude Code の場合:
+Claude Code では、ターミナルから次を実行します。
 
 ```bash
 claude plugin marketplace add Aboudjem/10x
 claude plugin install contextify@10x
 ```
 
-ほかのエージェントにはスキルをインストールします。
-
-```bash
-npx skills add Aboudjem/contextify
-```
-
-現在のリポジトリで contextify を実行するようエージェントに依頼してください。Claude Code では次のコマンドを使います。
+次に、リポジトリの中で最初の下書きを頼みます。
 
 ```text
 /contextify:contextify init
 ```
 
-提示された差分を確認してから、生成された指示ファイルと `.contextify/` のメタデータをコミットします。スクリプトには Git、POSIX シェルツール、Bash、Python 3.11 以降が必要です。追加の Python パッケージや MCP サーバーは不要です。インストーラーは `npx` 経由で Node.js を使います。[エディター別の設定](../docs/editors.md)。
+Codex、Cursor、Gemini CLI などのエージェントでは、スキルをインストールします。
 
-## 出力例
-
-**v0.1.0** の過去の実例です。0.2.0 の追加機能を検証するものではありません。2026年9月17日、Next.js アプリ HazeLab の隔離コピーで実行した実例の抜粋です。Codex が指示書の草案を作り、Contextify がファイルを書き込みました。[完全な出力と根拠](../examples/nextjs/README.md)。
-
-```markdown
-## Commands
-- Development from the repository root: `pnpm run dev`.
-- Build: `pnpm run build`; this generates the Prisma client before building Next.js.
-- Lint: `pnpm run lint`.
-## Testing
-- No test script is declared in `package.json`; do not assume a package-manager test command exists.
-- `vitest.config.ts` selects jsdom and discovers TypeScript tests under the tests directory.
+```bash
+npx skills add Aboudjem/contextify
 ```
 
-コピー上で引用された `lint` スクリプトを削除すると、次の通知が出ました。
+これらのエージェントには `/contextify:` という接頭辞がありません。「contextify init」「contextify update」と言葉で頼んでください。
+
+必要なのは Git、Bash、Python 3.11 以降です。Python パッケージも MCP サーバーも不要で、スクリプトはネットワークに接続しません。
+
+### ドリフトチェックを手動で実行する
+
+リポジトリが最新なら何も表示しません。リポジトリのルートで実行してください。
+
+プラグインとしてインストールした場合:
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+`npx skills add` でインストールした場合 (Codex、Cursor など多くは `.agents/skills` を使います):
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+Claude Code にスキルとしてインストールした場合、フォルダは `.claude/skills/contextify` です。`--ci --strict` を付けると、ドリフト時に終了コード 1 を返します。
+
+スキルのインストール自体はドリフトになりません。チェックは、各エージェントフォルダにある contextify 自身のコピーと `skills-lock.json` を無視します。`.agents/skills` に追加した他のスキルは `tree#depth2` の変更として数えます。無視したい場合は、次の 1 行を追加します。
+
+```bash
+echo ".agents/" >> .gitignore
+```
+
+### レポートの例
+
+2026-11-17、contextify 0.3.0 が小さな Python サービスの `AGENTS.md` を書きました。その後、`Makefile` から `test-health` ターゲットを削除しました。0.3.2 はこのリポジトリに対して次を表示します。トークンは使いません。
 
 ```text
 contextify: drift
-Scope    .
-Stale    AGENTS.md:7 references pnpm run lint
-Changed  package.json#scripts
-Changed  provenance:package.json:10
-Removed  script lint
-Files    0 written
-Next     /contextify update
-Accept   unavailable until the stale command is corrected
+1. Run /contextify:contextify update to fix AGENTS.md:6 (make test-health)
+2. Review the diff it shows before it writes
+3. Commit the context files with .contextify/
+Agents     outside Claude Code, ask for "contextify update"
+Scope      .
+Stale      AGENTS.md:6 references make test-health
+Unverified AGENTS.md:6 python3 -m unittest tests.test_health
+Changed    makefile#targets
+More       +3 findings
+Files      0 written
+Accept     unavailable until the stale command is corrected
 ```
 
-元のリポジトリは変更していません。[実行記録と検証範囲](../evals/dogfood.md)を参照してください。
+最新のリポジトリでは何も表示されません。この実行のファイルとスタンプは例に同梱されているので、再生できます。
 
-## 作成するファイル
+```bash
+sh examples/python-service-0.3.0/replay.sh
+```
 
-以下は新規作成時の値です。既存の人の記述も行数制限に含まれます。
-
-| ファイル | 読み込むツール | 行数 |
-| --- | --- | --- |
-| `AGENTS.md` | Codex、Cursor、同じ規約に対応するエージェント | 目安20/40/60、上限150 |
-| `CLAUDE.md` | Claude Code。`@AGENTS.md` で参照 | 標準4 |
-| `GEMINI.md` | Gemini CLI。`@AGENTS.md` で参照 | 3 |
-| `.cursor/rules/contextify.mdc` | Cursor。`AGENTS.md` も直接読むため任意 | 9 |
-| `.github/copilot-instructions.md` | GitHub Copilot | 4 |
-| `docs/context/architecture.md` | 必要に応じて構成要素、境界、データフローを説明 | 最大120 |
-| `docs/context/workflows.md` | 必要に応じて開発、テスト、リリースの手順を説明 | 最大120 |
-| `.contextify/evidence.json` | Contextify の根拠記録 | リポジトリによる |
-| `.contextify/stamp.json` | Contextify の更新確認 | リポジトリによる |
-
-選択した対象にだけ参照用ファイルを作ります。補足資料は任意で、それぞれ最大120行です。必要なときにだけ読みます。[補足資料](../docs/supporting-docs.md)と[読み込み規則](../docs/editors.md)を参照してください。
+[実行の全記録、ファイル、原因となった変更](../examples/python-service-0.3.0/README.md)。
 
 ## 仕組み
 
-![根拠、草案、レビュー、書き込み、確認](../assets/how-it-works.svg)
+![根拠、下書き、レビュー、書き込み、チェック](../assets/how-it-works.svg)
 
-| モード | 動作 |
-| --- | --- |
-| `init` | リポジトリを読み、指示書を作成し、根拠を確認して差分を提示した後、書き込みと検査を行います。 |
-| `update` | 根拠を読み直し、影響する管理対象の記述を修正します。ブロック外の人の編集は保持し、ブロック内の編集は競合として扱います。 |
-| `check` | 根拠をコミット済みの記録と比較し、引用されたコマンドとパスを確認します。書き込みは行いません。 |
-| `accept` | 指示書が正しいままならメタデータだけを更新します。無効になった参照は拒否し、本文は変更しません。 |
+| モード   | 何が起きるか                                                                             |
+| -------- | ---------------------------------------------------------------------------------------- |
+| `init`   | リポジトリを読み、指示を下書きし、根拠を確認し、差分を見せてから書き込み、チェックする。 |
+| `update` | 根拠を読み直し、管理ブロックを更新する。ブロック外のあなたの編集は残る。                 |
+| `check`  | 根拠をコミット済みのスタンプと比べる。何も書き込まない。                                 |
+| `accept` | 指示がまだ正しいときにスタンプを更新する。無効な記述は拒否する。                         |
 
-`init --dry-run` は作成予定のファイルと行数・バイト数を表示します。`--yes` は通常の質問を省略しますが、管理対象ブロックの競合や上限は回避しません。
+書き込むファイル:
 
-プラグインはセッション開始フックを既定では登録しません。インストーラーは Git の `pre-commit` と `pre-push` チェックを提案します。ファイルの作成と有効化は明示的な操作です。Contextify のチェックアウトから対象リポジトリを指定します。
+| ファイル                                    | 読み手                                         | 行数                         |
+| ------------------------------------------- | ---------------------------------------------- | ---------------------------- |
+| `AGENTS.md`                                 | Codex、Cursor など、この規約を読むエージェント | 目標 20、40、60 行。最大 150 |
+| `CLAUDE.md`                                 | Claude Code (`@AGENTS.md` 経由)                | 既定で 4                     |
+| `GEMINI.md`                                 | Gemini CLI (`@AGENTS.md` 経由)                 | 3                            |
+| `.cursor/rules/contextify.mdc`              | Cursor。Cursor は `AGENTS.md` も読むので任意   | 9                            |
+| `.github/copilot-instructions.md`           | GitHub Copilot                                 | 4                            |
+| `docs/context/architecture.md`              | 任意。コンポーネントとデータの流れの地図       | 最大 120                     |
+| `docs/context/workflows.md`                 | 任意。ビルド、テスト、リリースの手順           | 最大 120                     |
+| `.contextify/evidence.json` と `stamp.json` | ドリフトチェック                               | リポジトリによる             |
+
+選んだターゲットだけがポインターファイルを受け取ります。事実を述べる各行は、ソースファイルとその行に対応します。contextify が何かを書く前に、別のエージェントが下書きをレビューします。
+
+ドリフトチェックは、リポジトリが最新なら何も出力せずに 0 で終了します。ドリフトがあれば上の通知を表示し、それでも 0 で終了します。ファイルを書き換えることはありません。
+
+終了コード (2026-11-17、0.3.2、bash で測定):
+
+| モード                                       | 最新                   | ドリフト         | スタンプなし     | チェック自体の失敗 |
+| -------------------------------------------- | ---------------------- | ---------------- | ---------------- | ------------------ |
+| 通常、`--strict`、`--json`、`--hook <agent>` | 0、出力なし            | 0、通知          | 3、`init` の通知 | 1                  |
+| `--ci`                                       | 0、`contextify: fresh` | 0、通知          | 0、`init` の通知 | 1                  |
+| `--git`                                      | 0、出力なし            | 0、stderr に通知 | 0、stderr に通知 | 1                  |
+| `--ci --strict`、`--git --strict`            | 0                      | 1                | 1                | 1                  |
+
+通知は最大 12 行、2,048 バイトです。`--json` は通知を 1 行の JSON で出力します。`--strict` だけでは終了コードは変わりません。未検証の記述をドリフトとして数えるだけです。
+
+Git チェックは任意です。`init` の最後に、スキルが `pre-commit` と `pre-push` のチェックのインストールを提案します。このリポジトリのクローンからは次も実行できます。
 
 ```bash
-bash skills/contextify/scripts/install_hooks.sh /path/to/repo
 bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
 ```
 
-Git フックは現在の作業ツリーを確認します。ステージ済みの内容やプッシュするコミットの検査ではありません。既定では警告のみで、ファイルを書き換えません。厳格モードは任意です。既存のフックや独自・グローバルのフックパスを置き換える有効化は拒否します。[設定、移行、CI](../docs/hooks.md)を参照してください。
+既定では警告だけを出し、既存のフックは置き換えません。`--strict` を付けると、ドリフト時にコミットやプッシュを止めます。
 
-## ほかのツールとの比較
+グローバルな `core.hooksPath` が設定されていると、有効化は拒否されます。他のフックが隠れてしまうためです。代わりに、普段使っているフック管理ツールから `ctx-check --git` を呼んでください。
 
-**2026年9月16日**に調べたソースに限定した比較です。各ツールの最新リリース全体を評価するものではありません。[詳しい比較表とソースのパス](../docs/comparison.md)に調査範囲と違いを記載しています。
-
-| ツール | 比較する点 |
-| --- | --- |
-| contextify | 根拠記録、共通指示の一元化、行数上限、モデルを使わない変更検出、管理対象ブロックの更新。 |
-| ruler / rulesync | より多くのエージェントへ設定を配布。rulesync は既存設定の取り込みにも対応。 |
-| ClaudeForge | Claude 向けの構成と、プロジェクト規模に応じた例。 |
-| agents-md-generator | 小さな初期テンプレートと、`AGENTS.md` を指す `CLAUDE.md` のシンボリックリンク。 |
-
-## 利用前に知っておくこと
-
-「確認できたコマンド」とは、その宣言や対象が存在するという意味です。Contextify は動作を証明するために**コマンドを実行しません**。根拠となるファイル自体が古い場合もあり、すべてのシェル式やビルドシステムを解釈できるわけではありません。[制約](../docs/limits.md)を確認してください。
-
-[ETH Zurich の研究](https://arxiv.org/abs/2602.11988)では、リポジトリのコンテキストファイルによる一般的なタスク成功率の向上は見られず、平均推論コストは20%を超えて増加しました。Contextify による成功率の向上は測定されていません。具体的なミスを防ぐ指示だけを残してください。
-
-フックがファイルを書き換えることはありません。生成と修正にはコーディングエージェントを使い、更新確認はモデルやネットワーク要求なしでローカル実行します。[実リポジトリでの試用報告](../evals/dogfood.md)では、スクリプトの検証とエージェント上の動作を区別し、実施できなかった Claude 固有の検証も記載しています。
-
-## 関連資料
-
-[クイックスタート](../docs/quickstart.md) · [完全な出力例](../examples/README.md) · [フックと CI](../docs/hooks.md) · [FAQ](../docs/faq.md) · [評価](../evals/README.md) · [設計判断](../docs/design/DECISIONS.md)
-
-[貢献方法](../CONTRIBUTING.md) · [セキュリティ](../SECURITY.md) · [変更履歴](../CHANGELOG.md) · [MIT ライセンス](../LICENSE) · [10x プラグイン一覧](https://github.com/Aboudjem/10x)
-
-確認するリビジョンで以下を実行してください。[v0.1.0 の評価記録](../evals/dogfood.md)は過去の結果であり、新しい変更の合格を示すものではありません。
+ドリフトで失敗する CI ジョブには、strict モードでワークフローを生成します。そのステップは `ctx-check --ci --strict` を実行します。スタンプがない場合や未検証の記述がある場合も、他にドリフトがなくても失敗します。
 
 ```bash
-python3 tests/test_ctx_check.py
-python3 tests/test_verify_claims.py
-python3 tests/test_hooks.py
-python3 tests/test_regressions.py
-python3 tests/test_supporting_docs.py
-python3 tests/test_manifests.py
-python3 evals/check_skill.py skills/contextify/SKILL.md
+bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes /path/to/repo
 ```
+
+[フックと CI](../docs/hooks.md)。
+
+## 証拠
+
+1 つのコマンドで、すべてのテストスイート、スキルの契約、このリポジトリ自身のドリフトチェックを実行します。
+
+```bash
+make test
+```
+
+2026-11-17 の出力です (スイートごとに 1 行の要約、実行順)。
+
+```text
+tests/test_ctx_check.py        128/128 checks passed
+tests/test_verify_claims.py     30/30 checks passed
+tests/test_hooks.py             Ran 22 tests, OK
+tests/test_regressions.py       Ran 25 tests, OK
+tests/test_supporting_docs.py   Ran 16 tests, OK
+tests/test_manifests.py        155/155 checks passed
+evals/check_skill.py           114/114 checks passed
+make dogfood                   PASS: ctx-check is fresh and silent
+                               29 claims, 0 stale, 0 unverified
+```
+
+CI はプッシュとプルリクエストのたびに同じ `make test` を実行します。このリポジトリの `AGENTS.md` は contextify が書いたものなので、古くなれば最後のステップが失敗します。
+
+## 対応エージェント
+
+| エージェント | インストール方法                       | テスト                                                                                                                               |
+| ------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Claude Code  | `claude plugin install contextify@10x` | 2026-11-17: プラグインをインストールし、`init` を最後まで実行 ([実行記録](../examples/python-service-0.3.0/README.md))               |
+| Codex        | `npx skills add Aboudjem/contextify`   | 2026-11-17: スキルをインストールし、Codex がドリフトチェックを実行 ([実行ログ](../examples/python-service-0.3.0/codex-run-0.3.1.md)) |
+
+ドキュメントはあるが本日は未テスト: Gemini CLI と Cursor (テスト環境ではどちらの CLI もサインインできませんでした)、GitHub Copilot、OpenCode、Windsurf、Zed、Continue.dev、Kimi Code CLI。設定方法は [エディター設定](../docs/editors.md) にあります。
+
+## FAQ
+
+### なぜ CLAUDE.md ではなく AGENTS.md が元になるのですか?
+
+Codex、Cursor、Copilot は `AGENTS.md` を直接読みます。Claude Code と Gemini CLI は、それを読み込む短いファイルを受け取ります。だから同じ事実が 1 か所にまとまります。
+
+### ドリフトチェックはモデルを呼びますか?
+
+いいえ。シェルと Python のスクリプトです。Git とスタンプが指すファイルを読み、ハッシュを比べます。トークンは使いません。
+
+### 手で書いた内容は上書きされますか?
+
+いいえ。contextify が管理するのはマーカーの間のブロックだけです。ブロック外のテキストはどの更新でも残ります。ブロック内を編集すると、失われる代わりに競合として報告されます。
+
+### 検証済みのコマンドは本当に動きますか?
+
+それは証明されていません。検証済みとは、スクリプト、ターゲット、ファイルが存在するという意味です。contextify はコマンドを実行しません。動くかどうかはテストで確かめてください。
+
+### accept は何をしますか?
+
+根拠は変わったが指示はまだ正しいとき、スタンプを更新します。引用したコマンドが無効なままなら拒否するので、壊れた行が見過ごされることはありません。
+
+その他の回答は [FAQ 全文](../docs/faq.md) にあります。
+
+## 制限
+
+- 解決済みのコマンドは見つかっただけで、実行はされていません。リポジトリの根拠自体が間違っていることもあります。
+- リゾルバーはすべてのシェル式やビルドシステムを理解するわけではありません。確認できない行には `unverified` が付きます。
+- [ETH Zurich の研究](https://arxiv.org/abs/2602.11988) では、コンテキストファイルによるタスク成功率の全般的な向上は見られず、推論コストは 20% 以上増えました。contextify にもタスク成功率の向上は測定されていません。具体的なミスを防ぐ行だけを残してください。
+- contextify と並べて `.agents/skills` や他のエージェントフォルダに入れた他のスキルは、ツリーのドリフトとして表示されます。無視するには `.agents/` (またはそのフォルダ) を `.gitignore` に追加してください。
+- 0.3.1 以前で、スキルをインストール済みの状態で書いたスタンプには `.agents/skills/` が含まれます。更新後、チェックは `Changed tree#depth2` を 1 回表示します。`accept` を 1 回実行してください。
+- プラグインのリポジトリを書いていますか? `claude plugin validate --strict` はルートの `CLAUDE.md` に警告を出します。このリポジトリのように、`.claude/CLAUDE.md` から `@../AGENTS.md` を手で指してください。ライターはまだこのパスを対象にしていません。
+- プライバシー: スクリプトはネットワークに接続しません。下書きには、あなたのコーディングエージェントと普段の接続を使います。
+
+すべての制限と出典: [docs/limits.md](../docs/limits.md)。
+
+## さらに詳しく
+
+[クイックスタート](../docs/quickstart.md) · [実例](../examples/README.md) · [エディター設定](../docs/editors.md) · [比較](../docs/comparison.md) · [設計判断](../docs/design/DECISIONS.md)
+
+[コントリビュート](../CONTRIBUTING.md) · [セキュリティ](../SECURITY.md) · [変更履歴](../CHANGELOG.md) · [MIT ライセンス](../LICENSE) · [10x プラグインハブ](https://github.com/Aboudjem/10x)
+
 この翻訳はモデルの支援を受けて作成しました。[英語版](../README.md)より更新が遅れる場合があるため、英語版を正としてください。リンク先の資料は英語です。

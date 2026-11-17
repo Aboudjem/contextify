@@ -440,7 +440,7 @@
       }
     ]
   },
-  "commit": "18e665dfd4e4f6ccdd431354749c0e0744be6ebc",
+  "commit": "b2f2d6156d346e94a5624b425b7667812bbe6452",
   "contextFiles": {
     "AGENTS.md": {
       "digest": "sha256:2e52711a7edaf058db4f9541eef478d378f20b28e8a8f8597cba115d1e14530b",
@@ -471,9 +471,9 @@
     "makefile#targets": "sha256:fd8139a4a29e33cd40627181e291746835602322ed394a7bb85bc4b8d3b22a71",
     "tree#depth2": "sha256:947995e42a5f5d44728833d9340bebd1a2589d7aca45020926e61235caeea7d9"
   },
-  "evidenceFileDigest": "sha256:67670da079717ee450c8ff30c8281cb9324618eb447b78b6c24e7f38a30bca0c",
+  "evidenceFileDigest": "sha256:ce50528d46d8137e86cdcbe78f48c9e8dd6f77eba3ecb46a0a71e3bda86445e6",
   "fastKey": "sha256:f3b27980d75e11af0550c5d2504a56bd21890147033bb8d45f4b7a175325f0a4",
-  "generatedAt": "2026-11-17T16:08:57Z",
+  "generatedAt": "2026-11-17T16:38:41Z",
   "generatedBy": "accept",
   "normalizerVersion": 1,
   "provenance": [
@@ -847,7 +847,7 @@
     "codex"
   ],
   "tool": "contextify",
-  "toolVersion": "0.3.1",
+  "toolVersion": "0.3.2",
   "unverifiedLines": [],
   "version": 2
 }

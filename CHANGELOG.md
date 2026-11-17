@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2026-11-17
+
+### Fixed
+
+- Installing the skill with `npx skills add` no longer reads as drift. The check skips contextify's own copy under any agent folder (`.agents/skills/contextify`, `.claude/skills/contextify`, ...) and `skills-lock.json`. Other skills still count.
+- `ctx-check --json` now returns the same command as the text notice in `next`: `/contextify:contextify update` on drift, `/contextify:contextify init` with no stamp.
+- The README exit table now covers every mode, measured in bash. With no stamp, `--ci` and `--git` exit 0, not 3. DECISIONS D9 says the same.
+- The CI paragraph now says strict CI also fails on a missing stamp and on an unverified claim.
+- The four translated READMEs are full translations of the current English README. A test fails when their code blocks or heading levels differ from English.
+
+### Changed
+
+- The generated CI workflow clones tag `v0.3.2`.
+- A stamp written by 0.3.1 or older with the skill already installed shows one `Changed tree#depth2` after the upgrade. Run `accept` once.
+
 ## [0.3.1] - 2026-11-17
 
 ### Fixed
@@ -86,6 +101,7 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 
 [0.1.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.1.0
 
+[0.3.2]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.2
 [0.3.1]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.1
 [0.3.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.2.0

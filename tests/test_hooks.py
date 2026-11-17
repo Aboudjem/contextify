@@ -82,7 +82,7 @@ class HookTests(unittest.TestCase):
         result = self.install('--yes', '--targets', 'github')
         self.assertEqual(result.returncode, 0, result.stderr)
         workflow = (self.root / '.github/workflows/contextify-check.yml').read_text()
-        self.assertIn('--branch v0.3.1', workflow)
+        self.assertIn('--branch v0.3.2', workflow)
         self.assertIn('$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check', workflow)
         self.assertNotIn(str(INSTALLER.parent), workflow)
 

@@ -240,7 +240,7 @@ def tool_version():
                 return v
         except ValueError:
             pass
-    return "0.3.1"
+    return "0.3.2"
 
 
 def load_json_file(path):
@@ -356,7 +356,7 @@ def owned_supporting_files(root):
 
 def is_excluded(rel):
     norm = rel.replace(os.sep, "/")
-    if norm.startswith(STATE_DIR + "/") or norm == STATE_DIR:
+    if norm.startswith(STATE_DIR + "/") or norm == STATE_DIR or is_skill_install(norm):
         return True
     if norm in [g.replace(os.sep, "/") for g in GENERATED_FILES]:
         return True
@@ -2345,14 +2345,15 @@ def envelope(hook, text):
 def json_report(result):
     if result.status == "nostamp":
         return {"status": "nostamp", "changed": [], "removed": [], "added": [], "stale": [],
-                "next": "/contextify init"}
+                "next": CLAUDE_COMMAND + " init"}
     payload = {
         "status": result.status,
         "changed": result.changed,
         "removed": result.removed,
         "added": result.added,
         "stale": result.stale,
-        "next": "/contextify update" if result.status == "drift" else "",
+        # The same command the text notice prints, so a script and a reader agree.
+        "next": CLAUDE_COMMAND + " update" if result.status == "drift" else "",
     }
     if result.unverified:
         payload["unverified"] = result.unverified
@@ -2363,3 +2364,15 @@ def json_report(result):
     if result.missing:
         payload["missing"] = result.missing
     return payload
+
+
+# What `npx skills add` drops into a project: contextify's own copy under an agent folder
+# (.agents/skills/contextify, .claude/skills/contextify, ...) and the CLI's lockfile. Neither
+# says anything about the project, so installing the skill must not read as drift. Other
+# skills in the same folders still count.
+SKILL_INSTALL_RE = re.compile(r"^\.[^/]+/skills/contextify(?:/|$)")
+SKILLS_CLI_LOCK = "skills-lock.json"
+
+
+def is_skill_install(norm):
+    return norm == SKILLS_CLI_LOCK or SKILL_INSTALL_RE.match(norm) is not None

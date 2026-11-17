@@ -134,7 +134,7 @@ Usage: `install_hooks.sh [--yes] [--activate] [--strict] [--targets LIST] [PATH]
 
 Without `--yes`, show differences and make no file or Git-configuration changes. Applying hooks and activating them are distinct: `--activate` configures `.githooks` only in a compatible normal repository. Refuse before writes if that would mask an effective custom/global hooksPath or executable default hooks; refuse linked-worktree activation to avoid changing sibling configuration. Never change global config. Existing differing hooks require a manual merge; JSON settings merge without erasing unrelated keys. A repeated identical run is a no-op. Report activation failures accurately and preserve prior configuration/files.
 
-The GitHub workflow clones released tag `v0.3.1`; local hooks do not rely on a future network request. Advisory is the default; installer `--strict` opts into blocking Git checks (`--git --strict`) and a failing CI step (`--ci --strict`). `--strict` alone never changes an exit code. Git checkpoints inspect the current working tree, not staged or pushed snapshots.
+The GitHub workflow clones released tag `v0.3.2`; local hooks do not rely on a future network request. Advisory is the default; installer `--strict` opts into blocking Git checks (`--git --strict`) and a failing CI step (`--ci --strict`). `--strict` alone never changes an exit code. Git checkpoints inspect the current working tree, not staged or pushed snapshots.
 
 ## Terminal output rules
 

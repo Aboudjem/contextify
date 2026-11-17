@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/hero-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../assets/hero-light.svg">
-  <img alt="contextify" src="../assets/hero.svg" width="100%">
+  <img alt="contextify: one repository, one source of instructions, multiple coding agents" src="../assets/hero.svg" width="100%">
 </picture>
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
@@ -11,146 +11,216 @@
 
 <!-- may-lag -->
 
-**Tell every coding agent how your repo works. Then prove it is still true.**
+**告诉每个编码代理你的仓库如何运作，然后证明这些说明仍然成立。**
 
-让每个编程代理了解你的仓库如何运作，再检查这些说明是否仍然有效。
-
-contextify 是一个 Agent Skill，根据代理读过的文件编写简短的仓库说明。它会记录依据，让本地脚本能够提示哪些说明需要重新检查。
-
-## 功能
-
-- 将共用说明写入一个 `AGENTS.md`，为其他代理生成引用文件。根据仓库规模，以20、40或60行为目标，拒绝超过150行的文件。
-- 将命令和路径关联到仓库中的依据。没有依据的陈述必须标为 `unverified` 或省略，草稿由另一个代理审核。
-- 不调用模型即可检测变化。内容仍有效时不输出消息；更新时展示差异，并保留管理区块外的人工内容。
-- 仅在需要时补充架构或工作流程文档，从 `AGENTS.md` 链接。优先复用准确的现有文档。
+contextify 根据代理会读取的文件，写出一份简短的 `AGENTS.md`。之后，一个本地脚本会在它过时时提醒你。
 
 ## 安装
 
-在 Claude Code 中：
+在 Claude Code 中，从终端运行：
 
 ```bash
 claude plugin marketplace add Aboudjem/10x
 claude plugin install contextify@10x
 ```
 
-其他代理可安装同一个 skill：
-
-```bash
-npx skills add Aboudjem/contextify
-```
-
-然后请代理在当前仓库中运行 contextify。在 Claude Code 中使用：
+然后在你的仓库里，请求第一份草稿：
 
 ```text
 /contextify:contextify init
 ```
 
-审核差异后，将生成的上下文文件和 `.contextify/` 元数据提交到 Git。脚本需要 Git、POSIX shell 工具、Bash 和 Python 3.11+，无需额外的 Python 包或 MCP 服务器。安装器通过 `npx` 使用 Node.js。[各编辑器的安装方式](../docs/editors.md)。
+对于 Codex、Cursor、Gemini CLI 和其他代理，安装这个技能：
 
-## 输出示例
-
-这是 **v0.1.0** 的历史示例，不能证明 0.2.0 的新增功能已通过验证。以下内容摘自2026年9月17日在 Next.js 应用 HazeLab 的隔离副本上的真实运行。Codex 起草说明，Contextify 写入文件。[完整输出和依据](../examples/nextjs/README.md)。
-
-```markdown
-## Commands
-- Development from the repository root: `pnpm run dev`.
-- Build: `pnpm run build`; this generates the Prisma client before building Next.js.
-- Lint: `pnpm run lint`.
-## Testing
-- No test script is declared in `package.json`; do not assume a package-manager test command exists.
-- `vitest.config.ts` selects jsdom and discovers TypeScript tests under the tests directory.
+```bash
+npx skills add Aboudjem/contextify
 ```
 
-在该副本中删除引用的 `lint` 脚本后，得到以下通知：
+这些代理没有 `/contextify:` 前缀。直接用文字请求："contextify init"、"contextify update"。
+
+需要 Git、Bash 和 Python 3.11 或更高版本。不需要 Python 包，不需要 MCP 服务器，脚本不发起任何网络请求。
+
+### 手动运行漂移检查
+
+仓库是最新状态时，它什么也不输出。请在仓库根目录运行。
+
+作为插件安装时：
+
+```bash
+sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
+```
+
+通过 `npx skills add` 安装时（Codex、Cursor 和大多数其他代理使用 `.agents/skills`）：
+
+```bash
+sh .agents/skills/contextify/scripts/ctx-check
+```
+
+如果是 Claude Code 的技能安装，目录是 `.claude/skills/contextify`。加上 `--ci --strict`，漂移时退出码为 1。
+
+安装技能本身不算漂移。检查会忽略任何代理目录下 contextify 自己的副本，以及 `skills-lock.json`。你在 `.agents/skills` 中添加的其他技能会被计入，表现为一次 `tree#depth2` 变化。要忽略它们，加上这一行：
+
+```bash
+echo ".agents/" >> .gitignore
+```
+
+### 示例报告
+
+2026-11-17，contextify 0.3.0 为一个小型 Python 服务写了 `AGENTS.md`。随后，其 `Makefile` 中的 `test-health` 目标被删除。0.3.2 对这个仓库输出如下内容，不消耗任何 token：
 
 ```text
 contextify: drift
-Scope    .
-Stale    AGENTS.md:7 references pnpm run lint
-Changed  package.json#scripts
-Changed  provenance:package.json:10
-Removed  script lint
-Files    0 written
-Next     /contextify update
-Accept   unavailable until the stale command is corrected
+1. Run /contextify:contextify update to fix AGENTS.md:6 (make test-health)
+2. Review the diff it shows before it writes
+3. Commit the context files with .contextify/
+Agents     outside Claude Code, ask for "contextify update"
+Scope      .
+Stale      AGENTS.md:6 references make test-health
+Unverified AGENTS.md:6 python3 -m unittest tests.test_health
+Changed    makefile#targets
+More       +3 findings
+Files      0 written
+Accept     unavailable until the stale command is corrected
 ```
 
-原仓库未被修改。参见[运行记录和验证范围](../evals/dogfood.md)。
-
-## 写入的文件
-
-以下数值适用于新生成的文件。已有的人工内容也计入行数限制。
-
-| 文件 | 读取方 | 行数 |
-| --- | --- | --- |
-| `AGENTS.md` | Codex、Cursor 及其他支持该约定的代理 | 目标20/40/60；上限150 |
-| `CLAUDE.md` | Claude Code，通过 `@AGENTS.md` 引用 | 默认4 |
-| `GEMINI.md` | Gemini CLI，通过 `@AGENTS.md` 引用 | 3 |
-| `.cursor/rules/contextify.mdc` | Cursor；可选，因为它也直接读取 `AGENTS.md` | 9 |
-| `.github/copilot-instructions.md` | GitHub Copilot | 4 |
-| `docs/context/architecture.md` | 按需记录组件、边界和数据流 | 最多120 |
-| `docs/context/workflows.md` | 按需记录开发、测试和发布流程 | 最多120 |
-| `.contextify/evidence.json` | Contextify 的依据记录 | 取决于仓库 |
-| `.contextify/stamp.json` | Contextify 的时效检查 | 取决于仓库 |
-
-仅为选中的目标生成引用文件。补充文档是可选的，每个文件最多120行，按需读取。参阅[补充文档](../docs/supporting-docs.md)和[加载规则](../docs/editors.md)。
-
-## 工作方式
-
-![依据、草稿、审核、写入、检查](../assets/how-it-works.svg)
-
-| 模式 | 行为 |
-| --- | --- |
-| `init` | 读取仓库、起草说明、核对依据、展示差异，然后写入并检查。 |
-| `update` | 重新读取依据，修改受影响的管理内容。保留区块外的人工编辑；区块内的人工编辑会触发冲突。 |
-| `check` | 将依据与已提交的记录比较，并检查引用的命令和路径。不写入任何内容。 |
-| `accept` | 说明仍正确时，仅刷新元数据。拒绝失效的引用，正文保持不变。 |
-
-`init --dry-run` 展示拟生成的文件及其行数、字节数。`--yes` 跳过常规提问，但不会绕过管理区块冲突或硬性上限。
-
-插件默认不注册会话启动钩子。安装器默认建议 Git `pre-commit` 和 `pre-push` 检查，写入文件与启用钩子都需要显式操作。在 Contextify 的本地副本中指定目标仓库：
+最新状态的仓库什么也不输出。这次运行的文件和印记随示例一起提供，你可以重放：
 
 ```bash
-bash skills/contextify/scripts/install_hooks.sh /path/to/repo
+sh examples/python-service-0.3.0/replay.sh
+```
+
+[完整运行记录、文件以及引发漂移的修改](../examples/python-service-0.3.0/README.md)。
+
+## 工作原理
+
+![证据、草稿、审阅、写入、检查](../assets/how-it-works.svg)
+
+| 模式     | 发生什么                                                  |
+| -------- | --------------------------------------------------------- |
+| `init`   | 读取仓库，起草说明，审阅证据，展示 diff，然后写入并检查。 |
+| `update` | 重新读取证据并修订托管区块。你在区块之外的修改会保留。    |
+| `check`  | 将证据与已提交的印记对比。不写入任何内容。                |
+| `accept` | 说明仍然正确时刷新印记。失效的声明会被拒绝。              |
+
+它写入的文件：
+
+| 文件                                        | 读者                                         | 行数                        |
+| ------------------------------------------- | -------------------------------------------- | --------------------------- |
+| `AGENTS.md`                                 | Codex、Cursor 以及其他遵循此约定的代理       | 目标 20、40 或 60；最多 150 |
+| `CLAUDE.md`                                 | Claude Code，通过 `@AGENTS.md`               | 默认 4                      |
+| `GEMINI.md`                                 | Gemini CLI，通过 `@AGENTS.md`                | 3                           |
+| `.cursor/rules/contextify.mdc`              | Cursor；可选，因为 Cursor 也读取 `AGENTS.md` | 9                           |
+| `.github/copilot-instructions.md`           | GitHub Copilot                               | 4                           |
+| `docs/context/architecture.md`              | 可选的组件和数据流地图                       | 最多 120                    |
+| `docs/context/workflows.md`                 | 可选的构建、测试和发布步骤                   | 最多 120                    |
+| `.contextify/evidence.json` 和 `stamp.json` | 漂移检查                                     | 取决于仓库                  |
+
+只有你选择的目标才会得到指针文件。每一行事实都对应一个源文件和行号。在 contextify 写入任何内容之前，会有另一个代理审阅草稿。
+
+仓库是最新状态时，漂移检查以 0 退出且不输出任何内容。发生漂移时，它输出上面的通知，仍以 0 退出。它从不重写文件。
+
+退出码，2026-11-17 在 bash 中用 0.3.2 实测：
+
+| 模式                                         | 最新                   | 漂移                 | 尚无印记             | 检查本身出错 |
+| -------------------------------------------- | ---------------------- | -------------------- | -------------------- | ------------ |
+| 默认、`--strict`、`--json`、`--hook <agent>` | 0，无输出              | 0，输出通知          | 3，输出 `init` 通知  | 1            |
+| `--ci`                                       | 0，`contextify: fresh` | 0，输出通知          | 0，输出 `init` 通知  | 1            |
+| `--git`                                      | 0，无输出              | 0，通知输出到 stderr | 0，通知输出到 stderr | 1            |
+| `--ci --strict`、`--git --strict`            | 0                      | 1                    | 1                    | 1            |
+
+通知最多 12 行、2,048 字节。`--json` 将其输出为一行 JSON。单独使用 `--strict` 从不改变退出码，它只会把未验证的声明算作漂移。
+
+Git 检查是可选的。在 `init` 结束时，技能会提出安装 `pre-commit` 和 `pre-push` 检查。在本仓库的克隆中，你也可以运行：
+
+```bash
 bash skills/contextify/scripts/install_hooks.sh --yes --activate /path/to/repo
 ```
 
-Git 钩子检查当前工作树，而非暂存区快照或推送的提交。默认只发出提醒，不改写文件；严格模式可选。启用操作不会覆盖现有钩子或自定义、全局钩子路径。[安装、迁移和 CI](../docs/hooks.md)。
+默认情况下它们只发出警告，并拒绝替换已有的钩子。加上 `--strict` 可在漂移时阻止提交或推送。
 
-## 与其他工具比较
+如果设置了全局 `core.hooksPath`，激活会被拒绝，因为它会遮住你的其他钩子。请改为在你已有的钩子管理工具中调用 `ctx-check --git`。
 
-本表仅涉及**2026年9月16日**检查过的源码，不代表各工具所有当前版本的能力。[完整对照表和源码路径](../docs/comparison.md)说明了比较范围和取舍。
-
-| 工具 | 比较要点 |
-| --- | --- |
-| contextify | 记录依据、统一说明来源、行数上限、确定性变化检测、按管理区块更新。 |
-| ruler / rulesync | 面向更多代理分发配置；rulesync 还可导入已有配置。 |
-| ClaudeForge | 面向 Claude 的组织方式，以及不同项目规模的示例。 |
-| agents-md-generator | 小型初始模板，通过符号链接让 `CLAUDE.md` 指向 `AGENTS.md`。 |
-
-## 使用前须知
-
-命令通过解析检查，表示其声明或目标存在。Contextify **不会执行该命令**来证明它能正常运行。仓库中的依据本身也可能过时，检查器无法理解所有 shell 表达式或构建系统。请阅读[限制说明](../docs/limits.md)。
-
-[ETH Zurich 的研究](https://arxiv.org/abs/2602.11988)没有发现仓库上下文文件能普遍提高任务成功率，反而发现平均推理成本增加了20%以上。目前没有测得 Contextify 能提高任务成功率。请只保留能避免具体错误的说明。
-
-Hook 不会重写文件。生成和修订使用你的编程代理；时效检查在本地运行，不调用模型，也不发起网络请求。[真实仓库试用报告](../evals/dogfood.md)区分脚本验证结果和代理行为，也会说明尚未完成的 Claude 专属验证。
-
-## 更多资料
-
-[快速上手](../docs/quickstart.md) · [完整示例](../examples/README.md) · [Hook 与 CI](../docs/hooks.md) · [常见问题](../docs/faq.md) · [评估](../evals/README.md) · [设计决策](../docs/design/DECISIONS.md)
-
-[参与贡献](../CONTRIBUTING.md) · [安全](../SECURITY.md) · [更新日志](../CHANGELOG.md) · [MIT 许可证](../LICENSE) · [10x 插件目录](https://github.com/Aboudjem/10x)
-
-请在所评审的版本上运行以下检查。[v0.1.0 评估记录](../evals/dogfood.md)属于历史结果，不能证明新增修改已经通过验证。
+如果需要一个在漂移时失败的 CI 任务，请以 strict 模式生成工作流。它的步骤运行 `ctx-check --ci --strict`。缺少印记或存在任何未验证的声明时，它同样会失败，即使仓库没有其他漂移：
 
 ```bash
-python3 tests/test_ctx_check.py
-python3 tests/test_verify_claims.py
-python3 tests/test_hooks.py
-python3 tests/test_regressions.py
-python3 tests/test_supporting_docs.py
-python3 tests/test_manifests.py
-python3 evals/check_skill.py skills/contextify/SKILL.md
+bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes /path/to/repo
 ```
+
+[钩子与 CI](../docs/hooks.md)。
+
+## 证明
+
+一条命令运行所有测试套件、技能契约，以及本仓库对自身的漂移检查：
+
+```bash
+make test
+```
+
+它在 2026-11-17 的输出如下（每个套件一行摘要，按运行顺序）：
+
+```text
+tests/test_ctx_check.py        128/128 checks passed
+tests/test_verify_claims.py     30/30 checks passed
+tests/test_hooks.py             Ran 22 tests, OK
+tests/test_regressions.py       Ran 25 tests, OK
+tests/test_supporting_docs.py   Ran 16 tests, OK
+tests/test_manifests.py        155/155 checks passed
+evals/check_skill.py           114/114 checks passed
+make dogfood                   PASS: ctx-check is fresh and silent
+                               29 claims, 0 stale, 0 unverified
+```
+
+CI 在每次推送和拉取请求时运行同样的 `make test`。本仓库的 `AGENTS.md` 由 contextify 编写，所以一旦过时，最后一步就会失败。
+
+## 兼容的代理
+
+| 代理        | 安装方式                               | 测试                                                                                                               |
+| ----------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Claude Code | `claude plugin install contextify@10x` | 2026-11-17：安装插件，然后完整运行一次 `init`（[运行记录](../examples/python-service-0.3.0/README.md)）            |
+| Codex       | `npx skills add Aboudjem/contextify`   | 2026-11-17：安装技能，然后由 Codex 运行漂移检查（[运行日志](../examples/python-service-0.3.0/codex-run-0.3.1.md)） |
+
+有文档、今天未测试：Gemini CLI 和 Cursor（两个 CLI 在测试机器上都无法登录）、GitHub Copilot、OpenCode、Windsurf、Zed、Continue.dev 和 Kimi Code CLI。它们的配置见[编辑器设置](../docs/editors.md)。
+
+## FAQ
+
+### 为什么以 AGENTS.md 为源，而不是 CLAUDE.md？
+
+Codex、Cursor 和 Copilot 直接读取 `AGENTS.md`。Claude Code 和 Gemini CLI 得到一个导入它的短文件。这样同样的事实只存在于一个地方。
+
+### 漂移检查会调用模型吗？
+
+不会。它是一个 shell 和 Python 脚本。它读取 Git 和印记指向的文件，然后比较哈希值。它消耗零 token。
+
+### 它会覆盖我手写的内容吗？
+
+不会。contextify 只管理其标记之间的区块。区块之外的文本在每次更新后都会保留。区块内的修改会引发冲突，而不会被丢掉。
+
+### 已验证的命令真的能运行吗？
+
+这一点没有被证明。已验证的命令，指的是其脚本、目标或文件存在。contextify 不会运行它。能否运行仍由你的测试决定。
+
+### accept 做什么？
+
+当证据变了、但说明仍然正确时，它刷新印记。只要被引用的命令已失效，它就拒绝执行，所以一行坏掉的说明不会被放过。
+
+更多回答见[完整 FAQ](../docs/faq.md)。
+
+## 限制
+
+- 已解析的命令只是被找到，并没有被执行。仓库中的证据本身也可能是错的。
+- 解析器并不理解所有 shell 表达式或构建系统。它无法检查的行会被标为 `unverified`。
+- 一项 [ETH Zurich 研究](https://arxiv.org/abs/2602.11988) 发现，上下文文件没有带来普遍的任务成功率提升，推理成本却上升了 20% 以上。contextify 没有经过测量的任务成功率优势。只保留能防止具体错误的行。
+- 与 contextify 一起安装在 `.agents/skills` 或其他代理目录中的其他技能，会显示为目录树漂移。把 `.agents/`（或那个目录）加入 `.gitignore` 即可忽略它们。
+- 由 0.3.1 或更早版本、在已安装技能的情况下写出的印记，会列出 `.agents/skills/`。升级后，检查会显示一次 `Changed tree#depth2`。运行一次 `accept` 即可。
+- 在写插件仓库？`claude plugin validate --strict` 会对根目录的 `CLAUDE.md` 发出警告。像本仓库一样，手动让 `.claude/CLAUDE.md` 指向 `@../AGENTS.md`。写入器目前还不支持这个路径。
+- 隐私：脚本不发起任何网络请求。起草使用你自己的编码代理及其常规连接。
+
+全部限制及来源：[docs/limits.md](../docs/limits.md)。
+
+## 了解更多
+
+[快速开始](../docs/quickstart.md) · [完整示例](../examples/README.md) · [编辑器设置](../docs/editors.md) · [对比](../docs/comparison.md) · [设计决策](../docs/design/DECISIONS.md)
+
+[参与贡献](../CONTRIBUTING.md) · [安全](../SECURITY.md) · [更新日志](../CHANGELOG.md) · [MIT 许可证](../LICENSE) · [10x 插件中心](https://github.com/Aboudjem/10x)
+
 本译文由模型辅助完成，可能落后于[英文版](../README.md)，请以英文版为准。链接指向的文档仍为英文。
