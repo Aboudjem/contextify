@@ -1,6 +1,6 @@
 {
   "name": "contextify",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.",
   "author": {
     "name": "Adam Boudjemaa",

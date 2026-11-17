@@ -11,10 +11,10 @@ claude plugin marketplace add Aboudjem/10x
 claude plugin install contextify@10x
 ```
 
-For Codex:
+For Codex, for all your projects (drop `-g` for this project only):
 
 ```bash
-npx skills add Aboudjem/contextify -a codex
+npx skills add Aboudjem/contextify -g -a codex
 ```
 
 ## 2. Run it

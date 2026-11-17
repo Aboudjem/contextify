@@ -13,7 +13,7 @@ description: >-
 argument-hint: "[init|update|check|accept] [path]"
 license: MIT
 metadata:
-  version: "0.3.3"
+  version: "0.3.4"
 ---
 
 # contextify

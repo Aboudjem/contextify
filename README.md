@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="assets/hero-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="assets/hero-light.svg">
-  <img alt="contextify: one repository, one source of instructions, multiple coding agents" src="assets/hero.svg" width="100%">
+  <img alt="contextify: an AGENTS.md card with line 6 marked stale, linked to a Makefile card where the test-health target is crossed out, a 0 tokens counter, and the install command" src="assets/hero.svg" width="100%">
 </picture>
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
@@ -9,38 +9,34 @@
 
 English | [Français](READMEs/fr.md) | [Español](READMEs/es.md) | [日本語](READMEs/ja.md) | [简体中文](READMEs/zh-CN.md)
 
-**Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.**
+**One AGENTS.md for your agents, checked with zero tokens.**
 
-contextify writes one short `AGENTS.md` from your repo. A local script then tells you when a command, target or file it names is gone.
+contextify writes one short instruction file and warns when a line is out of date.
 
-## Install
+| Time saved | Context kept | Tokens saved |
+|:--|:--|:--|
+| The warning names the file, the line and the missing command. See the sample below. | One file of 20, 40 or 60 lines, by repo size. The `CLAUDE.md` pointer is 4 lines. | The check for stale lines is a local script. It calls no model, so it costs zero tokens. |
 
-In Claude Code, from your terminal:
+**Works with:** any agent that reads skills. Tested: Claude Code, Codex.
 
-```bash
-claude plugin marketplace add Aboudjem/10x
-claude plugin install contextify@10x
-```
+Not tied to one model: the check is plain Bash and Python.
 
-Then, inside your repository, ask for a first draft:
+`AGENTS.md` is the file of instructions that coding agents read. Use contextify when your repo has none, or when it names old commands.
 
-```text
-/contextify:contextify init
-```
-
-For Codex, Cursor, Gemini CLI and other agents, install the skill:
+You get one short file and a warning when a line goes stale.
 
 ```bash
-npx skills add Aboudjem/contextify
+npx skills add Aboudjem/contextify -g
+# then, in your agent: contextify init
 ```
 
-In those agents there is no `/contextify:` prefix. Ask in words: "contextify init", "contextify update".
-
-Needs Git, Bash and Python 3.11 or newer. No Python packages, no MCP server, no network call from the scripts.
+This installs it for all your projects. Each agent's own command is in [Install](#install).
 
 ### Sample report
 
-On 2026-11-17, contextify 0.3.0 wrote `AGENTS.md` for a small Python service. Then the `test-health` target was deleted from its `Makefile`. 0.3.3 prints this for that repo, at no token cost:
+A real run on 2026-11-17. contextify 0.3.0 wrote `AGENTS.md` for a small Python service.
+
+Then the `test-health` target was deleted from its `Makefile`. Version 0.3.3 prints this:
 
 ```text
 contextify: drift
@@ -65,17 +61,78 @@ sh examples/python-service-0.3.0/replay.sh
 
 [Full run, files and the edit that caused it](examples/python-service-0.3.0/README.md).
 
-A deleted Makefile target, a renamed script, a test that moved. Your agents keep following the old instructions, and each wrong try costs a turn. contextify names the stale line first.
+**Limit:** it checks commands, targets and files, not prose, and never runs them.
 
-### Why use it
+## Install
 
-- **See the exact stale line.** The notice gives the file, the line and the dead command, as in the replay above.
-- **Write it once.** One `AGENTS.md`, which Codex and Cursor read with no extra file. Only the agents you pick get a pointer: `CLAUDE.md` (the default), `GEMINI.md`, a Copilot file when `.github/` exists, an optional Cursor rule.
-- **Free to run.** A local script with no model and no network call, silent when the repo is fresh. This repo's own `AGENTS.md` passes it in CI: `make test` ends with `29 claims, 0 stale`.
+**Pick your agent.** Each command installs contextify for all your projects.
 
-It resolves commands, targets and files. It does not read prose or run the commands. No study shows context files raise task success, so keep only lines that prevent a real mistake.
+<p align="center">
+  <a href="#install-claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code"></a>
+  <a href="#install-codex"><img src="https://img.shields.io/badge/Codex-000000?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyBmaWxsPSJ3aGl0ZSIgcm9sZT0iaW1nIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI%2BPHRpdGxlPk9wZW5BSTwvdGl0bGU%2BPHBhdGggZD0iTTIyLjI4MTkgOS44MjExYTUuOTg0NyA1Ljk4NDcgMCAwIDAtLjUxNTctNC45MTA4IDYuMDQ2MiA2LjA0NjIgMCAwIDAtNi41MDk4LTIuOUE2LjA2NTEgNi4wNjUxIDAgMCAwIDQuOTgwNyA0LjE4MThhNS45ODQ3IDUuOTg0NyAwIDAgMC0zLjk5NzcgMi45IDYuMDQ2MiA2LjA0NjIgMCAwIDAgLjc0MjcgNy4wOTY2IDUuOTggNS45OCAwIDAgMCAuNTExIDQuOTEwNyA2LjA1MSA2LjA1MSAwIDAgMCA2LjUxNDYgMi45MDAxQTUuOTg0NyA1Ljk4NDcgMCAwIDAgMTMuMjU5OSAyNGE2LjA1NTcgNi4wNTU3IDAgMCAwIDUuNzcxOC00LjIwNTggNS45ODk0IDUuOTg5NCAwIDAgMCAzLjk5NzctMi45MDAxIDYuMDU1NyA2LjA1NTcgMCAwIDAtLjc0NzUtNy4wNzI5em0tOS4wMjIgMTIuNjA4MWE0LjQ3NTUgNC40NzU1IDAgMCAxLTIuODc2NC0xLjA0MDhsLjE0MTktLjA4MDQgNC43NzgzLTIuNzU4MmEuNzk0OC43OTQ4IDAgMCAwIC4zOTI3LS42ODEzdi02LjczNjlsMi4wMiAxLjE2ODZhLjA3MS4wNzEgMCAwIDEgLjAzOC4wNTJ2NS41ODI2YTQuNTA0IDQuNTA0IDAgMCAxLTQuNDk0NSA0LjQ5NDR6bS05LjY2MDctNC4xMjU0YTQuNDcwOCA0LjQ3MDggMCAwIDEtLjUzNDYtMy4wMTM3bC4xNDIuMDg1MiA0Ljc4MyAyLjc1ODJhLjc3MTIuNzcxMiAwIDAgMCAuNzgwNiAwbDUuODQyOC0zLjM2ODV2Mi4zMzI0YS4wODA0LjA4MDQgMCAwIDEtLjAzMzIuMDYxNUw5Ljc0IDE5Ljk1MDJhNC40OTkyIDQuNDk5MiAwIDAgMS02LjE0MDgtMS42NDY0ek0yLjM0MDggNy44OTU2YTQuNDg1IDQuNDg1IDAgMCAxIDIuMzY1NS0xLjk3MjhWMTEuNmEuNzY2NC43NjY0IDAgMCAwIC4zODc5LjY3NjVsNS44MTQ0IDMuMzU0My0yLjAyMDEgMS4xNjg1YS4wNzU3LjA3NTcgMCAwIDEtLjA3MSAwbC00LjgzMDMtMi43ODY1QTQuNTA0IDQuNTA0IDAgMCAxIDIuMzQwOCA3Ljg3MnptMTYuNTk2MyAzLjg1NThMMTMuMTAzOCA4LjM2NCAxNS4xMTkyIDcuMmEuMDc1Ny4wNzU3IDAgMCAxIC4wNzEgMGw0LjgzMDMgMi43OTEzYTQuNDk0NCA0LjQ5NDQgMCAwIDEtLjY3NjUgOC4xMDQydi01LjY3NzJhLjc5Ljc5IDAgMCAwLS40MDctLjY2N3ptMi4wMTA3LTMuMDIzMWwtLjE0Mi0uMDg1Mi00Ljc3MzUtMi43ODE4YS43NzU5Ljc3NTkgMCAwIDAtLjc4NTQgMEw5LjQwOSA5LjIyOTdWNi44OTc0YS4wNjYyLjA2NjIgMCAwIDEgLjAyODQtLjA2MTVsNC44MzAzLTIuNzg2NmE0LjQ5OTIgNC40OTkyIDAgMCAxIDYuNjgwMiA0LjY2ek04LjMwNjUgMTIuODYzbC0yLjAyLTEuMTYzOGEuMDgwNC4wODA0IDAgMCAxLS4wMzgtLjA1NjdWNi4wNzQyYTQuNDk5MiA0LjQ5OTIgMCAwIDEgNy4zNzU3LTMuNDUzN2wtLjE0Mi4wODA1TDguNzA0IDUuNDU5YS43OTQ4Ljc5NDggMCAwIDAtLjM5MjcuNjgxM3ptMS4wOTc2LTIuMzY1NGwyLjYwMi0xLjQ5OTggMi42MDY5IDEuNDk5OHYyLjk5OTRsLTIuNTk3NCAxLjQ5OTctMi42MDY3LTEuNDk5N1oiLz48L3N2Zz4%3D" alt="Codex"></a>
+  <a href="#install-cursor"><img src="https://img.shields.io/badge/Cursor-3B3B3B?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor"></a>
+  <a href="#install-gemini-cli"><img src="https://img.shields.io/badge/Gemini_CLI-1A73E8?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini CLI"></a>
+  <a href="#install-github-copilot"><img src="https://img.shields.io/badge/GitHub_Copilot-24292F?style=for-the-badge&logo=githubcopilot&logoColor=white" alt="GitHub Copilot"></a>
+  <a href="#install-opencode"><img src="https://img.shields.io/badge/OpenCode-4A4A4A?style=for-the-badge&logo=opencode&logoColor=white" alt="OpenCode"></a>
+</p>
+
+<a id="install-claude-code"></a>**Claude Code**, tested. From your terminal:
+
+```bash
+claude plugin marketplace add Aboudjem/10x && claude plugin install contextify@10x
+```
+
+Then, inside your repository, ask for a first draft:
+
+```text
+/contextify:contextify init
+```
+
+<a id="install-codex"></a>**Codex**, tested:
+
+```bash
+npx skills add Aboudjem/contextify -g -a codex
+```
+
+<a id="install-cursor"></a>**Cursor**, install tested:
+
+```bash
+npx skills add Aboudjem/contextify -g -a cursor
+```
+
+<a id="install-gemini-cli"></a>**Gemini CLI**, install tested:
+
+```bash
+npx skills add Aboudjem/contextify -g -a gemini-cli
+```
+
+<a id="install-github-copilot"></a>**GitHub Copilot**, install tested:
+
+```bash
+npx skills add Aboudjem/contextify -g -a github-copilot
+```
+
+<a id="install-opencode"></a>**OpenCode**, install tested:
+
+```bash
+npx skills add Aboudjem/contextify -g -a opencode
+```
+
+Only this project: drop `-g`. Another agent: find its `-a` code in [editor setup](docs/editors.md).
+
+Outside Claude Code there is no `/contextify:` prefix. Ask in words: "contextify init", "contextify update".
+
+You need Git, Bash and Python 3.11 or newer. No Python packages, no MCP server, no network call from the scripts.
 
 ## How it works
+
+Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.
+
+You delete a Makefile target, rename a script or move a test. Your agents still follow the old instructions. Each wrong try wastes a turn. contextify shows you the old line first:
+
+1. `init` reads your repo and drafts `AGENTS.md`. A separate agent reviews each line against its source.
+2. You see the diff. contextify writes the files and a stamp, a record of what each line names.
+3. The drift check compares the repo with the stamp. Drift means a line names something that is gone.
 
 ![Evidence, draft, review, write, check](assets/how-it-works.svg)
 
@@ -84,7 +141,7 @@ It resolves commands, targets and files. It does not read prose or run the comma
 | `init`   | Read the repo, draft instructions, review the evidence, show a diff, then write and check. |
 | `update` | Re-read the evidence and revise the managed block. Your edits outside the block survive.   |
 | `check`  | Compare the evidence with the committed stamp. Nothing is written.                         |
-| `accept` | Refresh the stamp when the instructions are still right. Dead claims are refused.          |
+| `accept` | Refresh the stamp when the instructions are still right. Lines naming missing things are refused. |
 
 What it writes:
 
@@ -99,7 +156,7 @@ What it writes:
 | `docs/context/workflows.md`                  | Optional build, test and release steps                   | Maximum 120                      |
 | `.contextify/evidence.json` and `stamp.json` | The drift check                                          | Depends on the repo              |
 
-Only the targets you pick get a pointer file. Every factual line maps to a source file and line. A separate agent reviews the draft before contextify writes anything.
+Codex and Cursor read `AGENTS.md` as it is. Only the agents you pick get a pointer file. Every factual line maps to a source file and line.
 
 The drift check exits 0 with no output when the repo is fresh. On drift it prints the notice above and still exits 0. It never rewrites a file.
 
@@ -142,15 +199,15 @@ Installed as a plugin:
 sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
 ```
 
-Installed with `npx skills add` (Codex, Cursor and most others use `.agents/skills`):
+Installed with `npx skills add -g` (Codex, Cursor, Gemini CLI, Copilot and OpenCode use `~/.agents/skills`):
 
 ```bash
-sh .agents/skills/contextify/scripts/ctx-check
+sh ~/.agents/skills/contextify/scripts/ctx-check
 ```
 
-For a Claude Code skills install, the folder is `.claude/skills/contextify` instead. Add `--ci --strict` to make drift exit 1.
+For a Claude Code skills install, the folder is `~/.claude/skills/contextify` instead. Without `-g`, the folder sits in your repo: `.agents/skills/contextify`. Add `--ci --strict` to make drift exit 1.
 
-Installing the skill does not count as drift. The check skips contextify's own copy under any agent folder and `skills-lock.json`. Other skills you add to `.agents/skills` do count, as a `tree#depth2` change. To ignore them, add this one line:
+Installing the skill does not count as drift. The check skips contextify's own copy under any agent folder and `skills-lock.json`. Other skills you add to your repo's `.agents/skills` do count, as a `tree#depth2` change. To ignore them, add this one line:
 
 ```bash
 echo ".agents/" >> .gitignore
@@ -182,12 +239,16 @@ CI runs the same `make test` on every push and pull request. This repo's own `AG
 
 ## Works with
 
-| Agent       | Install path                           | Tested                                                                                                    |
-| ----------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------- |
-| Claude Code | `claude plugin install contextify@10x` | 2026-11-17: plugin install, then a full `init` run ([run record](examples/python-service-0.3.0/README.md)) |
-| Codex       | `npx skills add Aboudjem/contextify`   | 2026-11-17: skill install, then Codex ran the drift check ([run log](examples/python-service-0.3.0/codex-run-0.3.1.md)) |
+| Agent          | Install path                                             | Tested                                                                                                                  |
+| -------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Claude Code    | `claude plugin install contextify@10x`                   | 2026-11-17: plugin install, then a full `init` run ([run record](examples/python-service-0.3.0/README.md))              |
+| Codex          | `npx skills add Aboudjem/contextify -g -a codex`         | 2026-11-17: skill install, then Codex ran the drift check ([run log](examples/python-service-0.3.0/codex-run-0.3.1.md)) |
+| Cursor         | `npx skills add Aboudjem/contextify -g -a cursor`        | 2026-11-17: install only, into an empty home folder. The skill landed in `~/.agents/skills`.                           |
+| Gemini CLI     | `npx skills add Aboudjem/contextify -g -a gemini-cli`    | 2026-11-17: install only, into an empty home folder. The skill landed in `~/.agents/skills`.                           |
+| GitHub Copilot | `npx skills add Aboudjem/contextify -g -a github-copilot` | 2026-11-17: install only, into an empty home folder. The skill landed in `~/.agents/skills`.                          |
+| OpenCode       | `npx skills add Aboudjem/contextify -g -a opencode`      | 2026-11-17: install only, into an empty home folder. The skill landed in `~/.agents/skills`.                           |
 
-Documented, not tested today: Gemini CLI and Cursor (both CLIs refused to sign in on the test machine), GitHub Copilot, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI. Their install codes are in [editor setup](docs/editors.md).
+"Install only" means the files were checked, but that agent did not run the skill. Documented, not tested today: Gemini CLI and Cursor running the skill (both CLIs refused to sign in on the test machine), GitHub Copilot, OpenCode, Windsurf, Zed, Continue.dev and Kimi Code CLI. Their install codes are in [editor setup](docs/editors.md).
 
 ## FAQ
 
@@ -199,6 +260,10 @@ Codex, Cursor and Copilot read `AGENTS.md` directly. Claude Code and Gemini CLI 
 
 No. It is a shell and Python script. It reads Git and the files the stamp points at, then compares hashes. It spends zero tokens.
 
+### Does it need a certain model?
+
+No. The check uses no model at all. Drafting with `init` uses whatever model your agent already runs.
+
 ### Will it overwrite what I wrote by hand?
 
 No. contextify owns only the block between its markers. Text outside the block survives every update. An edit inside the block raises a conflict instead of being lost.
@@ -209,7 +274,7 @@ Not proven. A verified command is one whose script, target or file exists. conte
 
 ### What does accept do?
 
-It refreshes the stamp when the evidence moved but the instructions are still right. It refuses while a quoted command is dead, so a broken line cannot be waved through.
+It refreshes the stamp when the evidence moved but the instructions are still right. It refuses while a quoted command is missing, so a broken line cannot pass.
 
 More answers in the [full FAQ](docs/faq.md).
 
@@ -217,7 +282,8 @@ More answers in the [full FAQ](docs/faq.md).
 
 - A resolved command was found, not executed. Repository evidence can itself be wrong.
 - The resolver does not understand every shell expression or build system. Lines it cannot check are labelled `unverified`.
-- An [ETH Zurich study](https://arxiv.org/abs/2602.11988) found no general task-success gain from context files, and an inference cost rise above 20%. contextify has no measured task-success advantage. Keep only lines that prevent a concrete mistake.
+- Zero tokens is the cost of the check itself. When your agent runs it and finds drift, the notice (12 lines at most) enters the agent's context.
+- No study shows that these files help agents finish tasks. An [ETH Zurich study](https://arxiv.org/abs/2602.11988) found no general gain, and model costs rose above 20%. Keep only lines that stop a real mistake.
 - Other skills installed next to contextify, in `.agents/skills` or another agent folder, show as tree drift. Add `.agents/` (or that folder) to `.gitignore` to ignore them.
 - A stamp written by 0.3.1 or older, with the skill already installed, lists `.agents/skills/`. After the upgrade the check shows one `Changed tree#depth2`. Run `accept` once.
 - Writing a plugin repo? `claude plugin validate --strict` warns on a root `CLAUDE.md`. Point `.claude/CLAUDE.md` at `@../AGENTS.md` by hand, as this repo does. The writer does not target that path yet.

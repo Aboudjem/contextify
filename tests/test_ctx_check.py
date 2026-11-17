@@ -1043,7 +1043,7 @@ check("22c every JSON snippet parses as JSON", not bad_json, "; ".join(bad_json)
 
 no_path = [rel for rel in expected22[:-1] if CTX_CHECK not in read(repo22, rel)]
 workflow22 = read(repo22, expected22[-1])
-portable22 = (CTX_CHECK not in workflow22 and '--branch v0.3.3' in workflow22
+portable22 = (CTX_CHECK not in workflow22 and '--branch v0.3.4' in workflow22
               and '$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check' in workflow22)
 check("22d local hooks use this installation and CI fetches a portable release",
       not no_path and portable22, "local missing: %s; portable CI=%s" % (no_path, portable22))

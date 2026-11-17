@@ -1,7 +1,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="../assets/hero-dark.svg">
   <source media="(prefers-color-scheme: light)" srcset="../assets/hero-light.svg">
-  <img alt="contextify: one repository, one source of instructions, multiple coding agents" src="../assets/hero.svg" width="100%">
+  <img alt="contextify: an AGENTS.md card with line 6 marked stale, linked to a Makefile card where the test-health target is crossed out, a 0 tokens counter, and the install command" src="../assets/hero.svg" width="100%">
 </picture>
 
 [![Validate](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml/badge.svg)](https://github.com/Aboudjem/contextify/actions/workflows/validate.yml)
@@ -11,38 +11,34 @@
 
 <!-- may-lag -->
 
-**エージェント向けの指示が、もう存在しないものを指したときに分かります。すべてのエージェントに 1 つの AGENTS.md と、トークンを使わないローカルチェック。**
+**エージェント用の AGENTS.md を 1 つに。チェックはトークン 0 です。**
 
-contextify はリポジトリから短い `AGENTS.md` を 1 つ書きます。その後、そこに書かれたコマンド、ターゲット、ファイルが消えると、ローカルスクリプトが知らせます。
+contextify は短い指示ファイルを 1 つ書き、古くなった行を知らせます。
 
-## インストール
+| 時間の節約 | コンテキストを小さく | トークンの節約 |
+|:--|:--|:--|
+| 通知はファイル、行、なくなったコマンドを示します。下の例を見てください。 | リポジトリの大きさに合わせて 20、40、60 行の 1 ファイル。`CLAUDE.md` の参照は 4 行です。 | 古い行のチェックはローカルのスクリプトです。モデルを呼ばないので、トークンは 0 です。 |
 
-Claude Code では、ターミナルから次を実行します。
+**対応:** skill を読むすべてのエージェント。テスト済み: Claude Code、Codex。
 
-```bash
-claude plugin marketplace add Aboudjem/10x
-claude plugin install contextify@10x
-```
+特定のモデルに依存しません。チェックは素の Bash と Python です。
 
-次に、リポジトリの中で最初の下書きを頼みます。
+`AGENTS.md` は、コーディングエージェントが読む指示のファイルです。リポジトリにそれがないとき、または古いコマンドが書かれているときに使います。
 
-```text
-/contextify:contextify init
-```
-
-Codex、Cursor、Gemini CLI などのエージェントでは、スキルをインストールします。
+短いファイル 1 つと、行が古くなったときの通知が手に入ります。
 
 ```bash
-npx skills add Aboudjem/contextify
+npx skills add Aboudjem/contextify -g
+# then, in your agent: contextify init
 ```
 
-これらのエージェントには `/contextify:` という接頭辞がありません。「contextify init」「contextify update」と言葉で頼んでください。
-
-必要なのは Git、Bash、Python 3.11 以降です。Python パッケージも MCP サーバーも不要で、スクリプトはネットワークに接続しません。
+このコマンドですべてのプロジェクトに入ります。エージェントごとのコマンドは [インストール](#インストール) にあります。
 
 ### レポートの例
 
-2026-11-17、contextify 0.3.0 が小さな Python サービスの `AGENTS.md` を書きました。その後、`Makefile` から `test-health` ターゲットを削除しました。0.3.3 はこのリポジトリに対して次を表示します。トークンは使いません。
+2026-11-17 の実際の実行です。contextify 0.3.0 が小さな Python サービスの `AGENTS.md` を書きました。
+
+その後、`Makefile` から `test-health` ターゲットを削除しました。0.3.3 は次を表示します:
 
 ```text
 contextify: drift
@@ -59,25 +55,84 @@ Files      0 written
 Accept     unavailable until the stale command is corrected
 ```
 
-最新のリポジトリでは何も表示されません。この実行のファイルとスタンプは例に同梱されているので、再生できます。
+最新のリポジトリでは何も表示されません。この実行のファイルとスタンプは例に含まれているので、再生できます:
 
 ```bash
 sh examples/python-service-0.3.0/replay.sh
 ```
 
-[実行の全記録、ファイル、原因となった変更](../examples/python-service-0.3.0/README.md)。
+[実行の全体、ファイル、原因となった変更](../examples/python-service-0.3.0/README.md)。
 
-Makefile のターゲットが削除された。スクリプトの名前が変わった。テストが移動した。エージェントは古い指示に従い続け、失敗するたびに 1 ターンを使います。contextify は先に古い行を示します。
+**制限:** コマンド、ターゲット、ファイルを確認しますが、文章は確認せず、コマンドも実行しません。
 
-### 使う理由
+## インストール
 
-- **古い行をそのまま特定。** 通知はファイル、行、使えなくなったコマンドを示します。上の再現例のとおりです。
-- **書くのは 1 回。** Codex と Cursor は `AGENTS.md` を 1 つ直接読むので、追加のファイルは不要です。ポインターは選んだエージェントにだけ書きます: `CLAUDE.md` (既定)、`GEMINI.md`、`.github/` があれば Copilot 用ファイル、任意の Cursor ルール。
-- **実行は無料。** モデルもネットワーク呼び出しも使わないローカルスクリプトで、リポジトリが最新なら何も表示しません。このリポジトリの `AGENTS.md` は CI で通っています。`make test` の最後は `29 claims, 0 stale` です。
+**エージェントを選んでください。** どのコマンドも contextify をすべてのプロジェクトに入れます。
 
-チェックするのはコマンド、ターゲット、ファイルです。文章は読まず、コマンドも実行しません。コンテキストファイルでタスク成功率が上がることを示した研究はありません。実際のミスを防ぐ行だけを残してください。
+<p align="center">
+  <a href="#install-claude-code"><img src="https://img.shields.io/badge/Claude_Code-D97757?style=for-the-badge&logo=claude&logoColor=white" alt="Claude Code"></a>
+  <a href="#install-codex"><img src="https://img.shields.io/badge/Codex-000000?style=for-the-badge&logo=data%3Aimage%2Fsvg%2Bxml%3Bbase64%2CPHN2ZyBmaWxsPSJ3aGl0ZSIgcm9sZT0iaW1nIiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI%2BPHRpdGxlPk9wZW5BSTwvdGl0bGU%2BPHBhdGggZD0iTTIyLjI4MTkgOS44MjExYTUuOTg0NyA1Ljk4NDcgMCAwIDAtLjUxNTctNC45MTA4IDYuMDQ2MiA2LjA0NjIgMCAwIDAtNi41MDk4LTIuOUE2LjA2NTEgNi4wNjUxIDAgMCAwIDQuOTgwNyA0LjE4MThhNS45ODQ3IDUuOTg0NyAwIDAgMC0zLjk5NzcgMi45IDYuMDQ2MiA2LjA0NjIgMCAwIDAgLjc0MjcgNy4wOTY2IDUuOTggNS45OCAwIDAgMCAuNTExIDQuOTEwNyA2LjA1MSA2LjA1MSAwIDAgMCA2LjUxNDYgMi45MDAxQTUuOTg0NyA1Ljk4NDcgMCAwIDAgMTMuMjU5OSAyNGE2LjA1NTcgNi4wNTU3IDAgMCAwIDUuNzcxOC00LjIwNTggNS45ODk0IDUuOTg5NCAwIDAgMCAzLjk5NzctMi45MDAxIDYuMDU1NyA2LjA1NTcgMCAwIDAtLjc0NzUtNy4wNzI5em0tOS4wMjIgMTIuNjA4MWE0LjQ3NTUgNC40NzU1IDAgMCAxLTIuODc2NC0xLjA0MDhsLjE0MTktLjA4MDQgNC43NzgzLTIuNzU4MmEuNzk0OC43OTQ4IDAgMCAwIC4zOTI3LS42ODEzdi02LjczNjlsMi4wMiAxLjE2ODZhLjA3MS4wNzEgMCAwIDEgLjAzOC4wNTJ2NS41ODI2YTQuNTA0IDQuNTA0IDAgMCAxLTQuNDk0NSA0LjQ5NDR6bS05LjY2MDctNC4xMjU0YTQuNDcwOCA0LjQ3MDggMCAwIDEtLjUzNDYtMy4wMTM3bC4xNDIuMDg1MiA0Ljc4MyAyLjc1ODJhLjc3MTIuNzcxMiAwIDAgMCAuNzgwNiAwbDUuODQyOC0zLjM2ODV2Mi4zMzI0YS4wODA0LjA4MDQgMCAwIDEtLjAzMzIuMDYxNUw5Ljc0IDE5Ljk1MDJhNC40OTkyIDQuNDk5MiAwIDAgMS02LjE0MDgtMS42NDY0ek0yLjM0MDggNy44OTU2YTQuNDg1IDQuNDg1IDAgMCAxIDIuMzY1NS0xLjk3MjhWMTEuNmEuNzY2NC43NjY0IDAgMCAwIC4zODc5LjY3NjVsNS44MTQ0IDMuMzU0My0yLjAyMDEgMS4xNjg1YS4wNzU3LjA3NTcgMCAwIDEtLjA3MSAwbC00LjgzMDMtMi43ODY1QTQuNTA0IDQuNTA0IDAgMCAxIDIuMzQwOCA3Ljg3MnptMTYuNTk2MyAzLjg1NThMMTMuMTAzOCA4LjM2NCAxNS4xMTkyIDcuMmEuMDc1Ny4wNzU3IDAgMCAxIC4wNzEgMGw0LjgzMDMgMi43OTEzYTQuNDk0NCA0LjQ5NDQgMCAwIDEtLjY3NjUgOC4xMDQydi01LjY3NzJhLjc5Ljc5IDAgMCAwLS40MDctLjY2N3ptMi4wMTA3LTMuMDIzMWwtLjE0Mi0uMDg1Mi00Ljc3MzUtMi43ODE4YS43NzU5Ljc3NTkgMCAwIDAtLjc4NTQgMEw5LjQwOSA5LjIyOTdWNi44OTc0YS4wNjYyLjA2NjIgMCAwIDEgLjAyODQtLjA2MTVsNC44MzAzLTIuNzg2NmE0LjQ5OTIgNC40OTkyIDAgMCAxIDYuNjgwMiA0LjY2ek04LjMwNjUgMTIuODYzbC0yLjAyLTEuMTYzOGEuMDgwNC4wODA0IDAgMCAxLS4wMzgtLjA1NjdWNi4wNzQyYTQuNDk5MiA0LjQ5OTIgMCAwIDEgNy4zNzU3LTMuNDUzN2wtLjE0Mi4wODA1TDguNzA0IDUuNDU5YS43OTQ4Ljc5NDggMCAwIDAtLjM5MjcuNjgxM3ptMS4wOTc2LTIuMzY1NGwyLjYwMi0xLjQ5OTggMi42MDY5IDEuNDk5OHYyLjk5OTRsLTIuNTk3NCAxLjQ5OTctMi42MDY3LTEuNDk5N1oiLz48L3N2Zz4%3D" alt="Codex"></a>
+  <a href="#install-cursor"><img src="https://img.shields.io/badge/Cursor-3B3B3B?style=for-the-badge&logo=cursor&logoColor=white" alt="Cursor"></a>
+  <a href="#install-gemini-cli"><img src="https://img.shields.io/badge/Gemini_CLI-1A73E8?style=for-the-badge&logo=googlegemini&logoColor=white" alt="Gemini CLI"></a>
+  <a href="#install-github-copilot"><img src="https://img.shields.io/badge/GitHub_Copilot-24292F?style=for-the-badge&logo=githubcopilot&logoColor=white" alt="GitHub Copilot"></a>
+  <a href="#install-opencode"><img src="https://img.shields.io/badge/OpenCode-4A4A4A?style=for-the-badge&logo=opencode&logoColor=white" alt="OpenCode"></a>
+</p>
+
+<a id="install-claude-code"></a>**Claude Code**、テスト済み。ターミナルから:
+
+```bash
+claude plugin marketplace add Aboudjem/10x && claude plugin install contextify@10x
+```
+
+次に、リポジトリの中で最初の下書きを頼みます:
+
+```text
+/contextify:contextify init
+```
+
+<a id="install-codex"></a>**Codex**、テスト済み:
+
+```bash
+npx skills add Aboudjem/contextify -g -a codex
+```
+
+<a id="install-cursor"></a>**Cursor**、インストールのみテスト済み:
+
+```bash
+npx skills add Aboudjem/contextify -g -a cursor
+```
+
+<a id="install-gemini-cli"></a>**Gemini CLI**、インストールのみテスト済み:
+
+```bash
+npx skills add Aboudjem/contextify -g -a gemini-cli
+```
+
+<a id="install-github-copilot"></a>**GitHub Copilot**、インストールのみテスト済み:
+
+```bash
+npx skills add Aboudjem/contextify -g -a github-copilot
+```
+
+<a id="install-opencode"></a>**OpenCode**、インストールのみテスト済み:
+
+```bash
+npx skills add Aboudjem/contextify -g -a opencode
+```
+
+このプロジェクトだけなら `-g` を外します。ほかのエージェントの `-a` コードは [エディターの設定](../docs/editors.md) にあります。
+
+Claude Code 以外では `/contextify:` という接頭辞はありません。言葉で頼んでください: "contextify init"、"contextify update"。
+
+Git、Bash、Python 3.11 以降が必要です。Python パッケージ、MCP サーバー、スクリプトからのネットワーク通信はありません。
 
 ## 仕組み
+
+Makefile のターゲットを消す、スクリプトの名前を変える、テストを移す。エージェントは古い指示に従い続けます。失敗するたびに 1 ターンを使います。contextify は古い行を先に見せます:
+
+1. `init` がリポジトリを読み、`AGENTS.md` を下書きします。別のエージェントが各行を元のファイルと照らします。
+2. diff を確認します。contextify がファイルとスタンプ (各行が指すものの記録) を書きます。
+3. ドリフトチェックがリポジトリとスタンプを比べます。ドリフトとは、行がもうないものを指している状態です。
 
 ![根拠、下書き、レビュー、書き込み、チェック](../assets/how-it-works.svg)
 
@@ -86,7 +141,7 @@ Makefile のターゲットが削除された。スクリプトの名前が変�
 | `init`   | リポジトリを読み、指示を下書きし、根拠を確認し、差分を見せてから書き込み、チェックする。 |
 | `update` | 根拠を読み直し、管理ブロックを更新する。ブロック外のあなたの編集は残る。                 |
 | `check`  | 根拠をコミット済みのスタンプと比べる。何も書き込まない。                                 |
-| `accept` | 指示がまだ正しいときにスタンプを更新する。無効な記述は拒否する。                         |
+| `accept` | 指示がまだ正しいときにスタンプを更新する。なくなったものを指す行は拒否する。 |
 
 書き込むファイル:
 
@@ -101,7 +156,7 @@ Makefile のターゲットが削除された。スクリプトの名前が変�
 | `docs/context/workflows.md`                 | 任意。ビルド、テスト、リリースの手順           | 最大 120                     |
 | `.contextify/evidence.json` と `stamp.json` | ドリフトチェック                               | リポジトリによる             |
 
-選んだターゲットだけがポインターファイルを受け取ります。事実を述べる各行は、ソースファイルとその行に対応します。contextify が何かを書く前に、別のエージェントが下書きをレビューします。
+Codex と Cursor は `AGENTS.md` をそのまま読みます。選んだエージェントだけが参照ファイルを受け取ります。事実を述べる各行は、元のファイルと行に対応しています。
 
 ドリフトチェックは、リポジトリが最新なら何も出力せずに 0 で終了します。ドリフトがあれば上の通知を表示し、それでも 0 で終了します。ファイルを書き換えることはありません。
 
@@ -144,15 +199,15 @@ bash skills/contextify/scripts/install_hooks.sh --strict --targets github --yes 
 sh "$(ls -d ~/.claude/plugins/cache/10x/contextify/*/ | sort -V | tail -1)skills/contextify/scripts/ctx-check"
 ```
 
-`npx skills add` でインストールした場合 (Codex、Cursor など多くは `.agents/skills` を使います):
+`npx skills add -g` でインストールした場合 (Codex、Cursor、Gemini CLI、Copilot、OpenCode は `~/.agents/skills` を使います):
 
 ```bash
-sh .agents/skills/contextify/scripts/ctx-check
+sh ~/.agents/skills/contextify/scripts/ctx-check
 ```
 
-Claude Code にスキルとしてインストールした場合、フォルダは `.claude/skills/contextify` です。`--ci --strict` を付けると、ドリフト時に終了コード 1 を返します。
+Claude Code の skill インストールでは、フォルダーは `~/.claude/skills/contextify` です。`-g` なしなら、フォルダーはリポジトリ内の `.agents/skills/contextify` です。`--ci --strict` を付けると、ドリフトで終了コード 1 になります。
 
-スキルのインストール自体はドリフトになりません。チェックは、各エージェントフォルダにある contextify 自身のコピーと `skills-lock.json` を無視します。`.agents/skills` に追加した他のスキルは `tree#depth2` の変更として数えます。無視したい場合は、次の 1 行を追加します。
+skill のインストールはドリフトになりません。チェックは、エージェントのフォルダーにある contextify 自身のコピーと `skills-lock.json` を無視します。リポジトリの `.agents/skills` に追加したほかの skill は `tree#depth2` の変更として数えます。無視するには、次の 1 行を追加します:
 
 ```bash
 echo ".agents/" >> .gitignore
@@ -184,12 +239,16 @@ CI はプッシュとプルリクエストのたびに同じ `make test` を実�
 
 ## 対応エージェント
 
-| エージェント | インストール方法                       | テスト                                                                                                                               |
-| ------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| Claude Code  | `claude plugin install contextify@10x` | 2026-11-17: プラグインをインストールし、`init` を最後まで実行 ([実行記録](../examples/python-service-0.3.0/README.md))               |
-| Codex        | `npx skills add Aboudjem/contextify`   | 2026-11-17: スキルをインストールし、Codex がドリフトチェックを実行 ([実行ログ](../examples/python-service-0.3.0/codex-run-0.3.1.md)) |
+| エージェント | インストール | テスト済み (Tested) |
+| --- | --- | --- |
+| Claude Code | `claude plugin install contextify@10x` | 2026-11-17: プラグインをインストールし、`init` を最後まで実行 ([実行記録](../examples/python-service-0.3.0/README.md)) |
+| Codex | `npx skills add Aboudjem/contextify -g -a codex` | 2026-11-17: skill をインストールし、Codex がドリフトチェックを実行 ([実行ログ](../examples/python-service-0.3.0/codex-run-0.3.1.md)) |
+| Cursor | `npx skills add Aboudjem/contextify -g -a cursor` | 2026-11-17: インストールのみ、空のホームフォルダーで実施。skill は `~/.agents/skills` に入りました。 |
+| Gemini CLI | `npx skills add Aboudjem/contextify -g -a gemini-cli` | 2026-11-17: インストールのみ、空のホームフォルダーで実施。skill は `~/.agents/skills` に入りました。 |
+| GitHub Copilot | `npx skills add Aboudjem/contextify -g -a github-copilot` | 2026-11-17: インストールのみ、空のホームフォルダーで実施。skill は `~/.agents/skills` に入りました。 |
+| OpenCode | `npx skills add Aboudjem/contextify -g -a opencode` | 2026-11-17: インストールのみ、空のホームフォルダーで実施。skill は `~/.agents/skills` に入りました。 |
 
-ドキュメントはあるが本日は未テスト: Gemini CLI と Cursor (テスト環境ではどちらの CLI もサインインできませんでした)、GitHub Copilot、OpenCode、Windsurf、Zed、Continue.dev、Kimi Code CLI。設定方法は [エディター設定](../docs/editors.md) にあります。
+「インストールのみ」は、ファイルを確認したが、そのエージェントで skill を実行していないという意味です。文書化済みだが今日はテストしていないもの: skill を実行する Gemini CLI と Cursor (テスト用マシンで両方の CLI がサインインを拒否)、GitHub Copilot、OpenCode、Windsurf、Zed、Continue.dev、Kimi Code CLI。インストール用のコードは [エディターの設定](../docs/editors.md) にあります。
 
 ## FAQ
 
@@ -201,6 +260,10 @@ Codex、Cursor、Copilot は `AGENTS.md` を直接読みます。Claude Code と
 
 いいえ。シェルと Python のスクリプトです。Git とスタンプが指すファイルを読み、ハッシュを比べます。トークンは使いません。
 
+### 特定のモデルが必要ですか?
+
+いいえ。チェックはモデルをまったく使いません。`init` での下書きには、エージェントがすでに使っているモデルを使います。
+
 ### 手で書いた内容は上書きされますか?
 
 いいえ。contextify が管理するのはマーカーの間のブロックだけです。ブロック外のテキストはどの更新でも残ります。ブロック内を編集すると、失われる代わりに競合として報告されます。
@@ -211,7 +274,7 @@ Codex、Cursor、Copilot は `AGENTS.md` を直接読みます。Claude Code と
 
 ### accept は何をしますか?
 
-根拠は変わったが指示はまだ正しいとき、スタンプを更新します。引用したコマンドが無効なままなら拒否するので、壊れた行が見過ごされることはありません。
+根拠が変わっても指示がまだ正しいときに、スタンプを更新します。引用したコマンドがなくなっている間は拒否するので、壊れた行は通りません。
 
 その他の回答は [FAQ 全文](../docs/faq.md) にあります。
 
@@ -219,7 +282,8 @@ Codex、Cursor、Copilot は `AGENTS.md` を直接読みます。Claude Code と
 
 - 解決済みのコマンドは見つかっただけで、実行はされていません。リポジトリの根拠自体が間違っていることもあります。
 - リゾルバーはすべてのシェル式やビルドシステムを理解するわけではありません。確認できない行には `unverified` が付きます。
-- [ETH Zurich の研究](https://arxiv.org/abs/2602.11988) では、コンテキストファイルによるタスク成功率の全般的な向上は見られず、推論コストは 20% 以上増えました。contextify にもタスク成功率の向上は測定されていません。具体的なミスを防ぐ行だけを残してください。
+- トークン 0 はチェックそのもののコストです。エージェントがチェックを実行してドリフトを見つけると、通知 (最大 12 行) がエージェントのコンテキストに入ります。
+- これらのファイルがエージェントのタスク完了を助けると示した研究はありません。[ETH Zurich の研究](https://arxiv.org/abs/2602.11988) では全般的な向上は見られず、モデルのコストは 20% 以上増えました。実際のミスを防ぐ行だけを残してください。
 - contextify と並べて `.agents/skills` や他のエージェントフォルダに入れた他のスキルは、ツリーのドリフトとして表示されます。無視するには `.agents/` (またはそのフォルダ) を `.gitignore` に追加してください。
 - 0.3.1 以前で、スキルをインストール済みの状態で書いたスタンプには `.agents/skills/` が含まれます。更新後、チェックは `Changed tree#depth2` を 1 回表示します。`accept` を 1 回実行してください。
 - プラグインのリポジトリを書いていますか? `claude plugin validate --strict` はルートの `CLAUDE.md` に警告を出します。このリポジトリのように、`.claude/CLAUDE.md` から `@../AGENTS.md` を手で指してください。ライターはまだこのパスを対象にしていません。

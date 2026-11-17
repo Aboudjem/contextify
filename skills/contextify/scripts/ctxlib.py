@@ -240,7 +240,7 @@ def tool_version():
                 return v
         except ValueError:
             pass
-    return "0.3.3"
+    return "0.3.4"
 
 
 def load_json_file(path):

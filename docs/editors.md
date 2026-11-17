@@ -18,19 +18,19 @@ it to keep that current. The plugin registers no session-start hooks by default.
 ## Any other agent
 
 ```bash
-npx skills add Aboudjem/contextify -a <agent>
+npx skills add Aboudjem/contextify -g -a <agent>
 ```
 
-Replace `<agent>` with a code below. Codes and default installation paths were checked against the [skills CLI agent registry](https://github.com/vercel-labs/skills/blob/main/src/agents.ts) on 2026-09-17. Environment overrides can change global paths; these are installation destinations, not proof that every host loads context files the same way.
+Replace `<agent>` with a code below. `-g` installs for all your projects; drop it to install in the current project only. Codes and default installation paths were checked against the [skills CLI agent registry](https://github.com/vercel-labs/skills/blob/main/src/agents.ts) on 2026-09-17. The global paths of Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI and OpenCode were re-measured on 2026-11-17: `skills@1.9.0 add -g` into an empty home folder. Environment overrides can change global paths; these are installation destinations, not proof that every host loads context files the same way.
 
 | Agent | `-a` code | Project path | Global path | Context file it reads |
 | --- | --- | --- | --- | --- |
 | Claude Code | `claude-code` | `.claude/skills/` | `~/.claude/skills/` | `CLAUDE.md` |
-| Cursor | `cursor` | `.agents/skills/` | `~/.cursor/skills/` | `AGENTS.md` natively, plus optional `.mdc` |
-| Codex | `codex` | `.agents/skills/` | `~/.codex/skills/` | `AGENTS.md` |
-| GitHub Copilot | `github-copilot` | `.agents/skills/` | `~/.copilot/skills/` | `AGENTS.md`, nearest-wins |
-| Gemini CLI | `gemini-cli` | `.agents/skills/` | `~/.gemini/skills/` | `GEMINI.md`, or the `context.fileName` array |
-| OpenCode | `opencode` | `.agents/skills/` | `~/.config/opencode/skills/` | uncertain |
+| Cursor | `cursor` | `.agents/skills/` | `~/.agents/skills/` | `AGENTS.md` natively, plus optional `.mdc` |
+| Codex | `codex` | `.agents/skills/` | `~/.agents/skills/` | `AGENTS.md` |
+| GitHub Copilot | `github-copilot` | `.agents/skills/` | `~/.agents/skills/` | `AGENTS.md`, nearest-wins |
+| Gemini CLI | `gemini-cli` | `.agents/skills/` | `~/.agents/skills/` | `GEMINI.md`, or the `context.fileName` array |
+| OpenCode | `opencode` | `.agents/skills/` | `~/.agents/skills/` | uncertain |
 | Windsurf | `windsurf` | `.windsurf/skills/` | `~/.codeium/windsurf/skills/` | uncertain |
 | Zed | `zed` | `.agents/skills/` | `~/.agents/skills/` | uncertain |
 | Continue.dev | `continue` | `.continue/skills/` | `~/.continue/skills/` | uncertain |
@@ -39,8 +39,8 @@ Replace `<agent>` with a code below. Codes and default installation paths were c
 So for Cursor, and for Codex:
 
 ```bash
-npx skills add Aboudjem/contextify -a cursor
-npx skills add Aboudjem/contextify -a codex
+npx skills add Aboudjem/contextify -g -a cursor
+npx skills add Aboudjem/contextify -g -a codex
 ```
 
 ## Copy it in by hand

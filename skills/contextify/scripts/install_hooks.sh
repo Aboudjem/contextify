@@ -176,7 +176,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Fetch released contextify
-        run: git clone --depth 1 --branch v0.3.3 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
+        run: git clone --depth 1 --branch v0.3.4 https://github.com/Aboudjem/contextify "$RUNNER_TEMP/contextify"
       - name: %s
         run: sh "$RUNNER_TEMP/contextify/skills/contextify/scripts/ctx-check" %s
 ''' % (step, mode)

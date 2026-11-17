@@ -26,7 +26,7 @@
 ## Install
 
 - Plugin (recommended): `claude plugin marketplace add Aboudjem/10x` then `claude plugin install contextify@10x`. Invoke it as `/contextify:contextify init`.
-- Skills CLI, any agent: `npx skills add Aboudjem/contextify -a claude-code`, swapping the `-a` code for your agent.
+- Skills CLI, any agent: `npx skills add Aboudjem/contextify -g -a codex`, swapping the `-a` code for your agent (`claude-code`, `cursor`, `gemini-cli`, `github-copilot`, `opencode`). `-g` installs for all your projects; drop it to install in one project only.
 - Manual: `git clone https://github.com/Aboudjem/contextify`, then copy `skills/contextify` into your agent's skills directory. Copy the whole directory: `references/` and `scripts/` load by relative path.
 
 ## Skill

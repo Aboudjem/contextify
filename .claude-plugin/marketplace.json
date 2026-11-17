@@ -11,7 +11,7 @@
       "name": "contextify",
       "source": "./",
       "description": "Know when your agent instructions point at something gone. One AGENTS.md for all your agents and a local check that costs no tokens.",
-      "version": "0.3.3"
+      "version": "0.3.4"
     }
   ]
 }

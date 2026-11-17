@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] - 2026-11-17
+
+### Changed
+
+- The README first screen now shows the benefits first: three chips (Time saved, Context kept, Tokens saved), each with its proof, then what it is, when to use it and what you get, in short sentences.
+- Install now opens with "Pick your agent": one badge and one command per agent. The default command installs for all your projects (`npx skills add Aboudjem/contextify -g -a <agent>`). Drop `-g` for one project only.
+- The works-with table adds Cursor, Gemini CLI, GitHub Copilot and OpenCode as install-only rows. Each global install was run today into an empty home folder.
+- `docs/editors.md` lists the global paths measured today with `skills@1.9.0`. For Cursor, Codex, Copilot, Gemini CLI and OpenCode the skill lands in `~/.agents/skills`.
+- New hero images and social preview: the headline, the three chips, the install command, and a stale `AGENTS.md` line linked to its deleted `Makefile` target.
+- The Limits section says that a drift notice of 12 lines at most enters your agent's context when the agent runs the check.
+- The four translations match the English README.
+- The generated CI workflow clones tag `v0.3.4`.
+
+No behaviour change in the scripts.
+
 ## [0.3.3] - 2026-11-17
 
 ### Changed
@@ -112,6 +127,7 @@ First release. Tell every coding agent how your repo works. Then prove it is sti
 
 [0.1.0]: https://github.com/Aboudjem/contextify/releases/tag/v0.1.0
 
+[0.3.4]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.4
 [0.3.3]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.3
 [0.3.2]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.2
 [0.3.1]: https://github.com/Aboudjem/contextify/releases/tag/v0.3.1
